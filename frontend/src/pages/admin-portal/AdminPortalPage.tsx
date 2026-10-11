@@ -280,6 +280,7 @@ export default function AdminPortalPage() {
                       <Space wrap>
                         <Tag>{inbound.protocol.toUpperCase()}</Tag>
                         <Tag color="geekblue">پورت {inbound.port}</Tag>
+                        <Tag color={inbound.enable ? 'success' : 'default'}>{inbound.enable ? 'فعال' : 'غیرفعال'}</Tag>
                         <Typography.Text type="secondary">شناسه {inbound.id}</Typography.Text>
                       </Space>
                     </Space>
@@ -327,6 +328,7 @@ export default function AdminPortalPage() {
                     options={inbounds.map((item) => ({
                       label: (item.remark || 'Inbound ' + item.id) + ' · ' + item.protocol.toUpperCase() + ' · ' + item.port,
                       value: item.id,
+                      disabled: item.enable === false,
                     }))}
                     disabled={inbounds.length === 0}
                   />
