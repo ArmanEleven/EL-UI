@@ -222,7 +222,7 @@ export default function AdminsPage() {
             <Button>بازنشانی 2FA</Button>
           </Popconfirm>
           <Popconfirm
-            title="حذف این ادمین؟
+            title="حذف این ادمین؟"
             okText="حذف"
             cancelText="لغو"
             onConfirm={() => remove(r.userId)}
