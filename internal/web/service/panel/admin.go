@@ -207,7 +207,4 @@ func (s *AdminService) AdjustClientQuota(userID int, oldBytes, newBytes int64) e
 	return nil
 }
 
-func adminMaxInt64(a, b int64) int64 {
-	if a > b { return a }
-	return b
-}
+
