@@ -31,7 +31,7 @@ jobs:
       - name: Format Go files
         run: |
           "$(go env GOPATH)/bin/gofumpt" -w internal/web/controller/admin.go internal/web/service/panel/admin.go
-          "$(go env GOPATH)/bin/goimports" -w internal/web/controller/admin.go internal/web/service/panel/admin.go
+          "$(go env GOPATH)/bin/goimports" -local github.com/mhsanaei/3x-ui/v3 -w internal/web/controller/admin.go internal/web/service/panel/admin.go
       - name: Format frontend file
         working-directory: frontend
         run: |
@@ -39,6 +39,7 @@ jobs:
           npx oxfmt src/pages/admin-portal/AdminPortalPage.tsx
       - name: Commit formatter changes
         run: |
+          git status --short
           if git diff --quiet; then
             echo "No formatter changes needed."
             exit 0
