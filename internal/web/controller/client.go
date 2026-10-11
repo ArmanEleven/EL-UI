@@ -255,7 +255,19 @@ func (a *ClientController) update(c *gin.Context) {
 		return
 	}
 	inboundFilter := parseInboundIdsQuery(c.Query("inboundIds"))
+	adminID, oldTotal, quotaAdjusted := 0, int64(0), false
+	if u := session.GetLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
+		adminID = u.Id
+		var old model.ClientRecord
+		if e := database.GetDB().Where("email = ?", email).First(&old).Error; e != nil { jsonMsg(c, I18nWeb(c, "somethingWentWrong"), e); return }
+		oldTotal = old.TotalGB
+		if e := a.adminService.AdjustClientQuota(adminID, oldTotal, req.Client.TotalGB); e != nil { jsonMsg(c, I18nWeb(c, "somethingWentWrong"), e); return }
+		quotaAdjusted = true
+	}
 	needRestart, err := a.clientService.UpdateByEmail(&a.inboundService, email, req.Client, req.LimitHwid, inboundFilter...)
+	if quotaAdjusted && err != nil && !needRestart {
+		if e := a.adminService.AdjustClientQuota(adminID, req.Client.TotalGB, oldTotal); e != nil { logger.Warning("admin quota rollback failed:", e) }
+	}
 	// Flagged before the error check: a partly-applied edit leaves the change
 	// committed on the inbounds that succeeded, and those still need the restart.
 	if needRestart {
@@ -276,7 +288,17 @@ func (a *ClientController) update(c *gin.Context) {
 func (a *ClientController) delete(c *gin.Context) {
 	email := c.Param("email")
 	keepTraffic := c.Query("keepTraffic") == "1"
+	adminID, oldTotal := 0, int64(0)
+	if u := session.GetLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
+		adminID = u.Id
+		var old model.ClientRecord
+		if e := database.GetDB().Where("email = ?", email).First(&old).Error; e != nil { jsonMsg(c, I18nWeb(c, "somethingWentWrong"), e); return }
+		oldTotal = old.TotalGB
+	}
 	needRestart, err := a.clientService.DeleteByEmail(&a.inboundService, email, keepTraffic)
+	if adminID > 0 && err == nil {
+		if e := a.adminService.ReleaseOwnedClient(adminID, email, oldTotal); e != nil { jsonMsg(c, I18nWeb(c, "somethingWentWrong"), e); return }
+	}
 	// Flagged before the error check: a partly-applied delete already removed
 	// the client from the inbounds that succeeded, and those need the restart.
 	if needRestart {
@@ -308,6 +330,10 @@ func (a *ClientController) attach(c *gin.Context) {
 	if err := c.ShouldBindJSON(&body); err != nil {
 		jsonMsg(c, I18nWeb(c, "somethingWentWrong"), err)
 		return
+	}
+	if u := session.GetLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
+		allowed, e := a.adminService.CanUseInboundIDs(u.Id, body.InboundIds)
+		if e != nil || !allowed { jsonMsg(c, I18nWeb(c, "somethingWentWrong"), panel.ErrAdminInvalid); return }
 	}
 	needRestart, err := a.clientService.AttachByEmail(&a.inboundService, email, body.InboundIds)
 	if needRestart {
@@ -717,6 +743,10 @@ func (a *ClientController) detach(c *gin.Context) {
 	if err := c.ShouldBindJSON(&body); err != nil {
 		jsonMsg(c, I18nWeb(c, "somethingWentWrong"), err)
 		return
+	}
+	if u := session.GetLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
+		allowed, e := a.adminService.CanUseInboundIDs(u.Id, body.InboundIds)
+		if e != nil || !allowed { jsonMsg(c, I18nWeb(c, "somethingWentWrong"), panel.ErrAdminInvalid); return }
 	}
 	needRestart, err := a.clientService.DetachByEmailMany(&a.inboundService, email, body.InboundIds)
 	// Flagged before the error check: a partly-applied detach already removed
