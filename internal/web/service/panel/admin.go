@@ -114,16 +114,46 @@ func (s *AdminService) Delete(actorID,targetID int)error{
 func (s *AdminService) IsEnabledAdmin(userID int)(bool,error){p,err:=s.GetProfile(userID);if errors.Is(err,gorm.ErrRecordNotFound){return false,nil};if err!=nil{return false,err};return p.Enabled,nil}
 func (s *AdminService) OwnsClient(userID int,email string)(bool,error){var n int64;err:=database.GetDB().Model(&model.ClientOwnership{}).Where("admin_user_id = ? AND client_email = ?",userID,email).Count(&n).Error;return n==1,err}
 func (s *AdminService) OwnedEmails(userID int)(map[string]struct{},error){var rows []model.ClientOwnership;if err:=database.GetDB().Where("admin_user_id = ?",userID).Find(&rows).Error;err!=nil{return nil,err};out:=make(map[string]struct{},len(rows));for _,r:=range rows{out[r.ClientEmail]=struct{}{}};return out,nil}
-func (s *AdminService) CanCreateClient(userID int,totalBytes int64)error{
- p,err:=s.GetProfile(userID);if err!=nil{return err};if !p.Enabled{return ErrAdminForbidden};if totalBytes<=0&&!p.AllowUnlimitedTraffic{return fmt.Errorf("%w: نامحدود مجاز نیست",ErrAdminInvalid)}
- return database.GetDB().Transaction(func(tx *gorm.DB)error{
-  q:=tx.Model(&model.AdminProfile{}).Where("user_id = ? AND enabled = ?",userID,true)
-  if !p.AllowUnlimitedClients{q=q.Where("allocated_clients < max_clients")}
-  if !p.AllowUnlimitedTraffic&&totalBytes>0{q=q.Where("allocated_traffic_bytes + ? <= traffic_quota_bytes",totalBytes)}
-  upd:=map[string]any{"allocated_clients":gorm.Expr("allocated_clients + 1")};if totalBytes>0{upd["allocated_traffic_bytes"]=gorm.Expr("allocated_traffic_bytes + ?",totalBytes)}
-  res:=q.Updates(upd);if res.Error!=nil{return res.Error};if res.RowsAffected!=1{return fmt.Errorf("%w: سهمیه تمام شده یا حساب غیرفعال است",ErrAdminInvalid)};return nil
- })
+func (s *AdminService) CanCreateClient(userID int, email string, totalBytes int64) error {
+	p, err := s.GetProfile(userID)
+	if err != nil { return err }
+	if !p.Enabled { return ErrAdminForbidden }
+	if strings.TrimSpace(email) == "" || (totalBytes <= 0 && !p.AllowUnlimitedTraffic) { return ErrAdminInvalid }
+	return database.GetDB().Transaction(func(tx *gorm.DB) error {
+		var count int64
+		if err := tx.Model(&model.ClientRecord{}).Where("email = ?", email).Count(&count).Error; err != nil { return err }
+		if count > 0 { return fmt.Errorf("%w: client already exists", ErrAdminInvalid) }
+		if err := tx.Model(&model.ClientOwnership{}).Where("client_email = ?", email).Count(&count).Error; err != nil { return err }
+		if count > 0 { return fmt.Errorf("%w: client email already assigned", ErrAdminInvalid) }
+		q := tx.Model(&model.AdminProfile{}).Where("user_id = ? AND enabled = ?", userID, true)
+		if !p.AllowUnlimitedClients { q = q.Where("allocated_clients < max_clients") }
+		if !p.AllowUnlimitedTraffic && totalBytes > 0 { q = q.Where("allocated_traffic_bytes + ? <= traffic_quota_bytes", totalBytes) }
+		updates := map[string]any{"allocated_clients": gorm.Expr("allocated_clients + 1")}
+		if totalBytes > 0 { updates["allocated_traffic_bytes"] = gorm.Expr("allocated_traffic_bytes + ?", totalBytes) }
+		res := q.Updates(updates)
+		if res.Error != nil { return res.Error }
+		if res.RowsAffected != 1 { return fmt.Errorf("%w: quota exceeded or account disabled", ErrAdminInvalid) }
+		if err := tx.Create(&model.ClientOwnership{ClientEmail: email, AdminUserID: userID}).Error; err != nil { return err }
+		return writeAdminAudit(tx, userID, "client.reserve", 0, map[string]any{"email": email, "trafficBytes": totalBytes})
+	})
 }
+
+func (s *AdminService) CancelClientReservation(userID int, email string, totalBytes int64) error {
+	return database.GetDB().Transaction(func(tx *gorm.DB) error {
+		res := tx.Where("admin_user_id = ? AND client_email = ?", userID, email).Delete(&model.ClientOwnership{})
+		if res.Error != nil { return res.Error }
+		if res.RowsAffected == 0 { return nil }
+		return tx.Model(&model.AdminProfile{}).Where("user_id = ?", userID).Updates(map[string]any{
+			"allocated_clients": gorm.Expr("CASE WHEN allocated_clients > 0 THEN allocated_clients - 1 ELSE 0 END"),
+			"allocated_traffic_bytes": gorm.Expr("CASE WHEN allocated_traffic_bytes >= ? THEN allocated_traffic_bytes - ? ELSE 0 END", adminMaxInt64(totalBytes, 0), adminMaxInt64(totalBytes, 0)),
+		}).Error
+	})
+}
+
+func (s *AdminService) ReleaseOwnedClient(userID int, email string, totalBytes int64) error {
+	return s.CancelClientReservation(userID, email, totalBytes)
+}
+
 func (s *AdminService) ReleaseClientReservation(userID int,totalBytes int64)error{return database.GetDB().Model(&model.AdminProfile{}).Where("user_id = ? AND allocated_clients > 0",userID).Updates(map[string]any{"allocated_clients":gorm.Expr("CASE WHEN allocated_clients > 0 THEN allocated_clients - 1 ELSE 0 END"),"allocated_traffic_bytes":gorm.Expr("CASE WHEN allocated_traffic_bytes >= ? THEN allocated_traffic_bytes - ? ELSE 0 END",adminMaxInt64(totalBytes,0),adminMaxInt64(totalBytes,0))}).Error}
 func (s *AdminService) AssignClient(userID int,email string)error{return database.GetDB().Create(&model.ClientOwnership{ClientEmail:email,AdminUserID:userID}).Error}
 func (s *AdminService) IsInboundAllowed(userID,inboundID int)(bool,error){p,err:=s.GetProfile(userID);if err!=nil{return false,err};var ids []int;if err:=json.Unmarshal([]byte(p.AllowedInboundIDsJSON),&ids);err!=nil{return false,err};for _,id:=range ids{if id==inboundID{return true,nil}};return false,nil}
