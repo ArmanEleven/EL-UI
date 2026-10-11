@@ -105,7 +105,7 @@ jobs:
 
       - name: Secondary-admin access-boundary regression tests
         run: |
-          go test ./internal/web/controller -run '^(TestSecondaryAdminAccessIsNarrow|TestDisabledSecondaryAdminIsDeniedEverywhere|TestOwnerKeepsMasterAccess)$' -count=1
+          go test ./internal/web/controller -run '^(TestSecondaryAdminAccessIsNarrow|TestDisabledSecondaryAdminIsDeniedEverywhere|TestOwnerKeepsMasterAccess|TestAdminQuickCreateProtocolAllowlist)$' -count=1
 
       - name: PostgreSQL migration and durable-first tests
         env:
