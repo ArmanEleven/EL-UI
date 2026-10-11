@@ -238,7 +238,7 @@ export default function AdminsPage() {
 
   return (
     <div dir="rtl" style={{ padding: 24 }}>
-        {contextHolder}
+      {contextHolder}
       <Card title="مدیریت ادمین‌ها">
         <Typography.Paragraph type="secondary">
           برای هر ادمین سقف کاربران، سهمیه ترافیک و Inboundهای مجاز تعیین کن. دسترسی نامحدود فقط با
