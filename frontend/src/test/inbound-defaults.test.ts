@@ -27,7 +27,6 @@ import {
   HysteriaClientSchema,
   HysteriaInboundSettingsSchema,
 } from '@/schemas/protocols/inbound/hysteria';
-import { TlsStreamSettingsSchema } from '@/schemas/protocols/security/tls';
 import { MixedInboundSettingsSchema } from '@/schemas/protocols/inbound/mixed';
 import {
   ShadowsocksClientSchema,
@@ -42,6 +41,7 @@ import { TunnelInboundSettingsSchema } from '@/schemas/protocols/inbound/tunnel'
 import { VlessClientSchema, VlessInboundSettingsSchema } from '@/schemas/protocols/inbound/vless';
 import { VmessClientSchema, VmessInboundSettingsSchema } from '@/schemas/protocols/inbound/vmess';
 import { WireguardInboundSettingsSchema } from '@/schemas/protocols/inbound/wireguard';
+import { TlsStreamSettingsSchema } from '@/schemas/protocols/security/tls';
 
 // Tests pass explicit seeds for every random field so the assertions don't
 // depend on window.crypto (the node test env has no crypto.randomUUID).
