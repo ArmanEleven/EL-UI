@@ -14,7 +14,7 @@ import (
 	"github.com/mhsanaei/3x-ui/v3/internal/web/session"
 )
 
-func newAdminAccessTestEngine(t *testing.T, enabled bool, actorID int) *gin.Engine {
+func newAdminAccessTestEngine(t *testing.T, enabled, secondaryActor bool) *gin.Engine {
 	t.Helper()
 	gin.SetMode(gin.TestMode)
 	dbDir := t.TempDir()
@@ -40,7 +40,7 @@ func newAdminAccessTestEngine(t *testing.T, enabled bool, actorID int) *gin.Engi
 	}
 
 	actor := &owner
-	if actorID == secondary.Id {
+	if secondaryActor {
 		actor = &secondary
 	}
 	engine := gin.New()
@@ -61,7 +61,7 @@ func newAdminAccessTestEngine(t *testing.T, enabled bool, actorID int) *gin.Engi
 }
 
 func TestSecondaryAdminAccessIsNarrow(t *testing.T) {
-	engine := newAdminAccessTestEngine(t, true, 2)
+	engine := newAdminAccessTestEngine(t, true, true)
 	cases := []struct {
 		name   string
 		method string
@@ -88,7 +88,7 @@ func TestSecondaryAdminAccessIsNarrow(t *testing.T) {
 }
 
 func TestDisabledSecondaryAdminIsDeniedEverywhere(t *testing.T) {
-	engine := newAdminAccessTestEngine(t, false, 2)
+	engine := newAdminAccessTestEngine(t, false, true)
 	req := httptest.NewRequest(http.MethodGet, "/panel/api/admins/me", nil)
 	rec := httptest.NewRecorder()
 	engine.ServeHTTP(rec, req)
@@ -98,7 +98,7 @@ func TestDisabledSecondaryAdminIsDeniedEverywhere(t *testing.T) {
 }
 
 func TestOwnerKeepsMasterAccess(t *testing.T) {
-	engine := newAdminAccessTestEngine(t, true, 1)
+	engine := newAdminAccessTestEngine(t, true, false)
 	req := httptest.NewRequest(http.MethodGet, "/panel/api/server/status", nil)
 	rec := httptest.NewRecorder()
 	engine.ServeHTTP(rec, req)
