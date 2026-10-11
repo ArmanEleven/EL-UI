@@ -82,8 +82,37 @@ func (a *APIController) enforceMultiAdminAccess(c *gin.Context) {
  u := session.GetLoginUser(c)
  if u == nil { c.AbortWithStatus(http.StatusUnauthorized); return }
  if a.adminService.IsOwner(u.Id) { c.Next(); return }
- // Fail closed until an endpoint has explicit ownership enforcement.
- if c.Request.Method == http.MethodGet && strings.HasSuffix(c.FullPath(), "/admins/me") { c.Next(); return }
+ // Secondary admins may only use endpoints explicitly scoped to their owned clients.
+ path := c.FullPath()
+ if c.Request.Method == http.MethodGet && strings.HasSuffix(path, "/admins/me") { c.Next(); return }
+ if strings.HasSuffix(path, "/clients/list") && c.Request.Method == http.MethodGet { c.Next(); return }
+ if strings.HasSuffix(path, "/clients/list/paged") && c.Request.Method == http.MethodGet { c.Next(); return }
+ if strings.HasSuffix(path, "/clients/add") && c.Request.Method == http.MethodPost { c.Next(); return }
+ email := c.Param("email")
+ allowed := false
+ switch {
+ case strings.HasSuffix(path, "/clients/get/:email") && c.Request.Method == http.MethodGet,
+ strings.HasSuffix(path, "/clients/traffic/:email") && c.Request.Method == http.MethodGet,
+ strings.HasSuffix(path, "/clients/links/:email") && c.Request.Method == http.MethodGet,
+ strings.HasSuffix(path, "/clients/update/:email") && c.Request.Method == http.MethodPost,
+ strings.HasSuffix(path, "/clients/del/:email") && c.Request.Method == http.MethodPost,
+ strings.HasSuffix(path, "/clients/:email/attach") && c.Request.Method == http.MethodPost,
+ strings.HasSuffix(path, "/clients/:email/detach") && c.Request.Method == http.MethodPost,
+ strings.HasSuffix(path, "/clients/:email/externalLinks") && c.Request.Method == http.MethodPost,
+ strings.HasSuffix(path, "/clients/resetTraffic/:email") && c.Request.Method == http.MethodPost,
+ strings.HasSuffix(path, "/clients/ips/:email") && c.Request.Method == http.MethodPost,
+ strings.HasSuffix(path, "/clients/clearIps/:email") && c.Request.Method == http.MethodPost,
+ strings.HasSuffix(path, "/clients/hwids/:email") && c.Request.Method == http.MethodPost,
+ strings.HasSuffix(path, "/clients/hwids/:email") && c.Request.Method == http.MethodDelete,
+ strings.HasSuffix(path, "/clients/hwids/:email/:id") && c.Request.Method == http.MethodDelete:
+ allowed = true
+ }
+ if allowed && email != "" {
+ owns, err := a.adminService.CanManageClient(u.Id, email)
+ if err == nil && owns { c.Next(); return }
+ if err != nil { c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"success":false,"msg":"بررسی مالکیت کاربر ناموفق بود"}); return }
+ c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"success":false,"msg":"این کاربر متعلق به حساب شما نیست"}); return
+ }
  c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"success": false, "msg": "این عملیات برای حساب ادمین مجاز نیست"})
 }
 
