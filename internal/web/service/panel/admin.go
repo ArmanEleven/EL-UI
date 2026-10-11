@@ -71,6 +71,7 @@ func (s *AdminService) Create(actorID int, username,password string,maxClients i
  hash,err:=crypto.HashPasswordAsBcrypt(password);if err!=nil{return 0,err}
  newID:=0
  err=database.GetDB().Transaction(func(tx *gorm.DB)error{
+  if err := validateAdminInboundIDs(tx, inboundIDs); err != nil { return err }
   var count int64
   if err:=tx.Model(&model.User{}).Where("username = ?",username).Count(&count).Error;err!=nil{return err}
   if count>0{return fmt.Errorf("%w: نام کاربری تکراری است",ErrAdminInvalid)}
@@ -91,6 +92,7 @@ func (s *AdminService) Update(actorID,targetID int,username,password *string,ena
  for _,id:=range inboundIDs{if id<=0{return ErrAdminInvalid}}
  idsJSON,err:=json.Marshal(uniquePositiveInts(inboundIDs));if err!=nil{return err}
  return database.GetDB().Transaction(func(tx *gorm.DB)error{
+  if err := validateAdminInboundIDs(tx, inboundIDs); err != nil { return err }
   p:=&model.AdminProfile{}
   if err:=tx.Where("user_id = ?",targetID).First(p).Error;err!=nil{if errors.Is(err,gorm.ErrRecordNotFound){return ErrAdminNotFound};return err}
   if username!=nil{name:=strings.TrimSpace(*username);if name==""{return ErrAdminInvalid};var count int64;if err:=tx.Model(&model.User{}).Where("username = ? AND id <> ?",name,targetID).Count(&count).Error;err!=nil{return err};if count>0{return fmt.Errorf("%w: نام کاربری تکراری است",ErrAdminInvalid)};if err:=tx.Model(&model.User{}).Where("id = ?",targetID).Update("username",name).Error;err!=nil{return err}}
@@ -162,6 +164,21 @@ func (s *AdminService) ReleaseOwnedClient(userID int, email string, totalBytes i
 func (s *AdminService) ReleaseClientReservation(userID int,totalBytes int64)error{return database.GetDB().Model(&model.AdminProfile{}).Where("user_id = ? AND allocated_clients > 0",userID).Updates(map[string]any{"allocated_clients":gorm.Expr("CASE WHEN allocated_clients > 0 THEN allocated_clients - 1 ELSE 0 END"),"allocated_traffic_bytes":gorm.Expr("CASE WHEN allocated_traffic_bytes >= ? THEN allocated_traffic_bytes - ? ELSE 0 END",adminMaxInt64(totalBytes,0),adminMaxInt64(totalBytes,0))}).Error}
 func (s *AdminService) AssignClient(userID int,email string)error{return database.GetDB().Create(&model.ClientOwnership{ClientEmail:email,AdminUserID:userID}).Error}
 func (s *AdminService) IsInboundAllowed(userID,inboundID int)(bool,error){p,err:=s.GetProfile(userID);if err!=nil{return false,err};var ids []int;if err:=json.Unmarshal([]byte(p.AllowedInboundIDsJSON),&ids);err!=nil{return false,err};for _,id:=range ids{if id==inboundID{return true,nil}};return false,nil}
+func validateAdminInboundIDs(tx *gorm.DB, ids []int) error {
+	ids = uniquePositiveInts(ids)
+	if len(ids) == 0 {
+		return nil
+	}
+	var count int64
+	if err := tx.Model(&model.Inbound{}).Where("id IN ?", ids).Count(&count).Error; err != nil {
+		return err
+	}
+	if count != int64(len(ids)) {
+		return fmt.Errorf("%w: یک یا چند ورودی وجود ندارد", ErrAdminInvalid)
+	}
+	return nil
+}
+
 func writeAdminAudit(tx *gorm.DB,actorID int,action string,targetID int,details map[string]any)error{b,err:=json.Marshal(details);if err!=nil{return err};return tx.Create(&model.AdminAuditLog{ActorID:actorID,Action:action,TargetID:targetID,Details:string(b)}).Error}
 func uniquePositiveInts(ids []int)[]int{seen:=map[int]struct{}{};out:=make([]int,0,len(ids));for _,id:=range ids{if id>0{if _,ok:=seen[id];!ok{seen[id]=struct{}{};out=append(out,id)}}};return out}
 func adminMaxInt64(a,b int64)int64{if a>b{return a};return b}
