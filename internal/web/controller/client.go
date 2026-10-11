@@ -13,7 +13,6 @@ import (
 	"github.com/mhsanaei/3x-ui/v3/internal/web/entity"
 	"github.com/mhsanaei/3x-ui/v3/internal/web/service"
 	"github.com/mhsanaei/3x-ui/v3/internal/web/service/panel"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/session"
 	"github.com/mhsanaei/3x-ui/v3/internal/web/websocket"
 
 	"github.com/gin-gonic/gin"
@@ -104,7 +103,7 @@ func (a *ClientController) list(c *gin.Context) {
 		jsonMsg(c, I18nWeb(c, "pages.inbounds.toasts.obtain"), err)
 		return
 	}
-	if u := session.GetLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
+	if u := optionalLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
 		owned, ownErr := a.adminService.OwnedEmails(u.Id)
 		if ownErr != nil {
 			jsonMsg(c, I18nWeb(c, "pages.inbounds.toasts.obtain"), ownErr)
@@ -137,7 +136,7 @@ func (a *ClientController) listPaged(c *gin.Context) {
 		jsonMsg(c, I18nWeb(c, "pages.inbounds.toasts.obtain"), err)
 		return
 	}
-	if u := session.GetLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
+	if u := optionalLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
 		params.OwnerAdminID = u.Id
 	}
 	resp, err := a.clientService.ListPaged(&a.inboundService, &a.settingService, params)
@@ -225,7 +224,7 @@ func (a *ClientController) create(c *gin.Context) {
 		return
 	}
 	adminID, reserved := 0, false
-	if u := session.GetLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
+	if u := optionalLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
 		adminID = u.Id
 		allowed, checkErr := a.adminService.CanUseInboundIDs(adminID, payload.InboundIds)
 		if checkErr != nil || !allowed {
@@ -273,7 +272,7 @@ func (a *ClientController) update(c *gin.Context) {
 	}
 	inboundFilter := parseInboundIdsQuery(c.Query("inboundIds"))
 	adminID, oldTotal, quotaAdjusted := 0, int64(0), false
-	if u := session.GetLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
+	if u := optionalLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
 		adminID = u.Id
 		var old model.ClientRecord
 		if e := database.GetDB().Where("email = ?", email).First(&old).Error; e != nil {
@@ -314,7 +313,7 @@ func (a *ClientController) delete(c *gin.Context) {
 	email := c.Param("email")
 	keepTraffic := c.Query("keepTraffic") == "1"
 	adminID, oldTotal := 0, int64(0)
-	if u := session.GetLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
+	if u := optionalLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
 		adminID = u.Id
 		var old model.ClientRecord
 		if e := database.GetDB().Where("email = ?", email).First(&old).Error; e != nil { jsonMsg(c, I18nWeb(c, "somethingWentWrong"), e); return }
@@ -359,7 +358,7 @@ func (a *ClientController) attach(c *gin.Context) {
 		jsonMsg(c, I18nWeb(c, "somethingWentWrong"), err)
 		return
 	}
-	if u := session.GetLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
+	if u := optionalLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
 		allowed, e := a.adminService.CanUseInboundIDs(u.Id, body.InboundIds)
 		if e != nil || !allowed {
 			jsonMsg(c, I18nWeb(c, "somethingWentWrong"), panel.ErrAdminInvalid)
@@ -775,7 +774,7 @@ func (a *ClientController) detach(c *gin.Context) {
 		jsonMsg(c, I18nWeb(c, "somethingWentWrong"), err)
 		return
 	}
-	if u := session.GetLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
+	if u := optionalLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
 		allowed, e := a.adminService.CanUseInboundIDs(u.Id, body.InboundIds)
 		if e != nil || !allowed { jsonMsg(c, I18nWeb(c, "somethingWentWrong"), panel.ErrAdminInvalid); return }
 	}
