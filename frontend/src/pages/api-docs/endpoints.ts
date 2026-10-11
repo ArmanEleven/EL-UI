@@ -2804,8 +2804,7 @@ export const sections: readonly Section[] = [
         method: 'GET',
         path: '/panel/api/admins',
         summary: 'فهرست ادمین‌های فرعی؛ فقط مالک اصلی.',
-        response:
-          '[{"userId":2,"username":"operator","enabled":true,"maxClients":20,"trafficQuotaBytes":107374182400}]',
+        response: '[{"userId":2,"username":"operator","enabled":true,"maxClients":20,"trafficQuotaBytes":107374182400}]',
       },
       {
         method: 'GET',
