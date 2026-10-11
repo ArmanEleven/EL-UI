@@ -12,6 +12,9 @@ type AdminProfile struct {
 	TrafficQuotaBytes     int64     `json:"trafficQuotaBytes" gorm:"column:traffic_quota_bytes;not null;default:0"`
 	AllowUnlimitedTraffic bool      `json:"allowUnlimitedTraffic" gorm:"column:allow_unlimited_traffic;not null;default:false"`
 	AllowedInboundIDsJSON string    `json:"-" gorm:"column:allowed_inbound_ids;type:text;not null;default:'[]'"`
+	TwoFactorEnabled      bool      `json:"twoFactorEnabled" gorm:"column:two_factor_enabled;not null;default:false"`
+	TwoFactorSecret       string    `json:"-" gorm:"column:two_factor_secret;type:text;not null;default:''"`
+	TwoFactorPending      string    `json:"-" gorm:"column:two_factor_pending;type:text;not null;default:''"`
 	AllocatedClients      int       `json:"allocatedClients" gorm:"column:allocated_clients;not null;default:0"`
 	AllocatedTrafficBytes int64     `json:"allocatedTrafficBytes" gorm:"column:allocated_traffic_bytes;not null;default:0"`
 	CreatedAt             time.Time `json:"createdAt" gorm:"autoCreateTime"`
