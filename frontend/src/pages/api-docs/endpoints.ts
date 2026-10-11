@@ -2805,7 +2805,8 @@ export const sections: readonly Section[] = [
         method: 'GET',
         path: '/panel/api/admins',
         summary: 'فهرست ادمین‌های فرعی؛ فقط مالک اصلی.',
-        response: '[{"userId":2,"username":"operator","enabled":true,"maxClients":20,"trafficQuotaBytes":107374182400}]',
+        response:
+          '[{"userId":2,"username":"operator","enabled":true,"maxClients":20,"trafficQuotaBytes":107374182400}]',
       },
       {
         method: 'GET',
@@ -2831,8 +2832,7 @@ export const sections: readonly Section[] = [
       {
         method: 'DELETE',
         path: '/panel/api/admins/:id',
-        summary:
-          'حذف ادمین فرعی؛ فقط مالک اصلی. کاربران تخصیص‌یافته به محدوده مالک اصلی برمی‌گردند.',
+        summary: 'حذف ادمین فرعی؛ فقط مالک اصلی. کاربران تخصیص‌یافته به محدوده مالک اصلی برمی‌گردند.',
       },
     ],
   },

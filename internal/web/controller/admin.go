@@ -16,13 +16,13 @@ type AdminController struct {
 }
 
 type adminCreateRequest struct {
-	Username               string `json:"username" binding:"required"`
-	Password               string `json:"password" binding:"required"`
-	MaxClients             int    `json:"maxClients"`
-	AllowUnlimitedClients  bool   `json:"allowUnlimitedClients"`
-	TrafficQuotaBytes      int64  `json:"trafficQuotaBytes"`
-	AllowUnlimitedTraffic  bool   `json:"allowUnlimitedTraffic"`
-	AllowedInboundIDs      []int  `json:"allowedInboundIds"`
+	Username              string `json:"username" binding:"required"`
+	Password              string `json:"password" binding:"required"`
+	MaxClients            int    `json:"maxClients"`
+	AllowUnlimitedClients bool   `json:"allowUnlimitedClients"`
+	TrafficQuotaBytes     int64  `json:"trafficQuotaBytes"`
+	AllowUnlimitedTraffic bool   `json:"allowUnlimitedTraffic"`
+	AllowedInboundIDs     []int  `json:"allowedInboundIds"`
 }
 
 type adminUpdateRequest struct {

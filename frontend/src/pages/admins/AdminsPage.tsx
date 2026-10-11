@@ -125,9 +125,7 @@ export default function AdminsPage() {
       enabled: values.enabled,
       maxClients: values.allowUnlimitedClients ? 0 : values.maxClients,
       allowUnlimitedClients: values.allowUnlimitedClients,
-      trafficQuotaBytes: values.allowUnlimitedTraffic
-        ? 0
-        : Math.round(values.trafficQuotaGB * GIB),
+      trafficQuotaBytes: values.allowUnlimitedTraffic ? 0 : Math.round(values.trafficQuotaGB * GIB),
       allowUnlimitedTraffic: values.allowUnlimitedTraffic,
       allowedInboundIds: inboundIds,
     };
@@ -169,9 +167,7 @@ export default function AdminsPage() {
       title: 'وضعیت',
       dataIndex: 'enabled',
       key: 'enabled',
-      render: (v: boolean) => (
-        <Tag color={v ? 'success' : 'default'}>{v ? 'فعال' : 'غیرفعال'}</Tag>
-      ),
+      render: (v: boolean) => <Tag color={v ? 'success' : 'default'}>{v ? 'فعال' : 'غیرفعال'}</Tag>,
     },
     {
       title: 'سقف کاربران',
@@ -268,9 +264,7 @@ export default function AdminsPage() {
             </Form.Item>
             <Form.Item
               label={
-                selectedAdmin
-                  ? 'رمز جدید (اختیاری؛ حداقل ۱۰ نویسه)'
-                  : 'رمز عبور (حداقل ۱۰ نویسه)'
+                selectedAdmin ? 'رمز جدید (اختیاری؛ حداقل ۱۰ نویسه)' : 'رمز عبور (حداقل ۱۰ نویسه)'
               }
               name="password"
               rules={[

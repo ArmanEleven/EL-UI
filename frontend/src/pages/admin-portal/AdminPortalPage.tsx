@@ -58,9 +58,11 @@ export default function AdminPortalPage() {
   const [inbounds, setInbounds] = useState<InboundOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [createdCredential, setCreatedCredential] = useState<{ email: string; uuid: string; password: string } | null>(
-    null,
-  );
+  const [createdCredential, setCreatedCredential] = useState<{
+    email: string;
+    uuid: string;
+    password: string;
+  } | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -99,7 +101,12 @@ export default function AdminPortalPage() {
   }, [load]);
 
   const createClient = useCallback(
-    async (values: { email: string; inboundIds: number[]; totalGB: number; expiryDays?: number }) => {
+    async (values: {
+      email: string;
+      inboundIds: number[];
+      totalGB: number;
+      expiryDays?: number;
+    }) => {
       setSaving(true);
       setCreatedCredential(null);
       try {
@@ -111,7 +118,8 @@ export default function AdminPortalPage() {
                 return Math.floor(char === 'x' ? random : (random % 4) + 8).toString(16);
               });
         const password = uuid.replaceAll('-', '').slice(0, 16);
-        const subId = typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : uuid;
+        const subId =
+          typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : uuid;
         const expiryTime =
           values.expiryDays && values.expiryDays > 0
             ? Date.now() + values.expiryDays * 24 * 60 * 60 * 1000
@@ -217,7 +225,9 @@ export default function AdminPortalPage() {
               <Typography.Title level={3} style={{ margin: 0 }}>
                 Eleven Panel
               </Typography.Title>
-              <Typography.Text type="secondary">پرتال ادمین · خوش آمدی {profile.username}</Typography.Text>
+              <Typography.Text type="secondary">
+                پرتال ادمین · خوش آمدی {profile.username}
+              </Typography.Text>
             </div>
           </Space>
           <Button icon={<LogoutOutlined />} onClick={logout}>
@@ -248,7 +258,11 @@ export default function AdminPortalPage() {
             <Card>
               <Statistic
                 title="ظرفیت ترافیک باقی‌مانده"
-                value={profile.allowUnlimitedTraffic ? 'نامحدود' : trafficGB.toLocaleString('fa-IR', { maximumFractionDigits: 2 })}
+                value={
+                  profile.allowUnlimitedTraffic
+                    ? 'نامحدود'
+                    : trafficGB.toLocaleString('fa-IR', { maximumFractionDigits: 2 })
+                }
                 suffix={profile.allowUnlimitedTraffic ? undefined : 'GB'}
                 prefix={<CloudServerOutlined />}
               />
@@ -278,11 +292,15 @@ export default function AdminPortalPage() {
                     }}
                   >
                     <Space direction="vertical" size={6}>
-                      <Typography.Text strong>{inbound.remark || 'Inbound ' + inbound.id}</Typography.Text>
+                      <Typography.Text strong>
+                        {inbound.remark || 'Inbound ' + inbound.id}
+                      </Typography.Text>
                       <Space wrap>
                         <Tag>{inbound.protocol.toUpperCase()}</Tag>
                         <Tag color="geekblue">پورت {inbound.port}</Tag>
-                        <Tag color={inbound.enable ? 'success' : 'default'}>{inbound.enable ? 'فعال' : 'غیرفعال'}</Tag>
+                        <Tag color={inbound.enable ? 'success' : 'default'}>
+                          {inbound.enable ? 'فعال' : 'غیرفعال'}
+                        </Tag>
                         <Typography.Text type="secondary">شناسه {inbound.id}</Typography.Text>
                       </Space>
                     </Space>
@@ -328,7 +346,12 @@ export default function AdminPortalPage() {
                     allowClear
                     placeholder="اینباندهای موردنظر را انتخاب کن"
                     options={inbounds.map((item) => ({
-                      label: (item.remark || 'Inbound ' + item.id) + ' · ' + item.protocol.toUpperCase() + ' · ' + item.port,
+                      label:
+                        (item.remark || 'Inbound ' + item.id) +
+                        ' · ' +
+                        item.protocol.toUpperCase() +
+                        ' · ' +
+                        item.port,
                       value: item.id,
                       disabled: item.enable === false,
                     }))}
@@ -351,7 +374,12 @@ export default function AdminPortalPage() {
                 </Form.Item>
               </Col>
             </Row>
-            <Button type="primary" htmlType="submit" loading={saving} disabled={inbounds.length === 0}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={saving}
+              disabled={inbounds.length === 0}
+            >
               ساخت کاربر
             </Button>
           </Form>
@@ -373,7 +401,12 @@ export default function AdminPortalPage() {
                   <Button
                     onClick={() =>
                       void navigator.clipboard.writeText(
-                        'شناسه: ' + createdCredential.email + '\nUUID: ' + createdCredential.uuid + '\nرمز اتصال: ' + createdCredential.password,
+                        'شناسه: ' +
+                          createdCredential.email +
+                          '\nUUID: ' +
+                          createdCredential.uuid +
+                          '\nرمز اتصال: ' +
+                          createdCredential.password,
                       )
                     }
                   >

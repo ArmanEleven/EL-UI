@@ -28,7 +28,8 @@ export default function PanelLayout() {
         const response = (await HttpUtil.get('/panel/api/admins/me', undefined, {
           silent: true,
         })) as ApiResponse<AdminIdentity>;
-        if (!response?.success || !response.obj?.role) throw new Error('Unable to identify account');
+        if (!response?.success || !response.obj?.role)
+          throw new Error('Unable to identify account');
         if (!cancelled) setRole(response.obj.role === 'admin' ? 'admin' : 'owner');
       } catch {
         if (!cancelled) setRole('error');
