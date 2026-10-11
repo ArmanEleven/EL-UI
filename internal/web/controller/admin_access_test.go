@@ -107,7 +107,6 @@ func TestOwnerKeepsMasterAccess(t *testing.T) {
 	}
 }
 
-
 func TestAdminQuickCreateProtocolAllowlist(t *testing.T) {
 	for _, protocol := range []string{"vless", "VMess", "trojan", "hysteria", "tuic", "masque"} {
 		if !supportsAdminQuickCreateProtocol(protocol) {
