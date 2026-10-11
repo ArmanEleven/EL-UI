@@ -149,7 +149,8 @@ func (a *APIController) enforceMultiAdminAccess(c *gin.Context) {
 	// inbound summary, read its own profile, and create clients only. All
 	// master-panel routes and every other mutation are denied by default.
 	path := c.FullPath()
-	allowed := (c.Request.Method == http.MethodGet && path == "/panel/api/admins/me") ||
+	allowed := (c.Request.Method == http.MethodGet && (path == "/panel/api/admins/me" || path == "/panel/api/admins/me/2fa")) ||
+		(c.Request.Method == http.MethodPost && (path == "/panel/api/admins/me/2fa/setup" || path == "/panel/api/admins/me/2fa/confirm")) ||
 		(c.Request.Method == http.MethodGet && path == "/panel/api/inbounds/options") ||
 		(c.Request.Method == http.MethodGet && path == "/panel/api/clients/list") ||
 		(c.Request.Method == http.MethodGet && path == "/panel/api/clients/list/paged") ||
