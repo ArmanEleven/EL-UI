@@ -2794,6 +2794,7 @@ export const sections: readonly Section[] = [
       },
     ],
   },
+
   {
     id: 'admins',
     title: 'مدیریت ادمین‌ها',
