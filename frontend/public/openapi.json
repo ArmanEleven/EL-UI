@@ -16664,6 +16664,45 @@
           }
         }
       },
+      "post": {
+        "tags": [
+          "مدیریت ادمین‌ها"
+        ],
+        "summary": "مسیر جایگزین برای ویرایش ادمین؛ فقط مالک اصلی.",
+        "operationId": "post_panel_api_admins_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "msg": {
+                      "type": "string"
+                    },
+                    "obj": {}
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
       "delete": {
         "tags": [
           "مدیریت ادمین‌ها"
