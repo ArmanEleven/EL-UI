@@ -9,6 +9,7 @@ import {
   InputNumber,
   Popconfirm,
   Space,
+  Select,
   Table,
   Tag,
   Typography,
@@ -32,6 +33,13 @@ interface AdminRecord {
   allocatedTrafficBytes: number;
 }
 
+interface InboundOption {
+  id: number;
+  remark: string;
+  protocol: string;
+  port: number;
+}
+
 interface FormValues {
   username: string;
   password: string;
@@ -40,12 +48,13 @@ interface FormValues {
   allowUnlimitedClients: boolean;
   trafficQuotaGB: number;
   allowUnlimitedTraffic: boolean;
-  allowedInboundIds: string;
+  allowedInboundIds: number[];
 }
 
 export default function AdminsPage() {
   const [form] = Form.useForm<FormValues>();
   const [rows, setRows] = useState<AdminRecord[]>([]);
+  const [inbounds, setInbounds] = useState<InboundOption[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [owner, setOwner] = useState<boolean | null>(null);
@@ -64,6 +73,17 @@ export default function AdminsPage() {
     setLoading(false);
   }, []);
 
+  const loadInbounds = useCallback(async () => {
+    const result = await HttpUtil.get<InboundOption[]>('/panel/api/inbounds/options', undefined, {
+      silent: true,
+    });
+    if (result.success && Array.isArray(result.obj)) {
+      setInbounds(result.obj);
+    } else {
+      message.error(result.msg || 'دریافت فهرست ورودی‌ها ناموفق بود');
+    }
+  }, []);
+
   useEffect(() => {
     let active = true;
     void HttpUtil.get<{ role?: string }>('/panel/api/admins/me', undefined, {
@@ -72,12 +92,15 @@ export default function AdminsPage() {
       if (!active) return;
       const allowed = r.success && r.obj?.role === 'owner';
       setOwner(allowed);
-      if (allowed) void load();
+      if (allowed) {
+        void load();
+        void loadInbounds();
+      }
     });
     return () => {
       active = false;
     };
-  }, [load]);
+  }, [load, loadInbounds]);
 
   const resetForm = () => {
     setSelectedAdmin(null);
@@ -88,17 +111,14 @@ export default function AdminsPage() {
       allowUnlimitedClients: false,
       trafficQuotaGB: 100,
       allowUnlimitedTraffic: false,
-      allowedInboundIds: '',
+      allowedInboundIds: [],
       password: '',
     });
   };
 
   const save = async (values: FormValues) => {
     setSaving(true);
-    const inboundIds = values.allowedInboundIds
-      .split(',')
-      .map((v) => Number(v.trim()))
-      .filter((v) => Number.isInteger(v) && v > 0);
+    const inboundIds = values.allowedInboundIds;
     const payload = {
       username: values.username.trim(),
       password: values.password || '',
@@ -131,7 +151,7 @@ export default function AdminsPage() {
       allowUnlimitedClients: admin.allowUnlimitedClients,
       trafficQuotaGB: admin.trafficQuotaBytes / GIB,
       allowUnlimitedTraffic: admin.allowUnlimitedTraffic,
-      allowedInboundIds: admin.allowedInboundIds.join(', '),
+      allowedInboundIds: admin.allowedInboundIds,
     });
   };
 
@@ -173,7 +193,15 @@ export default function AdminsPage() {
       title: 'Inboundهای مجاز',
       dataIndex: 'allowedInboundIds',
       key: 'inbounds',
-      render: (v: number[]) => (v.length ? v.join('، ') : 'هیچ‌کدام'),
+      render: (v: number[]) =>
+        v.length
+          ? v
+              .map((id) => {
+                const inbound = inbounds.find((item) => item.id === id);
+                return inbound ? `#${id} — ${inbound.remark}` : `#${id}`;
+              })
+              .join('، ')
+          : 'هیچ‌کدام',
     },
     {
       title: 'عملیات',
@@ -226,7 +254,7 @@ export default function AdminsPage() {
             allowUnlimitedClients: false,
             trafficQuotaGB: 100,
             allowUnlimitedTraffic: false,
-            allowedInboundIds: '',
+            allowedInboundIds: [],
             password: '',
           }}
         >
@@ -265,8 +293,21 @@ export default function AdminsPage() {
             >
               <InputNumber min={0} />
             </Form.Item>
-            <Form.Item label="Inboundهای مجاز" name="allowedInboundIds" extra="مثال: 1, 2, 5">
-              <Input placeholder="1, 2, 5" />
+            <Form.Item
+              label="ورودی‌های مجاز"
+              name="allowedInboundIds"
+              extra="ادمین فقط می‌تواند روی ورودی‌های انتخاب‌شده کاربر بسازد."
+            >
+              <Select
+                mode="multiple"
+                allowClear
+                placeholder="ورودی‌ها را انتخاب کن"
+                style={{ minWidth: 240 }}
+                options={inbounds.map((inbound) => ({
+                  label: `#${inbound.id} — ${inbound.remark} (${inbound.protocol}:${inbound.port})`,
+                  value: inbound.id,
+                }))}
+              />
             </Form.Item>
           </Space>
           <Space direction="vertical">
