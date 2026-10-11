@@ -73,7 +73,8 @@ type IconName =
   | 'sponsors'
   | 'apidocs'
   | 'outbound'
-  | 'routing';
+  | 'routing'
+  | 'admins';
 
 const iconByName: Record<IconName, ComponentType> = {
   dashboard: DashboardOutlined,
@@ -89,6 +90,7 @@ const iconByName: Record<IconName, ComponentType> = {
   apidocs: ApiOutlined,
   outbound: ExportOutlined,
   routing: SwapOutlined,
+  admins: SafetyOutlined,
 };
 
 function DonateButton({ ariaLabel }: { ariaLabel: string }) {
@@ -237,6 +239,7 @@ export default function AppSidebar() {
       { key: '/xray', icon: 'tool', title: t('menu.xray') },
       { key: '/api-docs', icon: 'apidocs', title: t('menu.apiDocs') },
       { key: '/sponsors', icon: 'sponsors', title: t('menu.sponsors') },
+      { key: '/admins', icon: 'admins', title: 'مدیریت ادمین‌ها' },
       { key: LOGOUT_KEY, icon: 'logout', title: t('logout') },
     ],
     [t],
