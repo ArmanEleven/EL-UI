@@ -710,7 +710,27 @@ func (a *ClientController) deleteHwid(c *gin.Context) {
 }
 
 func (a *ClientController) onlines(c *gin.Context) {
-	jsonObj(c, a.inboundService.GetOnlineClients(), nil)
+	online := a.inboundService.GetOnlineClients()
+	user := optionalLoginUser(c)
+	if user != nil && !a.adminService.IsOwner(user.Id) {
+		owned, err := a.adminService.OwnedEmails(user.Id)
+		if err != nil {
+			jsonMsg(c, I18nWeb(c, "somethingWentWrong"), err)
+			return
+		}
+		ownedLower := make(map[string]struct{}, len(owned))
+		for email := range owned {
+			ownedLower[strings.ToLower(email)] = struct{}{}
+		}
+		filtered := make([]string, 0, len(online))
+		for _, email := range online {
+			if _, ok := ownedLower[strings.ToLower(email)]; ok {
+				filtered = append(filtered, email)
+			}
+		}
+		online = filtered
+	}
+	jsonObj(c, online, nil)
 }
 
 func (a *ClientController) onlinesByGuid(c *gin.Context) {
