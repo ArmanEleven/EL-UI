@@ -51,6 +51,7 @@ type AdminProfile = {
 type ApiResponse<T> = { success?: boolean; msg?: string; obj?: T };
 
 const GB = 1024 * 1024 * 1024;
+const BASIC_CLIENT_PROTOCOLS = new Set(['vless', 'vmess', 'trojan', 'hysteria', 'tuic', 'masque']);
 
 function generateUuid(): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
@@ -149,6 +150,7 @@ export default function AdminPortalPage() {
             subId,
             uuid,
             password,
+            auth: password,
             totalGB: Math.round(values.totalGB * GB),
             expiryTime,
             enable: true,
@@ -293,6 +295,15 @@ export default function AdminPortalPage() {
           extra={<Tag color="blue">{inbounds.length.toLocaleString('fa-IR')} مورد</Tag>}
           style={{ marginBottom: 20 }}
         >
+          {inbounds.some((item) => !BASIC_CLIENT_PROTOCOLS.has(item.protocol.toLowerCase())) && (
+            <Alert
+              type="warning"
+              showIcon
+              style={{ marginBottom: 16 }}
+              message="بعضی پروتکل‌ها به تنظیمات اختصاصی نیاز دارند"
+              description="در فرم ساخت سریع فقط VLESS، VMess، Trojan، Hysteria، TUIC و MASQUE فعال هستند. سایر اینباندها قابل مشاهده‌اند، اما از این فرم برایشان کاربر نساز."
+            />
+          )}
           {inbounds.length === 0 ? (
             <Typography.Text type="secondary">
               هیچ اینباندی برای این حساب مجاز نشده است. با مالک پنل تماس بگیر.
@@ -315,6 +326,9 @@ export default function AdminPortalPage() {
                       </Typography.Text>
                       <Space wrap>
                         <Tag>{inbound.protocol.toUpperCase()}</Tag>
+                        {!BASIC_CLIENT_PROTOCOLS.has(inbound.protocol.toLowerCase()) && (
+                          <Tag color="warning">تنظیمات ویژه</Tag>
+                        )}
                         <Tag color="geekblue">پورت {inbound.port}</Tag>
                         <Tag color={inbound.enable ? 'success' : 'default'}>
                           {inbound.enable ? 'فعال' : 'غیرفعال'}
@@ -371,9 +385,15 @@ export default function AdminPortalPage() {
                         ' · ' +
                         item.port,
                       value: item.id,
-                      disabled: item.enable === false,
+                      disabled:
+                        item.enable === false ||
+                        !BASIC_CLIENT_PROTOCOLS.has(item.protocol.toLowerCase()),
                     }))}
-                    disabled={inbounds.length === 0}
+                    disabled={
+                      !inbounds.some(
+                        (item) => item.enable && BASIC_CLIENT_PROTOCOLS.has(item.protocol.toLowerCase()),
+                      )
+                    }
                   />
                 </Form.Item>
               </Col>
