@@ -130,3 +130,34 @@ func (s *AdminService) IsInboundAllowed(userID,inboundID int)(bool,error){p,err:
 func writeAdminAudit(tx *gorm.DB,actorID int,action string,targetID int,details map[string]any)error{b,err:=json.Marshal(details);if err!=nil{return err};return tx.Create(&model.AdminAuditLog{ActorID:actorID,Action:action,TargetID:targetID,Details:string(b)}).Error}
 func uniquePositiveInts(ids []int)[]int{seen:=map[int]struct{}{};out:=make([]int,0,len(ids));for _,id:=range ids{if id>0{if _,ok:=seen[id];!ok{seen[id]=struct{}{};out=append(out,id)}}};return out}
 func adminMaxInt64(a,b int64)int64{if a>b{return a};return b}
+
+func (s *AdminService) CanManageClient(userID int, email string) (bool, error) {
+	p, err := s.GetProfile(userID)
+	if err != nil { return false, err }
+	if !p.Enabled { return false, ErrAdminForbidden }
+	owns, err := s.OwnsClient(userID, email)
+	if err != nil || !owns { return owns, err }
+	var rec model.ClientRecord
+	if err := database.GetDB().Where("email = ?", email).First(&rec).Error; err != nil { return false, err }
+	var ids []int
+	if err := database.GetDB().Table("client_inbounds ci").Select("ci.inbound_id").Joins("JOIN clients c ON c.id = ci.client_id").Where("c.email = ?", email).Scan(&ids).Error; err != nil { return false, err }
+	var allowed []int
+	if err := json.Unmarshal([]byte(p.AllowedInboundIDsJSON), &allowed); err != nil { return false, err }
+	set := map[int]struct{}{}
+	for _, id := range allowed { set[id] = struct{}{} }
+	for _, id := range ids { if _, ok := set[id]; !ok { return false, nil } }
+	return true, nil
+}
+
+func (s *AdminService) CanUseInboundIDs(userID int, ids []int) (bool, error) {
+	if len(ids) == 0 { return false, nil }
+	p, err := s.GetProfile(userID)
+	if err != nil { return false, err }
+	if !p.Enabled { return false, ErrAdminForbidden }
+	var allowed []int
+	if err := json.Unmarshal([]byte(p.AllowedInboundIDsJSON), &allowed); err != nil { return false, err }
+	set := map[int]struct{}{}
+	for _, id := range allowed { set[id] = struct{}{} }
+	for _, id := range ids { if _, ok := set[id]; !ok { return false, nil } }
+	return true, nil
+}
