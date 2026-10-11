@@ -58,7 +58,7 @@ export default function AdminPortalPage() {
   const [inbounds, setInbounds] = useState<InboundOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [createdCredential, setCreatedCredential] = useState<{ email: string; uuid: string } | null>(
+  const [createdCredential, setCreatedCredential] = useState<{ email: string; uuid: string; password: string } | null>(
     null,
   );
 
@@ -109,6 +109,7 @@ export default function AdminPortalPage() {
                 return Math.floor(char === 'x' ? random : (random % 4) + 8).toString(16);
               });
         const password = uuid.replaceAll('-', '').slice(0, 16);
+        const subId = typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : uuid;
         const expiryTime =
           values.expiryDays && values.expiryDays > 0
             ? Date.now() + values.expiryDays * 24 * 60 * 60 * 1000
@@ -116,9 +117,11 @@ export default function AdminPortalPage() {
         const response = (await HttpUtil.post('/panel/api/clients/add', {
           client: {
             email: values.email.trim(),
+            id: uuid,
+            subId,
             uuid,
             password,
-            totalGB: values.totalGB,
+            totalGB: Math.round(values.totalGB * GB),
             expiryTime,
             enable: true,
           },
@@ -127,7 +130,7 @@ export default function AdminPortalPage() {
         if (!response?.success) {
           throw new Error(response?.msg || 'ساخت کاربر ناموفق بود.');
         }
-        setCreatedCredential({ email: values.email.trim(), uuid });
+        setCreatedCredential({ email: values.email.trim(), uuid, password });
         messageApi.success('کاربر با موفقیت ساخته شد.');
         form.resetFields();
         form.setFieldsValue({ totalGB: 10, expiryDays: 30 });
@@ -359,13 +362,14 @@ export default function AdminPortalPage() {
                 <Space direction="vertical">
                   <Typography.Text>شناسه: {createdCredential.email}</Typography.Text>
                   <Typography.Text>UUID: {createdCredential.uuid}</Typography.Text>
+                  <Typography.Text>رمز اتصال: {createdCredential.password}</Typography.Text>
                   <Typography.Text type="secondary">
                     UUID را همین حالا کپی و در جای امن ذخیره کن؛ این صفحه فقط یک‌بار آن را نشان می‌دهد.
                   </Typography.Text>
                   <Button
                     onClick={() =>
                       void navigator.clipboard.writeText(
-                        'شناسه: ' + createdCredential.email + '\nUUID: ' + createdCredential.uuid,
+                        'شناسه: ' + createdCredential.email + '\nUUID: ' + createdCredential.uuid + '\nرمز اتصال: ' + createdCredential.password,
                       )
                     }
                   >
