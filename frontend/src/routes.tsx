@@ -15,6 +15,7 @@ const XrayPage = lazy(() => import('@/pages/xray/XrayPage'));
 const ApiDocsPage = lazy(() => import('@/pages/api-docs/ApiDocsPage'));
 const SponsorsPage = lazy(() => import('@/pages/sponsors/SponsorsPage'));
 const AdminsPage = lazy(() => import('@/pages/admins/AdminsPage'));
+const AdminPortalPage = lazy(() => import('@/pages/admin-portal/AdminPortalPage'));
 
 function withSuspense(node: React.ReactNode) {
   return (
@@ -55,6 +56,7 @@ const routes: RouteObject[] = [
       { path: 'api-docs', element: withSuspense(<ApiDocsPage />) },
       { path: 'sponsors', element: withSuspense(<SponsorsPage />) },
       { path: 'admins', element: withSuspense(<AdminsPage />) },
+      { path: 'portal', element: withSuspense(<AdminPortalPage />) },
     ],
   },
 ];
