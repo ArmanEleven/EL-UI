@@ -236,7 +236,11 @@ export default function LoginPage() {
                     <FormField
                       name="twoFactorCode"
                       label={t('twoFactorCode')}
-                      rules={twoFactorEnable ? { validate: rhfZodValidate(TwoFactorCodeSchema) } : undefined}
+                      rules={
+                        twoFactorEnable
+                          ? { validate: rhfZodValidate(TwoFactorCodeSchema) }
+                          : undefined
+                      }
                     >
                       <Input
                         prefix={<KeyOutlined />}

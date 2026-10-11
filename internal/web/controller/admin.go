@@ -152,7 +152,7 @@ func (a *AdminController) twoFactorConfirm(c *gin.Context) {
 		return
 	}
 	if err := database.GetDB().Model(&model.AdminProfile{}).Where("user_id = ?", u.Id).Updates(map[string]any{
-		"two_factor_secret": secret,
+		"two_factor_secret":  secret,
 		"two_factor_pending": "",
 		"two_factor_enabled": true,
 	}).Error; err != nil {
@@ -179,7 +179,7 @@ func (a *AdminController) resetTwoFactor(c *gin.Context) {
 	}
 	if err := database.GetDB().Model(&model.AdminProfile{}).Where("user_id = ?", id).Updates(map[string]any{
 		"two_factor_enabled": false,
-		"two_factor_secret": "",
+		"two_factor_secret":  "",
 		"two_factor_pending": "",
 	}).Error; err != nil {
 		a.writeError(c, err)

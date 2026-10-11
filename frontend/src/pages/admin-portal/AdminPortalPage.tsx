@@ -272,7 +272,7 @@ export default function AdminPortalPage() {
     } finally {
       setSetupLoading(false);
     }
-  }, [load, messageApi, setupCode]);
+  }, [load, messageApi]);
 
   const showClientLinks = useCallback(
     async (email: string) => {
@@ -324,7 +324,16 @@ export default function AdminPortalPage() {
 
   if (twoFactorStatus?.panelTwoFactorEnabled && !twoFactorStatus.twoFactorEnabled) {
     return (
-      <div dir="rtl" style={{ minHeight: '100vh', padding: 24, display: 'grid', placeItems: 'center', background: 'var(--ant-color-bg-layout, #f4f6fb)' }}>
+      <div
+        dir="rtl"
+        style={{
+          minHeight: '100vh',
+          padding: 24,
+          display: 'grid',
+          placeItems: 'center',
+          background: 'var(--ant-color-bg-layout, #f4f6fb)',
+        }}
+      >
         {messageContextHolder}
         <Card title="فعال‌سازی تأیید دومرحله‌ای" style={{ width: 'min(560px, 100%)' }}>
           <Alert
@@ -335,7 +344,12 @@ export default function AdminPortalPage() {
             style={{ marginBottom: 20 }}
           />
           {!setupSecret ? (
-            <Button type="primary" block loading={setupLoading} onClick={() => void beginTwoFactorSetup()}>
+            <Button
+              type="primary"
+              block
+              loading={setupLoading}
+              onClick={() => void beginTwoFactorSetup()}
+            >
               شروع راه‌اندازی
             </Button>
           ) : (
@@ -350,7 +364,12 @@ export default function AdminPortalPage() {
                 placeholder="کد ۶ رقمی برنامه احراز هویت"
                 maxLength={8}
               />
-              <Button type="primary" block loading={setupLoading} onClick={() => void confirmTwoFactorSetup()}>
+              <Button
+                type="primary"
+                block
+                loading={setupLoading}
+                onClick={() => void confirmTwoFactorSetup()}
+              >
                 تأیید و فعال‌سازی
               </Button>
             </Space>
