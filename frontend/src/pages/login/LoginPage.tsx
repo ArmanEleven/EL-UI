@@ -81,7 +81,15 @@ export default function LoginPage() {
     setSubmitting(true);
     try {
       const msg = await HttpUtil.post('/login', values);
-      if (msg.success) window.location.href = basePath + 'panel/';
+      if (msg.success) {
+        try {
+          const profile = await HttpUtil.get('/panel/api/admins/me', undefined, { silent: true });
+          const isSecondaryAdmin = profile?.success && profile?.obj?.role === 'admin';
+          window.location.href = basePath + (isSecondaryAdmin ? 'panel/portal' : 'panel/');
+        } catch {
+          window.location.href = basePath + 'panel/';
+        }
+      }
     } finally {
       setSubmitting(false);
     }
