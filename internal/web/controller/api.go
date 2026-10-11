@@ -118,6 +118,33 @@ func (a *APIController) enforceMultiAdminAccess(c *gin.Context) {
 		return
 	}
 
+	// If the master panel requires 2FA, a secondary admin must enroll their own
+	// authenticator before any inbound or client data is exposed.
+	if a.settingController != nil {
+		required, settingErr := a.settingController.settingService.GetTwoFactorEnable()
+		if settingErr == nil && required {
+			profile, profileErr := a.adminService.GetProfile(u.Id)
+			if profileErr != nil {
+				c.AbortWithStatus(http.StatusForbidden)
+				return
+			}
+			if !profile.TwoFactorEnabled {
+				path := c.FullPath()
+				setupAllowed := (c.Request.Method == http.MethodGet && (path == "/panel/api/admins/me" || path == "/panel/api/admins/me/2fa")) ||
+					(c.Request.Method == http.MethodPost && (path == "/panel/api/admins/me/2fa/setup" || path == "/panel/api/admins/me/2fa/confirm"))
+				if setupAllowed {
+					c.Next()
+					return
+				}
+				c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
+					"success": false,
+					"msg":     "برای ادامه ابتدا تأیید دومرحله‌ای را فعال کن",
+				})
+				return
+			}
+		}
+	}
+
 	// The secondary-admin portal is intentionally narrow: inspect the safe
 	// inbound summary, read its own profile, and create clients only. All
 	// master-panel routes and every other mutation are denied by default.
