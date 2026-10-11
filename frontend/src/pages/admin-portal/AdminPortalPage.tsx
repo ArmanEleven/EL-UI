@@ -51,6 +51,30 @@ type ApiResponse<T> = { success?: boolean; msg?: string; obj?: T };
 
 const GB = 1024 * 1024 * 1024;
 
+function generateUuid(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
+    const bytes = crypto.getRandomValues(new Uint8Array(16));
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+    const hex = Array.from(bytes, (value) => value.toString(16).padStart(2, '0')).join('');
+    return (
+      hex.slice(0, 8) +
+      '-' +
+      hex.slice(8, 12) +
+      '-' +
+      hex.slice(12, 16) +
+      '-' +
+      hex.slice(16, 20) +
+      '-' +
+      hex.slice(20)
+    );
+  }
+  throw new Error('مرورگر از تولید شناسه امن پشتیبانی نمی‌کند.');
+}
+
 export default function AdminPortalPage() {
   const [form] = Form.useForm();
   const [messageApi, messageContextHolder] = message.useMessage();
@@ -110,16 +134,9 @@ export default function AdminPortalPage() {
       setSaving(true);
       setCreatedCredential(null);
       try {
-        const uuid =
-          typeof crypto !== 'undefined' && 'randomUUID' in crypto
-            ? crypto.randomUUID()
-            : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (char) => {
-                const random = Math.random() * 16;
-                return Math.floor(char === 'x' ? random : (random % 4) + 8).toString(16);
-              });
+        const uuid = generateUuid();
         const password = uuid.replaceAll('-', '').slice(0, 16);
-        const subId =
-          typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : uuid;
+        const subId = generateUuid();
         const expiryTime =
           values.expiryDays && values.expiryDays > 0
             ? Date.now() + values.expiryDays * 24 * 60 * 60 * 1000
