@@ -114,7 +114,9 @@ export default function AdminPortalPage() {
   const [inbounds, setInbounds] = useState<InboundOption[]>([]);
   const [clients, setClients] = useState<ClientSummary[]>([]);
   const [twoFactorStatus, setTwoFactorStatus] = useState<TwoFactorStatus | null>(null);
-  const [setupSecret, setSetupSecret] = useState<{ secret: string; otpauthUrl: string } | null>(null);
+  const [setupSecret, setSetupSecret] = useState<{ secret: string; otpauthUrl: string } | null>(
+    null,
+  );
   const [setupCode, setSetupCode] = useState('');
   const [setupLoading, setSetupLoading] = useState(false);
   const [selectedLinks, setSelectedLinks] = useState<{ email: string; links: string[] } | null>(
