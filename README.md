@@ -2,7 +2,7 @@
 
 **EL-UI** is a planned management panel built around the Sanaei 3X-UI core, with a redesigned interface and a management layer inspired by the capabilities of HMPanel.
 
-> **Project status:** research and architecture phase. No upstream code has been merged into this repository yet. Do not use this repository as a production installer.
+> **Project status:** Phase 1 source audit and Phase 2 architecture decision are recorded. The Sanaei 3X-UI source tree has not yet been imported, so implementation/build validation cannot start. Do not use this repository as a production installer.
 
 ## Project goals
 
