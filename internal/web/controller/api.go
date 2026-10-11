@@ -88,7 +88,7 @@ func optionalLoginUser(c *gin.Context) *model.User {
 }
 
 func (a *APIController) enforceMultiAdminAccess(c *gin.Context) {
-	// API tokens and mTLS are governed by their existing explicit token scopes.
+	// API tokens and mTLS keep their separate, explicit token-scope policy.
 	if authed, ok := c.Get("api_authed"); ok && authed == true {
 		c.Next()
 		return
@@ -118,74 +118,20 @@ func (a *APIController) enforceMultiAdminAccess(c *gin.Context) {
 		return
 	}
 
-	// Secondary admins may only use endpoints explicitly scoped to their owned clients.
+	// The secondary-admin portal is intentionally narrow: inspect the safe
+	// inbound summary, read its own profile, and create clients only. All
+	// master-panel routes and every other mutation are denied by default.
 	path := c.FullPath()
-	if c.Request.Method == http.MethodGet && strings.HasSuffix(path, "/inbounds/options") {
+	allowed := (c.Request.Method == http.MethodGet && path == "/panel/api/admins/me") ||
+		(c.Request.Method == http.MethodGet && path == "/panel/api/inbounds/options") ||
+		(c.Request.Method == http.MethodPost && path == "/panel/api/clients/add")
+	if allowed {
 		c.Next()
-		return
-	}
-	if c.Request.Method == http.MethodGet && strings.HasSuffix(path, "/admins/me") {
-		c.Next()
-		return
-	}
-	if strings.HasSuffix(path, "/clients/list") && c.Request.Method == http.MethodGet {
-		c.Next()
-		return
-	}
-	if strings.HasSuffix(path, "/clients/list/paged") && c.Request.Method == http.MethodGet {
-		c.Next()
-		return
-	}
-	if strings.HasSuffix(path, "/clients/onlines") && c.Request.Method == http.MethodPost {
-		c.Next()
-		return
-	}
-	if strings.HasSuffix(path, "/clients/add") && c.Request.Method == http.MethodPost {
-		c.Next()
-		return
-	}
-
-	email := c.Param("email")
-	allowed := false
-	switch {
-	case strings.HasSuffix(path, "/clients/get/:email") && c.Request.Method == http.MethodGet,
-		strings.HasSuffix(path, "/clients/traffic/:email") && c.Request.Method == http.MethodGet,
-		strings.HasSuffix(path, "/clients/links/:email") && c.Request.Method == http.MethodGet,
-		strings.HasSuffix(path, "/clients/update/:email") && c.Request.Method == http.MethodPost,
-		strings.HasSuffix(path, "/clients/del/:email") && c.Request.Method == http.MethodPost,
-		strings.HasSuffix(path, "/clients/:email/attach") && c.Request.Method == http.MethodPost,
-		strings.HasSuffix(path, "/clients/:email/detach") && c.Request.Method == http.MethodPost,
-		strings.HasSuffix(path, "/clients/:email/externalLinks") && c.Request.Method == http.MethodPost,
-		strings.HasSuffix(path, "/clients/resetTraffic/:email") && c.Request.Method == http.MethodPost,
-		strings.HasSuffix(path, "/clients/ips/:email") && c.Request.Method == http.MethodPost,
-		strings.HasSuffix(path, "/clients/clearIps/:email") && c.Request.Method == http.MethodPost,
-		strings.HasSuffix(path, "/clients/hwids/:email") && c.Request.Method == http.MethodPost,
-		strings.HasSuffix(path, "/clients/hwids/:email") && c.Request.Method == http.MethodDelete,
-		strings.HasSuffix(path, "/clients/hwids/:email/:id") && c.Request.Method == http.MethodDelete:
-		allowed = true
-	}
-	if allowed && email != "" {
-		owns, err := a.adminService.CanManageClient(u.Id, email)
-		if err == nil && owns {
-			c.Next()
-			return
-		}
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"success": false,
-				"msg":     "بررسی مالکیت کاربر ناموفق بود",
-			})
-			return
-		}
-		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
-			"success": false,
-			"msg":     "این کاربر متعلق به حساب شما نیست",
-		})
 		return
 	}
 	c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
 		"success": false,
-		"msg":     "این عملیات برای حساب ادمین مجاز نیست",
+		"msg":     "این عملیات در پنل ادمین مجاز نیست",
 	})
 }
 
