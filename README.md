@@ -26,15 +26,16 @@ The result is the x-ui binary. Configure your service and TLS for your own envir
 
 **Eleven Panel (EL-UI)** is a web control panel for managing [Xray-core](https://github.com/XTLS/Xray-core) servers.
 
-Built as an enhanced fork of the original X-UI project, 3X-UI adds broader protocol support, improved stability, per-client traffic accounting, and many quality-of-life features.
+EL-UI retains the 3X-UI protocol engine and adds its own branding, Persian-first experience, and secondary-admin access controls.
 
 > [!IMPORTANT]
 > This project is intended for personal use only. Please do not use it for illegal purposes or in a production environment.
 
-## Upstream feature set
-
 ## Features
 
+- **Multi-admin access control** — secondary-admin accounts, client/traffic quotas, inbound allowlists, and admin audit events.
+- **Separate secondary-admin portal** — safe read-only inbound summaries and client creation, without master-panel settings.
+- **Eleven theme** — purple accent color, dark/light modes, and RTL-friendly layout.
 - **Multi-protocol inbounds** — VLESS, VMess, Trojan, Shadowsocks, WireGuard, AmneziaWG, TUIC v5, Hysteria2, MTProto, HTTP, SOCKS (Mixed), Dokodemo-door / Tunnel, and TUN.
 - **Modern transports & security** — TCP (Raw), mKCP, WebSocket, gRPC, HTTPUpgrade, and XHTTP, secured with TLS, XTLS, and REALITY.
 - **AmneziaWG built in** — DPI-resistant WireGuard runs inside the panel on a userspace network stack, with no kernel module, DKMS, or extra packages to install.
