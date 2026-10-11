@@ -239,10 +239,18 @@ export default function AdminsPage() {
               <Input />
             </Form.Item>
             <Form.Item
-              label={selectedAdmin ? 'رمز جدید (اختیاری؛ حداقل ۱۰ نویسه)' : 'رمز عبور (حداقل ۱۰ نویسه)'}
+              label={
+            selectedAdmin
+              ? 'رمز جدید (اختیاری؛ حداقل ۱۰ نویسه)'
+              : 'رمز عبور (حداقل ۱۰ نویسه)'
+          }
               name="password"
               rules={[
-                { required: !selectedAdmin, min: 10, message: 'رمز عبور باید حداقل ۱۰ نویسه باشد.' },
+                {
+                  required: !selectedAdmin,
+                  min: 10,
+                  message: 'رمز عبور باید حداقل ۱۰ نویسه باشد.',
+                },
               ]}
             >
               <Input.Password />
