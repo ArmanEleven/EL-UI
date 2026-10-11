@@ -1,0 +1,150 @@
+name: Build Eleven Panel v4 ZIP
+
+on:
+  push:
+    branches:
+      - feature/multi-admin-v1
+    paths:
+      - ".github/workflows/package-bundle.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-and-package:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: xui_durable
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d xui_durable"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      CGO_ENABLED: 1
+    steps:
+      - name: Checkout EL-UI
+        uses: actions/checkout@v7
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Regenerate API schemas and OpenAPI
+        working-directory: frontend
+        run: npm run gen
+
+      - name: Verify generated files are current
+        run: git diff --exit-code -- frontend/src/generated frontend/public/openapi.json
+
+      - name: Frontend lint
+        working-directory: frontend
+        run: npm run lint
+
+      - name: Frontend formatting
+        working-directory: frontend
+        run: npm run format:check
+
+      - name: TypeScript check
+        working-directory: frontend
+        run: npm run typecheck
+
+      - name: Frontend tests
+        working-directory: frontend
+        run: npm test
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
+      - name: Compile Storybook
+        working-directory: frontend
+        run: npm run build-storybook
+
+      - name: Go lint
+        uses: golangci/golangci-lint-action@v9
+
+      - name: Go tests
+        run: |
+          go list ./... | grep -v '/frontend/node_modules/' > /tmp/go-packages.txt
+          go test -shuffle=on -count=1 -timeout 25m $(cat /tmp/go-packages.txt)
+
+      - name: PostgreSQL migration and durable-first tests
+        env:
+          XUI_DB_TYPE: postgres
+          XUI_DB_DSN: "host=127.0.0.1 port=5432 user=postgres password=postgres dbname=xui_durable sslmode=disable"
+        run: |
+          go test ./internal/web/service -run 'PostgresCommitFailure' -count=1
+          go test ./internal/database -run '^(TestHostAutoMigrateCreatesColumns_Postgres|TestMigrate_Postgres|TestClientWeeklyRenewMigration_Postgres)$' -count=1
+
+      - name: Race tests
+        run: |
+          go list ./... | grep -v '/frontend/node_modules/' > /tmp/go-packages.txt
+          go test -race -shuffle=on -count=1 -timeout 25m $(cat /tmp/go-packages.txt)
+
+      - name: Master/node end-to-end test
+        run: make node-e2e
+
+      - name: Verify installer shell syntax
+        run: bash -n install.sh update.sh x-ui.sh
+
+      - name: Build Linux amd64 panel binary
+        run: go build -o /tmp/eleven-panel-x-ui .
+
+      - name: Assemble full source bundle (including installed npm dependencies)
+        run: |
+          set -euo pipefail
+          PACKAGE_DIR="$RUNNER_TEMP/EL-UI-v4.0.0"
+          mkdir -p "$PACKAGE_DIR/bin"
+          tar --exclude=.git --exclude=.cache --exclude=.env --exclude=.env.local --exclude=.env.production --exclude='*.db' --exclude='*.sqlite' --exclude='*.sqlite3' --exclude=secrets --exclude=credentials --exclude=logs -cf - . | tar -xf - -C "$PACKAGE_DIR"
+          cp /tmp/eleven-panel-x-ui "$PACKAGE_DIR/bin/x-ui"
+          cat > "$PACKAGE_DIR/PACKAGE-INFO.txt" <<INFO
+          Eleven Panel (EL-UI) v4.0.0
+          Commit: $GITHUB_SHA
+          Branch: $GITHUB_REF_NAME
+
+          This archive contains the full source tree, frontend dependencies, generated frontend build, and a Linux amd64 x-ui binary.
+          No .env file, database, private key, or runtime credential is intentionally packaged.
+          INFO
+          cd "$RUNNER_TEMP"
+          zip -0 -qr "$GITHUB_WORKSPACE/EL-UI-v4.0.0-full.zip" "EL-UI-v4.0.0"
+          unzip -t "$GITHUB_WORKSPACE/EL-UI-v4.0.0-full.zip"
+          size=$(stat -c '%s' "$GITHUB_WORKSPACE/EL-UI-v4.0.0-full.zip")
+          echo "ZIP_SIZE_BYTES=$size" | tee "$GITHUB_WORKSPACE/ZIP-SIZE.txt"
+          if [ "$size" -lt 73400320 ]; then
+            echo "ZIP is smaller than the requested 70 MiB minimum ($size bytes)." >&2
+            exit 1
+          fi
+          sha256sum "$GITHUB_WORKSPACE/EL-UI-v4.0.0-full.zip" > "$GITHUB_WORKSPACE/EL-UI-v4.0.0-full.zip.sha256"
+
+      - name: Upload verified ZIP
+        uses: actions/upload-artifact@v7
+        with:
+          name: EL-UI-v4.0.0-full-zip
+          path: |
+            EL-UI-v4.0.0-full.zip
+            EL-UI-v4.0.0-full.zip.sha256
+            ZIP-SIZE.txt
+          if-no-files-found: error
+          retention-days: 7
