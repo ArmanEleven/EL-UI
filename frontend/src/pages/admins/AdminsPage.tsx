@@ -162,6 +162,13 @@ export default function AdminsPage() {
     }
   };
 
+  const resetTwoFactor = async (id: number) => {
+    const result = await HttpUtil.post(`/panel/api/admins/${id}/2fa/reset`, {});
+    if (result.success) {
+      messageApi.success('تأیید دومرحله‌ای ادمین بازنشانی شد.');
+    }
+  };
+
   const columns: ColumnsType<AdminRecord> = [
     { title: 'نام کاربری', dataIndex: 'username', key: 'username' },
     {
@@ -207,7 +214,15 @@ export default function AdminsPage() {
         <Space>
           <Button onClick={() => edit(r)}>ویرایش</Button>
           <Popconfirm
-            title="حذف این ادمین؟"
+            title="تأیید دومرحله‌ای این ادمین بازنشانی شود؟"
+            okText="بازنشانی"
+            cancelText="لغو"
+            onConfirm={() => resetTwoFactor(r.userId)}
+          >
+            <Button>بازنشانی 2FA</Button>
+          </Popconfirm>
+          <Popconfirm
+            title="حذف این ادمین؟
             okText="حذف"
             cancelText="لغو"
             onConfirm={() => remove(r.userId)}
