@@ -31,12 +31,17 @@ func newAdminAccessTestEngine(t *testing.T, enabled, secondaryActor bool) *gin.E
 	}
 	if err := database.GetDB().Create(&model.AdminProfile{
 		UserID:                secondary.Id,
-		Enabled:               enabled,
+		Enabled:               true,
 		MaxClients:            10,
 		TrafficQuotaBytes:     10 * 1024 * 1024 * 1024,
 		AllowedInboundIDsJSON: "[]",
 	}).Error; err != nil {
 		t.Fatalf("create admin profile: %v", err)
+	}
+	if !enabled {
+		if err := database.GetDB().Model(&model.AdminProfile{}).Where("user_id = ?", secondary.Id).Update("enabled", false).Error; err != nil {
+			t.Fatalf("disable secondary admin: %v", err)
+		}
 	}
 
 	actor := &owner
