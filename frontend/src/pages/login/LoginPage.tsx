@@ -28,7 +28,7 @@ import { FormField, rhfZodValidate } from '@/components/form/rhf';
 import { setMessageInstance } from '@/utils/messageBus';
 import SponsorSlot from '@/components/sponsor/SponsorSlot';
 import { pauseAnimationsUntilLeave, useTheme } from '@/hooks/useTheme';
-import { LoginFormSchema, TwoFactorCodeSchema, type LoginFormValues } from '@/schemas/login';
+import { LoginFormSchema, type LoginFormValues } from '@/schemas/login';
 import './LoginPage.css';
 
 const HEADLINE_INTERVAL_MS = 2000;
@@ -235,11 +235,8 @@ export default function LoginPage() {
 
                     <FormField
                       name="twoFactorCode"
-                      label={t('twoFactorCode')}
-                      rules={
-                        twoFactorEnable
-                          ? { validate: rhfZodValidate(TwoFactorCodeSchema) }
-                          : undefined
+                      label={
+                        twoFactorEnable ? t('twoFactorCode') : `${t('twoFactorCode')} (اختیاری)`
                       }
                     >
                       <Input
