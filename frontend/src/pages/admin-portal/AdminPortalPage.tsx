@@ -31,6 +31,7 @@ type InboundOption = {
   remark: string;
   protocol: string;
   port: number;
+  enable: boolean;
   tlsFlowCapable?: boolean;
 };
 
