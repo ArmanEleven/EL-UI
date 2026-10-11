@@ -391,7 +391,8 @@ export default function AdminPortalPage() {
                     }))}
                     disabled={
                       !inbounds.some(
-                        (item) => item.enable && BASIC_CLIENT_PROTOCOLS.has(item.protocol.toLowerCase()),
+                        (item) =>
+                          item.enable && BASIC_CLIENT_PROTOCOLS.has(item.protocol.toLowerCase()),
                       )
                     }
                   />
