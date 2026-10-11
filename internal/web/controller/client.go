@@ -274,6 +274,10 @@ func (a *ClientController) update(c *gin.Context) {
 	adminID, oldTotal, quotaAdjusted := 0, int64(0), false
 	if u := optionalLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
 		adminID = u.Id
+		if req.Email != "" && req.Email != email {
+			jsonMsg(c, I18nWeb(c, "somethingWentWrong"), panel.ErrAdminInvalid)
+			return
+		}
 		var old model.ClientRecord
 		if e := database.GetDB().Where("email = ?", email).First(&old).Error; e != nil {
 			jsonMsg(c, I18nWeb(c, "somethingWentWrong"), e)
