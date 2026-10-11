@@ -136,6 +136,10 @@ func (a *APIController) enforceMultiAdminAccess(c *gin.Context) {
 		c.Next()
 		return
 	}
+	if strings.HasSuffix(path, "/clients/onlines") && c.Request.Method == http.MethodPost {
+		c.Next()
+		return
+	}
 	if strings.HasSuffix(path, "/clients/add") && c.Request.Method == http.MethodPost {
 		c.Next()
 		return
