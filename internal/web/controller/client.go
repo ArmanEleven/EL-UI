@@ -316,7 +316,10 @@ func (a *ClientController) delete(c *gin.Context) {
 	if u := optionalLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
 		adminID = u.Id
 		var old model.ClientRecord
-		if e := database.GetDB().Where("email = ?", email).First(&old).Error; e != nil { jsonMsg(c, I18nWeb(c, "somethingWentWrong"), e); return }
+		if e := database.GetDB().Where("email = ?", email).First(&old).Error; e != nil {
+			jsonMsg(c, I18nWeb(c, "somethingWentWrong"), e)
+			return
+		}
 		oldTotal = old.TotalGB
 	}
 	needRestart, err := a.clientService.DeleteByEmail(&a.inboundService, email, keepTraffic)
@@ -776,7 +779,10 @@ func (a *ClientController) detach(c *gin.Context) {
 	}
 	if u := optionalLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
 		allowed, e := a.adminService.CanUseInboundIDs(u.Id, body.InboundIds)
-		if e != nil || !allowed { jsonMsg(c, I18nWeb(c, "somethingWentWrong"), panel.ErrAdminInvalid); return }
+		if e != nil || !allowed {
+			jsonMsg(c, I18nWeb(c, "somethingWentWrong"), panel.ErrAdminInvalid)
+			return
+		}
 	}
 	needRestart, err := a.clientService.DetachByEmailMany(&a.inboundService, email, body.InboundIds)
 	// Flagged before the error check: a partly-applied detach already removed
