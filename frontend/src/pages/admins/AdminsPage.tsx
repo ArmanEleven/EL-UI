@@ -8,8 +8,8 @@ import {
   Input,
   InputNumber,
   Popconfirm,
-  Space,
   Select,
+  Space,
   Table,
   Tag,
   Typography,
@@ -268,10 +268,10 @@ export default function AdminsPage() {
             </Form.Item>
             <Form.Item
               label={
-            selectedAdmin
-              ? 'رمز جدید (اختیاری؛ حداقل ۱۰ نویسه)'
-              : 'رمز عبور (حداقل ۱۰ نویسه)'
-          }
+                selectedAdmin
+                  ? 'رمز جدید (اختیاری؛ حداقل ۱۰ نویسه)'
+                  : 'رمز عبور (حداقل ۱۰ نویسه)'
+              }
               name="password"
               rules={[
                 {
