@@ -1,0 +1,39 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+credentials/
+
+# Logs and runtime data
+*.log
+logs/
+*.sqlite
+*.sqlite3
+*.db
+data/
+backups/
+
+# JavaScript / frontend
+node_modules/
+dist/
+build/
+.next/
+coverage/
+.vite/
+
+# Go / build artifacts
+bin/
+*.exe
+*.test
+coverage.out
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
