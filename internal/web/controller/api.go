@@ -245,7 +245,8 @@ func (a *APIController) initRouter(g *gin.RouterGroup) {
 	api.Use(middleware.CSRFMiddleware())
 
 	api.GET("/openapi.json", ServeOpenAPISpec)
-	NewAdminController(api)
+	a.settingController = NewSettingController(api)
+	NewAdminController(api, a.settingController.settingService)
 
 	// Inbounds API
 	inbounds := api.Group("/inbounds")
@@ -270,7 +271,6 @@ func (a *APIController) initRouter(g *gin.RouterGroup) {
 	// Settings + Xray config management live under the API surface too, so the
 	// same API token drives them. Paths are /panel/api/setting/* and
 	// /panel/api/xray/*.
-	a.settingController = NewSettingController(api)
 	a.xraySettingController = NewXraySettingController(api)
 
 	// Subscription balancers — client-side balancers for the JSON sub output
