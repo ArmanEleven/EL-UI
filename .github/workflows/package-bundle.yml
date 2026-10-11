@@ -143,7 +143,8 @@ jobs:
           Branch: $GITHUB_REF_NAME
 
           This archive contains the full source tree, frontend dependencies, generated frontend build, and a Linux amd64 x-ui binary.
-          The secondary-admin portal includes inbound visibility, client creation, an owned-client list, and connection links/QR codes.
+          The secondary-admin portal includes safe inbound visibility, client creation, an owned-client list, and connection links/QR codes.
+          Per-admin TOTP enrollment, login verification, owner reset UI, and the "x-ui admin reset-2fa -username NAME" command are included.
           No .env file, database, private key, or runtime credential is intentionally packaged.
           INFO
           cd "$RUNNER_TEMP"
