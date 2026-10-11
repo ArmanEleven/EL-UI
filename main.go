@@ -18,6 +18,7 @@ import (
 	"github.com/mhsanaei/3x-ui/v3/internal/config"
 	"github.com/mhsanaei/3x-ui/v3/internal/crypto/nodetoken"
 	"github.com/mhsanaei/3x-ui/v3/internal/database"
+	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
 	"github.com/mhsanaei/3x-ui/v3/internal/logger"
 	"github.com/mhsanaei/3x-ui/v3/internal/sub"
 	"github.com/mhsanaei/3x-ui/v3/internal/tunnelmonitor"
@@ -578,6 +579,32 @@ func loadServiceEnvFile() {
 	}
 }
 
+func resetAdminTwoFactor(username string) error {
+	username = strings.TrimSpace(username)
+	if username == "" {
+		return fmt.Errorf("admin username is required")
+	}
+	if err := database.InitDB(config.GetDBPath()); err != nil {
+		return fmt.Errorf("initialize database: %w", err)
+	}
+	var user model.User
+	if err := database.GetDB().Where("username = ?", username).First(&user).Error; err != nil {
+		return fmt.Errorf("find admin %q: %w", username, err)
+	}
+	result := database.GetDB().Model(&model.AdminProfile{}).Where("user_id = ?", user.Id).Updates(map[string]any{
+		"two_factor_enabled": false,
+		"two_factor_secret":  "",
+		"two_factor_pending": "",
+	})
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("user %q is not a secondary admin", username)
+	}
+	return nil
+}
+
 // main is the entry point of the 3x-ui application.
 // It parses command-line arguments to run the web server, migrate database, or update settings.
 func main() {
@@ -604,6 +631,10 @@ func main() {
 	migrateDbCmd.StringVar(&migrateDump, "dump", "", "Write a portable SQL text dump of --src to this file (.db -> .dump)")
 	migrateDbCmd.StringVar(&migrateRestore, "restore", "", "Rebuild a SQLite database from this SQL text dump (.dump -> .db); requires --out")
 	migrateDbCmd.StringVar(&migrateOut, "out", "", "Destination SQLite file for --restore (must not already exist)")
+
+	adminCmd := flag.NewFlagSet("admin", flag.ExitOnError)
+	var adminUsername string
+	adminCmd.StringVar(&adminUsername, "username", "", "Secondary admin username")
 
 	settingCmd := flag.NewFlagSet("setting", flag.ExitOnError)
 	var port int
@@ -703,6 +734,20 @@ func main() {
 		default:
 			fmt.Println("nothing to do: pass --dump <file>, --restore <file> --out <db>, or --dsn <postgres-dsn>")
 		}
+	case "admin":
+		if len(os.Args) < 3 || os.Args[2] != "reset-2fa" {
+			fmt.Println("Usage: x-ui admin reset-2fa -username NAME")
+			os.Exit(2)
+		}
+		if err := adminCmd.Parse(os.Args[3:]); err != nil {
+			fmt.Println(err)
+			os.Exit(2)
+		}
+		if err := resetAdminTwoFactor(adminUsername); err != nil {
+			fmt.Println("Failed to reset secondary-admin 2FA:", err)
+			os.Exit(1)
+		}
+		fmt.Printf("Two-factor authentication reset for admin %q. They must enroll again if panel 2FA is enabled.\n", adminUsername)
 	case "setting":
 		err := settingCmd.Parse(os.Args[2:])
 		if err != nil {
@@ -772,5 +817,6 @@ Commands:
     migrate-db     SQLite <-> .dump (--dump/--restore) or copy into PostgreSQL (--dsn)
     encrypt-tokens encrypt node bearer tokens with the configured active key
     setting        set settings
+    admin          manage secondary admins (reset-2fa -username NAME)
 `
 }
