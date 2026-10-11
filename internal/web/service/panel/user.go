@@ -101,7 +101,14 @@ func (s *UserService) CheckUser(username string, password string, twoFactorCode 
 		return nil, err
 	}
 
-	if twoFactorEnable {
+	if profileErr == nil {
+		// Secondary administrators always use their own authenticator once enrolled.
+		if adminProfile.TwoFactorEnabled && !totp.VerifyWithSkew(adminProfile.TwoFactorSecret, twoFactorCode, time.Now()) {
+			return nil, errors.New("invalid 2fa code")
+		}
+		// When panel-wide 2FA is enabled, an unenrolled secondary admin may sign
+		// in only to reach the enrollment gate; the API middleware blocks all data.
+	} else if twoFactorEnable {
 		twoFactorToken, err := s.settingService.GetTwoFactorToken()
 		if err != nil {
 			logger.Warning("check two factor token err:", err)
