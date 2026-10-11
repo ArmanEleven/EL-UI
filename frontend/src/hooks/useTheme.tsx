@@ -92,10 +92,16 @@ const LIGHT_CONTRAST_TOKENS = {
   colorErrorText: '#cf1322',
   colorSuccessText: '#237804',
 };
+const ELEVEN_PRIMARY_TOKENS = {
+  colorPrimary: '#8b5cf6',
+  colorPrimaryHover: '#a78bfa',
+  colorPrimaryActive: '#7c3aed',
+  borderRadius: 10,
+};
 const LIGHT_BUTTON_TOKENS = {
-  colorPrimary: '#0958d9',
-  colorPrimaryHover: '#2468e5',
-  colorPrimaryActive: '#073ea8',
+  colorPrimary: '#7c3aed',
+  colorPrimaryHover: '#8b5cf6',
+  colorPrimaryActive: '#6d28d9',
 };
 
 // hashed:false drops the `:where(.css-<hash>)` wrapper antd puts around every
@@ -109,7 +115,7 @@ const LIGHT_BUTTON_TOKENS = {
 // token block under a new class instead of reusing the one already in the head.
 const SHARED_STYLE_CONFIG = {
   hashed: false,
-  cssVar: { key: 'xui' },
+  cssVar: { key: 'elui' },
 } as const;
 
 export function buildAntdThemeConfig(isDark: boolean, isUltra: boolean): ThemeConfig {
@@ -117,7 +123,7 @@ export function buildAntdThemeConfig(isDark: boolean, isUltra: boolean): ThemeCo
     return {
       ...SHARED_STYLE_CONFIG,
       algorithm: antdTheme.defaultAlgorithm,
-      token: LIGHT_CONTRAST_TOKENS,
+      token: { ...ELEVEN_PRIMARY_TOKENS, ...LIGHT_CONTRAST_TOKENS },
       components: {
         Statistic: STATISTIC_TOKENS,
         Button: LIGHT_BUTTON_TOKENS,
@@ -127,7 +133,7 @@ export function buildAntdThemeConfig(isDark: boolean, isUltra: boolean): ThemeCo
   return {
     ...SHARED_STYLE_CONFIG,
     algorithm: antdTheme.darkAlgorithm,
-    token: isUltra ? ULTRA_DARK_TOKENS : DARK_TOKENS,
+    token: { ...ELEVEN_PRIMARY_TOKENS, ...(isUltra ? ULTRA_DARK_TOKENS : DARK_TOKENS) },
     components: {
       Layout: isUltra ? ULTRA_DARK_LAYOUT_TOKENS : DARK_LAYOUT_TOKENS,
       Menu: isUltra ? ULTRA_DARK_MENU_TOKENS : DARK_MENU_TOKENS,

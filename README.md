@@ -1,28 +1,37 @@
 [English](/README.md) | [فارسی](/README.fa_IR.md) | [العربية](/README.ar_EG.md) | [中文](/README.zh_CN.md) | [Español](/README.es_ES.md) | [Русский](/README.ru_RU.md) | [Türkçe](/README.tr_TR.md)
 
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./media/3x-ui-dark.png">
-    <img alt="3x-ui" src="./media/3x-ui-light.png">
-  </picture>
-</p>
+# Eleven Panel (EL-UI) v4.0.0
 
-<p align="center">
-  <a href="https://github.com/MHSanaei/3x-ui/releases"><img src="https://img.shields.io/github/v/release/mhsanaei/3x-ui" alt="Release"></a>
-  <a href="https://github.com/MHSanaei/3x-ui/actions"><img src="https://img.shields.io/github/actions/workflow/status/mhsanaei/3x-ui/release.yml.svg" alt="Build"></a>
-  <a href="#"><img src="https://img.shields.io/github/go-mod/go-version/mhsanaei/3x-ui.svg" alt="GO Version"></a>
-  <a href="https://github.com/MHSanaei/3x-ui/releases/latest"><img src="https://img.shields.io/github/downloads/mhsanaei/3x-ui/total.svg" alt="Downloads"></a>
-  <a href="https://www.gnu.org/licenses/gpl-3.0.en.html"><img src="https://img.shields.io/badge/license-GPL%20V3-blue.svg?longCache=true" alt="License"></a>
-  <a href="https://pkg.go.dev/github.com/mhsanaei/3x-ui/v3"><img src="https://pkg.go.dev/badge/github.com/mhsanaei/3x-ui/v3.svg" alt="Go Reference"></a>
-  <a href="https://docs.sanaei.dev"><img src="https://img.shields.io/badge/docs-docs.sanaei.dev-22d3ee" alt="Documentation"></a>
-</p>
+**A Persian-first Xray control panel with RTL support, a dedicated Eleven theme, and a separate secondary-admin portal.**
 
-**3X-UI** is an advanced, open-source web control panel for managing [Xray-core](https://github.com/XTLS/Xray-core) servers. It provides a clean, multi-language interface for deploying, configuring, and monitoring a wide range of proxy and VPN protocols — from a single VPS to multi-node deployments.
+This project is a development fork of 3X-UI. EL-UI adds secondary-admin management with client/traffic quotas, inbound allowlists, client ownership, and a separate client-creation portal. Secondary admins are not allowed into the master panel or its settings.
+
+> **Release status:** this is the v4.0.0 development branch. CI and an EL-UI-specific installer/updater must be validated before production use. Do not use the upstream 3X-UI install script to install EL-UI.
+
+## Build from source
+
+Requirements: the Go version declared in go.mod, and Node.js 26 or newer.
+
+~~~bash
+git clone --branch feature/multi-admin-v1 https://github.com/ArmanEleven/EL-UI.git
+cd EL-UI
+cd frontend && npm ci && npm run build
+cd ..
+go build -o x-ui .
+~~~
+
+The result is the x-ui binary. Configure your service and TLS for your own environment; these commands do not install a systemd service or configure a firewall.
+
+---
+
+**Eleven Panel (EL-UI)** is a web control panel for managing [Xray-core](https://github.com/XTLS/Xray-core) servers.
 
 Built as an enhanced fork of the original X-UI project, 3X-UI adds broader protocol support, improved stability, per-client traffic accounting, and many quality-of-life features.
 
 > [!IMPORTANT]
 > This project is intended for personal use only. Please do not use it for illegal purposes or in a production environment.
+
+## Upstream feature set
 
 ## Features
 
