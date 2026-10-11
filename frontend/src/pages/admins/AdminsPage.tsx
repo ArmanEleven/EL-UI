@@ -35,6 +35,7 @@ interface AdminRecord {
 interface FormValues {
   username: string;
   password: string;
+  enabled: boolean;
   maxClients: number;
   allowUnlimitedClients: boolean;
   trafficQuotaGB: number;
@@ -48,6 +49,7 @@ export default function AdminsPage() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [owner, setOwner] = useState<boolean | null>(null);
+  const [selectedAdmin, setSelectedAdmin] = useState<AdminRecord | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -77,15 +79,30 @@ export default function AdminsPage() {
     };
   }, [load]);
 
-  const create = async (values: FormValues) => {
+  const resetForm = () => {
+    setSelectedAdmin(null);
+    form.resetFields();
+    form.setFieldsValue({
+      enabled: true,
+      maxClients: 10,
+      allowUnlimitedClients: false,
+      trafficQuotaGB: 100,
+      allowUnlimitedTraffic: false,
+      allowedInboundIds: '',
+      password: '',
+    });
+  };
+
+  const save = async (values: FormValues) => {
     setSaving(true);
     const inboundIds = values.allowedInboundIds
       .split(',')
       .map((v) => Number(v.trim()))
       .filter((v) => Number.isInteger(v) && v > 0);
-    const result = await HttpUtil.post('/panel/api/admins', {
+    const payload = {
       username: values.username.trim(),
-      password: values.password,
+      password: values.password || '',
+      enabled: values.enabled,
       maxClients: values.allowUnlimitedClients ? 0 : values.maxClients,
       allowUnlimitedClients: values.allowUnlimitedClients,
       trafficQuotaBytes: values.allowUnlimitedTraffic
@@ -93,17 +110,37 @@ export default function AdminsPage() {
         : Math.round(values.trafficQuotaGB * GIB),
       allowUnlimitedTraffic: values.allowUnlimitedTraffic,
       allowedInboundIds: inboundIds,
-    });
+    };
+    const result = selectedAdmin
+      ? await HttpUtil.post(`/panel/api/admins/${selectedAdmin.userId}`, payload)
+      : await HttpUtil.post('/panel/api/admins', payload);
     setSaving(false);
     if (result.success) {
-      form.resetFields();
+      resetForm();
       await load();
     }
   };
 
+  const edit = (admin: AdminRecord) => {
+    setSelectedAdmin(admin);
+    form.setFieldsValue({
+      username: admin.username,
+      password: '',
+      enabled: admin.enabled,
+      maxClients: admin.maxClients,
+      allowUnlimitedClients: admin.allowUnlimitedClients,
+      trafficQuotaGB: admin.trafficQuotaBytes / GIB,
+      allowUnlimitedTraffic: admin.allowUnlimitedTraffic,
+      allowedInboundIds: admin.allowedInboundIds.join(', '),
+    });
+  };
+
   const remove = async (id: number) => {
     const result = await HttpUtil.delete(`/panel/api/admins/${id}`);
-    if (result.success) await load();
+    if (result.success) {
+      if (selectedAdmin?.userId === id) resetForm();
+      await load();
+    }
   };
 
   const columns: ColumnsType<AdminRecord> = [
@@ -142,20 +179,27 @@ export default function AdminsPage() {
       title: 'عملیات',
       key: 'actions',
       render: (_, r) => (
-        <Popconfirm
-          title="حذف این ادمین؟"
-          okText="حذف"
-          cancelText="لغو"
-          onConfirm={() => remove(r.userId)}
-        >
-          <Button danger>حذف</Button>
-        </Popconfirm>
+        <Space>
+          <Button onClick={() => edit(r)}>ویرایش</Button>
+          <Popconfirm
+            title="حذف این ادمین؟"
+            okText="حذف"
+            cancelText="لغو"
+            onConfirm={() => remove(r.userId)}
+          >
+            <Button danger>حذف</Button>
+          </Popconfirm>
+        </Space>
       ),
     },
   ];
 
   if (owner === null) {
-    return <div dir="rtl" style={{ padding: 24 }}>در حال بررسی دسترسی...</div>;
+    return (
+      <div dir="rtl" style={{ padding: 24 }}>
+        در حال بررسی دسترسی...
+      </div>
+    );
   }
   if (!owner) {
     return (
@@ -175,23 +219,31 @@ export default function AdminsPage() {
         <Form
           form={form}
           layout="vertical"
-          onFinish={create}
+          onFinish={save}
           initialValues={{
+            enabled: true,
             maxClients: 10,
             allowUnlimitedClients: false,
             trafficQuotaGB: 100,
             allowUnlimitedTraffic: false,
             allowedInboundIds: '',
+            password: '',
           }}
         >
           <Space align="start" wrap style={{ width: '100%' }}>
-            <Form.Item label="نام کاربری" name="username" rules={[{ required: true, whitespace: true }]}>
+            <Form.Item
+              label="نام کاربری"
+              name="username"
+              rules={[{ required: true, whitespace: true }]}
+            >
               <Input />
             </Form.Item>
             <Form.Item
-              label="رمز عبور (حداقل ۱۰ نویسه)"
+              label={selectedAdmin ? 'رمز جدید (اختیاری؛ حداقل ۱۰ نویسه)' : 'رمز عبور (حداقل ۱۰ نویسه)'}
               name="password"
-              rules={[{ required: true, min: 10 }]}
+              rules={[
+                { required: !selectedAdmin, min: 10, message: 'رمز عبور باید حداقل ۱۰ نویسه باشد.' },
+              ]}
             >
               <Input.Password />
             </Form.Item>
@@ -205,15 +257,14 @@ export default function AdminsPage() {
             >
               <InputNumber min={0} />
             </Form.Item>
-            <Form.Item
-              label="Inboundهای مجاز"
-              name="allowedInboundIds"
-              extra="مثال: 1, 2, 5"
-            >
+            <Form.Item label="Inboundهای مجاز" name="allowedInboundIds" extra="مثال: 1, 2, 5">
               <Input placeholder="1, 2, 5" />
             </Form.Item>
           </Space>
           <Space direction="vertical">
+            <Form.Item name="enabled" valuePropName="checked">
+              <Checkbox>حساب فعال باشد</Checkbox>
+            </Form.Item>
             <Form.Item name="allowUnlimitedClients" valuePropName="checked">
               <Checkbox>تعداد کاربران نامحدود</Checkbox>
             </Form.Item>
@@ -221,9 +272,12 @@ export default function AdminsPage() {
               <Checkbox>ترافیک نامحدود</Checkbox>
             </Form.Item>
           </Space>
-          <Button type="primary" htmlType="submit" loading={saving}>
-            ساخت ادمین
-          </Button>
+          <Space>
+            <Button type="primary" htmlType="submit" loading={saving}>
+              {selectedAdmin ? 'ذخیره تغییرات' : 'ساخت ادمین'}
+            </Button>
+            {selectedAdmin && <Button onClick={resetForm}>لغو ویرایش</Button>}
+          </Space>
         </Form>
         <Table<AdminRecord>
           style={{ marginTop: 24 }}
