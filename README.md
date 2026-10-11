@@ -38,3 +38,10 @@
 - Test database migrations and restore procedures against disposable data first.
 - Keep upstream code and notices attributable; review license compatibility before distributing a combined build.
 - Mark a feature complete only after implementation and a reproducible test, not just because it appears in the UI.
+
+
+## Current audit findings
+
+See [the source audit](docs/SOURCE_AUDIT.md) for the architecture comparison and licensing caveats. The main compatibility issue is that 3X-UI uses a Go/Gin backend and embedded React/Vite frontend, while HMPanel uses a separate NestJS backend, Next.js frontend, PostgreSQL/Prisma schema, and Redis-backed jobs. They are not a drop-in merge.
+
+**Important license gate:** HMPanel's README states MIT, but its backend package metadata says `UNLICENSED`, and the connected lookup did not find a root LICENSE file. Do not copy or redistribute HMPanel backend code until the discrepancy is clarified. EL-UI can still implement the same capabilities independently.
