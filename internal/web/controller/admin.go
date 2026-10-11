@@ -8,7 +8,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/mhsanaei/3x-ui/v3/internal/web/service/panel"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/session"
 	"gorm.io/gorm"
 )
 
@@ -50,7 +49,7 @@ func NewAdminController(g *gin.RouterGroup) *AdminController {
 }
 
 func (a *AdminController) list(c *gin.Context) {
-	u := session.GetLoginUser(c)
+	u := optionalLoginUser(c)
 	if u == nil {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
@@ -64,7 +63,7 @@ func (a *AdminController) list(c *gin.Context) {
 }
 
 func (a *AdminController) me(c *gin.Context) {
-	u := session.GetLoginUser(c)
+	u := optionalLoginUser(c)
 	if u == nil {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
@@ -99,7 +98,7 @@ func (a *AdminController) me(c *gin.Context) {
 }
 
 func (a *AdminController) create(c *gin.Context) {
-	u := session.GetLoginUser(c)
+	u := optionalLoginUser(c)
 	if u == nil {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
@@ -127,7 +126,7 @@ func (a *AdminController) create(c *gin.Context) {
 }
 
 func (a *AdminController) update(c *gin.Context) {
-	u := session.GetLoginUser(c)
+	u := optionalLoginUser(c)
 	if u == nil {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
@@ -161,7 +160,7 @@ func (a *AdminController) update(c *gin.Context) {
 }
 
 func (a *AdminController) delete(c *gin.Context) {
-	u := session.GetLoginUser(c)
+	u := optionalLoginUser(c)
 	if u == nil {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
