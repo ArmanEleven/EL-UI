@@ -120,6 +120,10 @@ func (a *APIController) enforceMultiAdminAccess(c *gin.Context) {
 
 	// Secondary admins may only use endpoints explicitly scoped to their owned clients.
 	path := c.FullPath()
+	if c.Request.Method == http.MethodGet && strings.HasSuffix(path, "/inbounds/options") {
+		c.Next()
+		return
+	}
 	if c.Request.Method == http.MethodGet && strings.HasSuffix(path, "/admins/me") {
 		c.Next()
 		return
