@@ -2793,7 +2793,7 @@ export const sections: readonly Section[] = [
         security: [{ cookieAuth: [] }],
       },
     ],
-  },,
+  },
   {
     id: 'admins',
     title: 'مدیریت ادمین‌ها',
