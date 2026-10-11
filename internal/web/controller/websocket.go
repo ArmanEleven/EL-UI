@@ -71,7 +71,8 @@ func (w *WebSocketController) HandleWebSocket(c *gin.Context) {
 	}
 	// WebSocket broadcasts contain master-panel events. Secondary admins use
 	// the isolated portal and must never subscribe to the master event stream.
-	if !(panel.AdminService{}).IsOwner(u.Id) {
+	adminService := &panel.AdminService{}
+	if !adminService.IsOwner(u.Id) {
 		c.AbortWithStatus(http.StatusForbidden)
 		return
 	}
