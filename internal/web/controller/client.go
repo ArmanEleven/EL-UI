@@ -7,9 +7,13 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/mhsanaei/3x-ui/v3/internal/database"
 	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
+	"github.com/mhsanaei/3x-ui/v3/internal/logger"
 	"github.com/mhsanaei/3x-ui/v3/internal/web/entity"
 	"github.com/mhsanaei/3x-ui/v3/internal/web/service"
+	"github.com/mhsanaei/3x-ui/v3/internal/web/service/panel"
+	"github.com/mhsanaei/3x-ui/v3/internal/web/session"
 	"github.com/mhsanaei/3x-ui/v3/internal/web/websocket"
 
 	"github.com/gin-gonic/gin"
@@ -40,6 +44,7 @@ type ClientController struct {
 	xrayService    service.XrayService
 	settingService service.SettingService
 	happGenerator  service.HappLinkGenerator
+	adminService   panel.AdminService
 }
 
 func NewClientController(g *gin.RouterGroup) *ClientController {
@@ -99,6 +104,13 @@ func (a *ClientController) list(c *gin.Context) {
 		jsonMsg(c, I18nWeb(c, "pages.inbounds.toasts.obtain"), err)
 		return
 	}
+	if u := session.GetLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
+		owned, ownErr := a.adminService.OwnedEmails(u.Id)
+		if ownErr != nil { jsonMsg(c, I18nWeb(c, "pages.inbounds.toasts.obtain"), ownErr); return }
+		filtered := make([]service.ClientWithAttachments, 0, len(rows))
+		for _, row := range rows { if _, ok := owned[row.Email]; ok { filtered = append(filtered, row) } }
+		rows = filtered
+	}
 	jsonObj(c, rows, nil)
 }
 
@@ -118,6 +130,7 @@ func (a *ClientController) listPaged(c *gin.Context) {
 		jsonMsg(c, I18nWeb(c, "pages.inbounds.toasts.obtain"), err)
 		return
 	}
+	if u := session.GetLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) { params.OwnerAdminID = u.Id }
 	resp, err := a.clientService.ListPaged(&a.inboundService, &a.settingService, params)
 	if err != nil {
 		jsonMsg(c, I18nWeb(c, "pages.inbounds.toasts.obtain"), err)
@@ -202,7 +215,18 @@ func (a *ClientController) create(c *gin.Context) {
 		jsonMsg(c, I18nWeb(c, "somethingWentWrong"), err)
 		return
 	}
+	adminID, reserved := 0, false
+	if u := session.GetLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
+		adminID = u.Id
+		allowed, checkErr := a.adminService.CanUseInboundIDs(adminID, payload.InboundIds)
+		if checkErr != nil || !allowed { jsonMsg(c, I18nWeb(c, "somethingWentWrong"), panel.ErrAdminInvalid); return }
+		if err := a.adminService.CanCreateClient(adminID, payload.Client.Email, payload.Client.TotalGB); err != nil { jsonMsg(c, I18nWeb(c, "somethingWentWrong"), err); return }
+		reserved = true
+	}
 	needRestart, err := a.clientService.Create(&a.inboundService, &payload)
+	if reserved && err != nil && !needRestart {
+		if rollbackErr := a.adminService.CancelClientReservation(adminID, payload.Client.Email, payload.Client.TotalGB); rollbackErr != nil { logger.Warning("admin reservation rollback failed:", rollbackErr) }
+	}
 	// Flagged before the error check: a partly-applied create leaves clients
 	// committed on the inbounds that succeeded, and those still need the restart.
 	if needRestart {
