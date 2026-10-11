@@ -106,7 +106,7 @@ func (a *AdminController) create(c *gin.Context) {
 	}
 	var req adminCreateRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "msg": "داده‌های ادمین معتبر نیست"})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "msg": "داده\u200cهای ادمین معتبر نیست"})
 		return
 	}
 	id, err := a.service.Create(
@@ -139,7 +139,7 @@ func (a *AdminController) update(c *gin.Context) {
 	}
 	var req adminUpdateRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "msg": "داده‌های ادمین معتبر نیست"})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "msg": "داده\u200cهای ادمین معتبر نیست"})
 		return
 	}
 	if err := a.service.Update(
