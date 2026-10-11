@@ -122,7 +122,14 @@ func (a *APIController) enforceMultiAdminAccess(c *gin.Context) {
 	// authenticator before any inbound or client data is exposed.
 	if a.settingController != nil {
 		required, settingErr := a.settingController.settingService.GetTwoFactorEnable()
-		if settingErr == nil && required {
+		if settingErr != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"success": false,
+				"msg":     "بررسی تنظیمات تأیید دومرحله‌ای ناموفق بود",
+			})
+			return
+		}
+		if required {
 			profile, profileErr := a.adminService.GetProfile(u.Id)
 			if profileErr != nil {
 				c.AbortWithStatus(http.StatusForbidden)
