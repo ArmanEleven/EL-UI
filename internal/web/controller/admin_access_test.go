@@ -58,6 +58,8 @@ func newAdminAccessTestEngine(t *testing.T, enabled, secondaryActor bool) *gin.E
 	api.Use(a.enforceMultiAdminAccess)
 	api.GET("/admins/me", func(c *gin.Context) { c.Status(http.StatusOK) })
 	api.GET("/inbounds/options", func(c *gin.Context) { c.Status(http.StatusOK) })
+	api.GET("/clients/list/paged", func(c *gin.Context) { c.Status(http.StatusOK) })
+	api.GET("/clients/links/:email", func(c *gin.Context) { c.Status(http.StatusOK) })
 	api.POST("/clients/add", func(c *gin.Context) { c.Status(http.StatusOK) })
 	api.GET("/server/status", func(c *gin.Context) { c.Status(http.StatusOK) })
 	api.POST("/inbounds/update/:id", func(c *gin.Context) { c.Status(http.StatusOK) })
@@ -75,6 +77,8 @@ func TestSecondaryAdminAccessIsNarrow(t *testing.T) {
 	}{
 		{name: "own profile", method: http.MethodGet, path: "/panel/api/admins/me", want: http.StatusOK},
 		{name: "safe inbound summary", method: http.MethodGet, path: "/panel/api/inbounds/options", want: http.StatusOK},
+		{name: "own client list", method: http.MethodGet, path: "/panel/api/clients/list/paged", want: http.StatusOK},
+		{name: "own client links route", method: http.MethodGet, path: "/panel/api/clients/links/demo", want: http.StatusOK},
 		{name: "create client", method: http.MethodPost, path: "/panel/api/clients/add", want: http.StatusOK},
 		{name: "master status denied", method: http.MethodGet, path: "/panel/api/server/status", want: http.StatusForbidden},
 		{name: "inbound mutation denied", method: http.MethodPost, path: "/panel/api/inbounds/update/1", want: http.StatusForbidden},
