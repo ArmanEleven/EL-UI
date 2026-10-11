@@ -43,7 +43,7 @@ func validateAdminQuickCreateInbounds(ids []int) error {
 		return panel.ErrAdminInvalid
 	}
 	for _, inbound := range inbounds {
-		if !supportsAdminQuickCreateProtocol(inbound.Protocol) {
+		if !supportsAdminQuickCreateProtocol(string(inbound.Protocol)) {
 			return panel.ErrAdminInvalid
 		}
 	}
