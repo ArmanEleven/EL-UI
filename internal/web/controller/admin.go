@@ -105,7 +105,7 @@ func (a *AdminController) twoFactorSetup(c *gin.Context) {
 		return
 	}
 	if profile.TwoFactorEnabled {
-		c.JSON(http.StatusConflict, gin.H{"success": false, "msg": "تأیید دومرحله‌ای قبلاً فعال شده است"})
+		c.JSON(http.StatusConflict, gin.H{"success": false, "msg": "تأیید دومرحله\u200cای قبلاً فعال شده است"})
 		return
 	}
 	raw := make([]byte, 20)
@@ -159,7 +159,7 @@ func (a *AdminController) twoFactorConfirm(c *gin.Context) {
 		a.writeError(c, err)
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "msg": "تأیید دومرحله‌ای فعال شد"})
+	c.JSON(http.StatusOK, gin.H{"success": true, "msg": "تأیید دومرحله\u200cای فعال شد"})
 }
 
 func (a *AdminController) resetTwoFactor(c *gin.Context) {
@@ -169,7 +169,7 @@ func (a *AdminController) resetTwoFactor(c *gin.Context) {
 		return
 	}
 	if !a.service.IsOwner(u.Id) {
-		c.JSON(http.StatusForbidden, gin.H{"success": false, "msg": "فقط مالک پنل می‌تواند 2FA ادمین را بازنشانی کند"})
+		c.JSON(http.StatusForbidden, gin.H{"success": false, "msg": "فقط مالک پنل می\u200cتواند 2FA ادمین را بازنشانی کند"})
 		return
 	}
 	id, err := strconv.Atoi(c.Param("id"))
