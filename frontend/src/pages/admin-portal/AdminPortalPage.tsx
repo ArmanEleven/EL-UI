@@ -108,7 +108,9 @@ export default function AdminPortalPage() {
   const [profile, setProfile] = useState<AdminProfile | null>(null);
   const [inbounds, setInbounds] = useState<InboundOption[]>([]);
   const [clients, setClients] = useState<ClientSummary[]>([]);
-  const [selectedLinks, setSelectedLinks] = useState<{ email: string; links: string[] } | null>(null);
+  const [selectedLinks, setSelectedLinks] = useState<{ email: string; links: string[] } | null>(
+    null,
+  );
   const [linksLoading, setLinksLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -421,16 +423,31 @@ export default function AdminPortalPage() {
                   <Card
                     size="small"
                     title={client.email}
-                    extra={<Tag color={client.enable ? 'success' : 'default'}>{client.enable ? 'فعال' : 'غیرفعال'}</Tag>}
+                    extra={
+                      <Tag color={client.enable ? 'success' : 'default'}>
+                        {client.enable ? 'فعال' : 'غیرفعال'}
+                      </Tag>
+                    }
                   >
                     <Space direction="vertical" style={{ width: '100%' }}>
                       <Typography.Text type="secondary">
-                        حجم کل: {(client.totalGB / GB).toLocaleString('fa-IR', { maximumFractionDigits: 2 })} GB
+                        حجم کل:{' '}
+                        {(client.totalGB / GB).toLocaleString('fa-IR', {
+                          maximumFractionDigits: 2,
+                        })}{' '}
+                        GB
                       </Typography.Text>
                       <Typography.Text type="secondary">
-                        انقضا: {client.expiryTime > 0 ? new Date(client.expiryTime).toLocaleDateString('fa-IR') : 'بدون انقضا'}
+                        انقضا:{' '}
+                        {client.expiryTime > 0
+                          ? new Date(client.expiryTime).toLocaleDateString('fa-IR')
+                          : 'بدون انقضا'}
                       </Typography.Text>
-                      <Button block loading={linksLoading} onClick={() => void showClientLinks(client.email)}>
+                      <Button
+                        block
+                        loading={linksLoading}
+                        onClick={() => void showClientLinks(client.email)}
+                      >
                         نمایش لینک و QR
                       </Button>
                     </Space>
@@ -454,7 +471,10 @@ export default function AdminPortalPage() {
                 <Card key={link + index} size="small">
                   <Space direction="vertical" align="center" style={{ width: '100%' }}>
                     <QRCode value={link} size={176} />
-                    <Typography.Paragraph copyable={{ text: link }} style={{ width: '100%', wordBreak: 'break-all' }}>
+                    <Typography.Paragraph
+                      copyable={{ text: link }}
+                      style={{ width: '100%', wordBreak: 'break-all' }}
+                    >
                       {link}
                     </Typography.Paragraph>
                   </Space>
