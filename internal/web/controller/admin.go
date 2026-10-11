@@ -32,7 +32,7 @@ type adminUpdateRequest struct{
  AllowedInboundIDs []int `json:"allowedInboundIds"`
 }
 func NewAdminController(g *gin.RouterGroup)*AdminController{
- a:=&AdminController{};r:=g.Group("/admins");r.GET("",a.list);r.GET("/me",a.me);r.POST("",a.create);r.PUT("/:id",a.update);r.DELETE("/:id",a.delete);return a
+ a:=&AdminController{};r:=g.Group("/admins");r.GET("",a.list);r.GET("/me",a.me);r.POST("",a.create);r.PUT("/:id",a.update);r.POST("/:id",a.update);r.DELETE("/:id",a.delete);return a
 }
 func(a *AdminController)list(c *gin.Context){u:=session.GetLoginUser(c);if u==nil{c.AbortWithStatus(http.StatusUnauthorized);return};rows,err:=a.service.List(u.Id);if err!=nil{a.writeError(c,err);return};jsonObj(c,rows,nil)}
 func(a *AdminController)me(c *gin.Context){
