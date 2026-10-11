@@ -2793,5 +2793,39 @@ export const sections: readonly Section[] = [
         security: [{ cookieAuth: [] }],
       },
     ],
-  },
+  },,
+  {
+    id: 'admins',
+    title: 'مدیریت ادمین‌ها',
+    description: 'مدیریت حساب‌های فرعی فقط برای مالک اصلی پنل مجاز است. ادمین فرعی فقط می‌تواند پروفایل خودش را بخواند.',
+    endpoints: [
+      {
+        method: 'GET',
+        path: '/panel/api/admins',
+        summary: 'فهرست ادمین‌های فرعی؛ فقط مالک اصلی.',
+        response: '[{"userId":2,"username":"operator","enabled":true,"maxClients":20,"trafficQuotaBytes":107374182400}]',
+      },
+      {
+        method: 'GET',
+        path: '/panel/api/admins/me',
+        summary: 'نمایش نقش و محدودیت‌های حساب واردشده.',
+      },
+      {
+        method: 'POST',
+        path: '/panel/api/admins',
+        summary: 'ساخت حساب ادمین فرعی؛ فقط مالک اصلی.',
+        body: '{\n  "username": "operator",\n  "password": "replace-with-a-strong-password",\n  "maxClients": 20,\n  "allowUnlimitedClients": false,\n  "trafficQuotaBytes": 107374182400,\n  "allowUnlimitedTraffic": false,\n  "allowedInboundIds": [1, 2]\n}',
+      },
+      {
+        method: 'PUT',
+        path: '/panel/api/admins/:id',
+        summary: 'ویرایش حساب، وضعیت، سهمیه و inboundهای مجاز؛ فقط مالک اصلی.',
+      },
+      {
+        method: 'DELETE',
+        path: '/panel/api/admins/:id',
+        summary: 'حذف ادمین فرعی؛ فقط مالک اصلی. کاربران تخصیص‌یافته به محدوده مالک اصلی برمی‌گردند.',
+      },
+    ],
+  }
 ];
