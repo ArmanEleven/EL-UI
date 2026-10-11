@@ -52,6 +52,7 @@ interface FormValues {
 }
 
 export default function AdminsPage() {
+  const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm<FormValues>();
   const [rows, setRows] = useState<AdminRecord[]>([]);
   const [inbounds, setInbounds] = useState<InboundOption[]>([]);
@@ -68,7 +69,7 @@ export default function AdminsPage() {
     if (result.success && Array.isArray(result.obj)) {
       setRows(result.obj);
     } else {
-      message.error(result.msg || 'دریافت فهرست ادمین‌ها ناموفق بود');
+      messageApi.error(result.msg || 'دریافت فهرست ادمین‌ها ناموفق بود');
     }
     setLoading(false);
   }, []);
@@ -80,7 +81,7 @@ export default function AdminsPage() {
     if (result.success && Array.isArray(result.obj)) {
       setInbounds(result.obj);
     } else {
-      message.error(result.msg || 'دریافت فهرست ورودی‌ها ناموفق بود');
+      messageApi.error(result.msg || 'دریافت فهرست ورودی‌ها ناموفق بود');
     }
   }, []);
 
@@ -221,6 +222,7 @@ export default function AdminsPage() {
   if (owner === null) {
     return (
       <div dir="rtl" style={{ padding: 24 }}>
+        {contextHolder}
         در حال بررسی دسترسی...
       </div>
     );
@@ -228,6 +230,7 @@ export default function AdminsPage() {
   if (!owner) {
     return (
       <div dir="rtl" style={{ padding: 24 }}>
+        {contextHolder}
         <Alert type="error" showIcon message="این بخش فقط برای مالک اصلی پنل است." />
       </div>
     );
@@ -235,6 +238,7 @@ export default function AdminsPage() {
 
   return (
     <div dir="rtl" style={{ padding: 24 }}>
+        {contextHolder}
       <Card title="مدیریت ادمین‌ها">
         <Typography.Paragraph type="secondary">
           برای هر ادمین سقف کاربران، سهمیه ترافیک و Inboundهای مجاز تعیین کن. دسترسی نامحدود فقط با
