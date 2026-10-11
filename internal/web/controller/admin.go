@@ -1,11 +1,20 @@
 package controller
 
 import (
+	"crypto/rand"
+	"encoding/base32"
 	"encoding/json"
 	"errors"
 	"net/http"
+	"net/url"
 	"strconv"
+	"strings"
+	"time"
 
+	"github.com/mhsanaei/3x-ui/v3/internal/database"
+	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
+	"github.com/mhsanaei/3x-ui/v3/internal/util/totp"
+	"github.com/mhsanaei/3x-ui/v3/internal/web/service"
 	"github.com/mhsanaei/3x-ui/v3/internal/web/service/panel"
 
 	"github.com/gin-gonic/gin"
@@ -13,7 +22,8 @@ import (
 )
 
 type AdminController struct {
-	service panel.AdminService
+	service        panel.AdminService
+	settingService service.SettingService
 }
 
 type adminCreateRequest struct {
@@ -37,16 +47,145 @@ type adminUpdateRequest struct {
 	AllowedInboundIDs     []int   `json:"allowedInboundIds"`
 }
 
-func NewAdminController(g *gin.RouterGroup) *AdminController {
-	a := &AdminController{}
+func NewAdminController(g *gin.RouterGroup, settings service.SettingService) *AdminController {
+	a := &AdminController{settingService: settings}
 	r := g.Group("/admins")
 	r.GET("", a.list)
 	r.GET("/me", a.me)
+	r.GET("/me/2fa", a.twoFactorStatus)
+	r.POST("/me/2fa/setup", a.twoFactorSetup)
+	r.POST("/me/2fa/confirm", a.twoFactorConfirm)
 	r.POST("", a.create)
 	r.PUT("/:id", a.update)
 	r.POST("/:id", a.update)
 	r.DELETE("/:id", a.delete)
+	r.POST("/:id/2fa/reset", a.resetTwoFactor)
 	return a
+}
+
+func (a *AdminController) twoFactorStatus(c *gin.Context) {
+	u := optionalLoginUser(c)
+	if u == nil {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+	if a.service.IsOwner(u.Id) {
+		c.JSON(http.StatusOK, gin.H{"success": true, "obj": gin.H{"panelTwoFactorEnabled": false, "twoFactorEnabled": false}})
+		return
+	}
+	profile, err := a.service.GetProfile(u.Id)
+	if err != nil {
+		a.writeError(c, err)
+		return
+	}
+	required, err := a.settingService.GetTwoFactorEnable()
+	if err != nil {
+		a.writeError(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"success": true, "obj": gin.H{
+		"panelTwoFactorEnabled": required,
+		"twoFactorEnabled":      profile.TwoFactorEnabled,
+	}})
+}
+
+func (a *AdminController) twoFactorSetup(c *gin.Context) {
+	u := optionalLoginUser(c)
+	if u == nil {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+	if a.service.IsOwner(u.Id) {
+		c.JSON(http.StatusForbidden, gin.H{"success": false, "msg": "برای مالک پنل نیازی به تنظیم 2FA ادمین نیست"})
+		return
+	}
+	profile, err := a.service.GetProfile(u.Id)
+	if err != nil {
+		a.writeError(c, err)
+		return
+	}
+	if profile.TwoFactorEnabled {
+		c.JSON(http.StatusConflict, gin.H{"success": false, "msg": "تأیید دومرحله‌ای قبلاً فعال شده است"})
+		return
+	}
+	raw := make([]byte, 20)
+	if _, err := rand.Read(raw); err != nil {
+		a.writeError(c, err)
+		return
+	}
+	secret := base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(raw)
+	if err := database.GetDB().Model(&model.AdminProfile{}).Where("user_id = ?", u.Id).Update("two_factor_pending", secret).Error; err != nil {
+		a.writeError(c, err)
+		return
+	}
+	account := url.PathEscape(u.Username)
+	issuer := url.QueryEscape("Eleven Panel")
+	uri := "otpauth://totp/" + issuer + ":" + account + "?secret=" + secret + "&issuer=" + issuer + "&algorithm=SHA1&digits=6&period=30"
+	c.JSON(http.StatusOK, gin.H{"success": true, "obj": gin.H{"secret": secret, "otpauthUrl": uri}})
+}
+
+func (a *AdminController) twoFactorConfirm(c *gin.Context) {
+	u := optionalLoginUser(c)
+	if u == nil {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+	if a.service.IsOwner(u.Id) {
+		c.JSON(http.StatusForbidden, gin.H{"success": false, "msg": "برای مالک پنل نیازی به تنظیم 2FA ادمین نیست"})
+		return
+	}
+	var req struct {
+		Code string `json:"code" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil || strings.TrimSpace(req.Code) == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "msg": "کد تأیید معتبر نیست"})
+		return
+	}
+	profile, err := a.service.GetProfile(u.Id)
+	if err != nil {
+		a.writeError(c, err)
+		return
+	}
+	secret := strings.TrimSpace(profile.TwoFactorPending)
+	if secret == "" || !totp.VerifyWithSkew(secret, strings.TrimSpace(req.Code), time.Now()) {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "msg": "کد تأیید نادرست است"})
+		return
+	}
+	if err := database.GetDB().Model(&model.AdminProfile{}).Where("user_id = ?", u.Id).Updates(map[string]any{
+		"two_factor_secret": secret,
+		"two_factor_pending": "",
+		"two_factor_enabled": true,
+	}).Error; err != nil {
+		a.writeError(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"success": true, "msg": "تأیید دومرحله‌ای فعال شد"})
+}
+
+func (a *AdminController) resetTwoFactor(c *gin.Context) {
+	u := optionalLoginUser(c)
+	if u == nil {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+	if !a.service.IsOwner(u.Id) {
+		c.JSON(http.StatusForbidden, gin.H{"success": false, "msg": "فقط مالک پنل می‌تواند 2FA ادمین را بازنشانی کند"})
+		return
+	}
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil || id <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "msg": "شناسه ادمین معتبر نیست"})
+		return
+	}
+	if err := database.GetDB().Model(&model.AdminProfile{}).Where("user_id = ?", id).Updates(map[string]any{
+		"two_factor_enabled": false,
+		"two_factor_secret": "",
+		"two_factor_pending": "",
+	}).Error; err != nil {
+		a.writeError(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"success": true, "msg": "2FA ادمین بازنشانی شد"})
 }
 
 func (a *AdminController) list(c *gin.Context) {
