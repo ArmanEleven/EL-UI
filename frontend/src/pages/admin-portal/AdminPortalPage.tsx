@@ -416,7 +416,11 @@ export default function AdminPortalPage() {
               type="primary"
               htmlType="submit"
               loading={saving}
-              disabled={inbounds.length === 0}
+              disabled={
+                !inbounds.some(
+                  (item) => item.enable && BASIC_CLIENT_PROTOCOLS.has(item.protocol.toLowerCase()),
+                )
+              }
             >
               ساخت کاربر
             </Button>
