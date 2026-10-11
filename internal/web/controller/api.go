@@ -76,6 +76,17 @@ func (a *APIController) checkAPIAuth(c *gin.Context) {
 	c.Next()
 }
 
+// optionalLoginUser keeps controller handlers safe in focused tests that do not install session middleware.
+func optionalLoginUser(c *gin.Context) *model.User {
+	if _, ok := c.Get("api_auth_user"); ok {
+		return session.GetLoginUser(c)
+	}
+	if _, ok := c.Get("github.com/gin-contrib/sessions"); !ok {
+		return nil
+	}
+	return session.GetLoginUser(c)
+}
+
 func (a *APIController) enforceMultiAdminAccess(c *gin.Context) {
 	// API tokens and mTLS are governed by their existing explicit token scopes.
 	if authed, ok := c.Get("api_authed"); ok && authed == true {
