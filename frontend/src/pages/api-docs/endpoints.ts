@@ -2824,6 +2824,11 @@ export const sections: readonly Section[] = [
         summary: 'ویرایش حساب، وضعیت، سهمیه و inboundهای مجاز؛ فقط مالک اصلی.',
       },
       {
+        method: 'POST',
+        path: '/panel/api/admins/:id',
+        summary: 'مسیر جایگزین برای ویرایش ادمین؛ فقط مالک اصلی.',
+      },
+      {
         method: 'DELETE',
         path: '/panel/api/admins/:id',
         summary:
