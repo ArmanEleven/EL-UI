@@ -95,6 +95,66 @@ jobs:
           go list ./... | grep -v '/frontend/node_modules/' > /tmp/go-packages.txt
           go test -shuffle=on -count=1 -timeout 25m $(cat /tmp/go-packages.txt)
 
+      - name: Secondary-admin access-boundary regression tests
+        run: go test ./internal/web/controller -run '^(TestSecondaryAdminAccessIsNarrow|TestDisabledSecondaryAdminIsDeniedEverywhere|TestOwnerKeepsMasterAccess)        env:
+          XUI_DB_TYPE: postgres
+          XUI_DB_DSN: "host=127.0.0.1 port=5432 user=postgres password=postgres dbname=xui_durable sslmode=disable"
+        run: |
+          go test ./internal/web/service -run 'PostgresCommitFailure' -count=1
+          go test ./internal/database -run '^(TestHostAutoMigrateCreatesColumns_Postgres|TestMigrate_Postgres|TestClientWeeklyRenewMigration_Postgres)$' -count=1
+
+      - name: Race tests
+        run: |
+          go list ./... | grep -v '/frontend/node_modules/' > /tmp/go-packages.txt
+          go test -race -shuffle=on -count=1 -timeout 25m $(cat /tmp/go-packages.txt)
+
+      - name: Master/node end-to-end test
+        run: make node-e2e
+
+      - name: Verify installer shell syntax
+        run: bash -n install.sh update.sh x-ui.sh
+
+      - name: Build Linux amd64 panel binary
+        run: go build -o /tmp/eleven-panel-x-ui .
+
+      - name: Assemble full source bundle (including installed npm dependencies)
+        run: |
+          set -euo pipefail
+          PACKAGE_DIR="$RUNNER_TEMP/EL-UI-v4.0.0"
+          mkdir -p "$PACKAGE_DIR/bin"
+          tar --exclude=.git --exclude=.cache --exclude=.env --exclude=.env.local --exclude=.env.production --exclude='*.db' --exclude='*.sqlite' --exclude='*.sqlite3' --exclude=secrets --exclude=credentials --exclude=logs -cf - . | tar -xf - -C "$PACKAGE_DIR"
+          cp /tmp/eleven-panel-x-ui "$PACKAGE_DIR/bin/x-ui"
+          cat > "$PACKAGE_DIR/PACKAGE-INFO.txt" <<INFO
+          Eleven Panel (EL-UI) v4.0.0
+          Commit: $GITHUB_SHA
+          Branch: $GITHUB_REF_NAME
+
+          This archive contains the full source tree, frontend dependencies, generated frontend build, and a Linux amd64 x-ui binary.
+          No .env file, database, private key, or runtime credential is intentionally packaged.
+          INFO
+          cd "$RUNNER_TEMP"
+          zip -0 -qr "$GITHUB_WORKSPACE/EL-UI-v4.0.0-full.zip" "EL-UI-v4.0.0"
+          unzip -t "$GITHUB_WORKSPACE/EL-UI-v4.0.0-full.zip"
+          size=$(stat -c '%s' "$GITHUB_WORKSPACE/EL-UI-v4.0.0-full.zip")
+          echo "ZIP_SIZE_BYTES=$size" | tee "$GITHUB_WORKSPACE/ZIP-SIZE.txt"
+          if [ "$size" -lt 73400320 ]; then
+            echo "ZIP is smaller than the requested 70 MiB minimum ($size bytes)." >&2
+            exit 1
+          fi
+          sha256sum "$GITHUB_WORKSPACE/EL-UI-v4.0.0-full.zip" > "$GITHUB_WORKSPACE/EL-UI-v4.0.0-full.zip.sha256"
+
+      - name: Upload verified ZIP
+        uses: actions/upload-artifact@v7
+        with:
+          name: EL-UI-v4.0.0-full-zip
+          path: |
+            EL-UI-v4.0.0-full.zip
+            EL-UI-v4.0.0-full.zip.sha256
+            ZIP-SIZE.txt
+          if-no-files-found: error
+          retention-days: 7
+ -count=1
+
       - name: PostgreSQL migration and durable-first tests
         env:
           XUI_DB_TYPE: postgres
