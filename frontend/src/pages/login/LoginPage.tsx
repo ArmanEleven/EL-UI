@@ -83,7 +83,10 @@ export default function LoginPage() {
       const msg = await HttpUtil.post('/login', values);
       if (msg.success) {
         try {
-          const profile = await HttpUtil.get('/panel/api/admins/me', undefined, { silent: true });
+          const profile = (await HttpUtil.get('/panel/api/admins/me', undefined, { silent: true })) as {
+            success?: boolean;
+            obj?: { role?: string };
+          };
           const isSecondaryAdmin = profile?.success && profile?.obj?.role === 'admin';
           window.location.href = basePath + (isSecondaryAdmin ? 'panel/portal' : 'panel/');
         } catch {
