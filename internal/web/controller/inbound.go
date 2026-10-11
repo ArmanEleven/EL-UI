@@ -182,6 +182,21 @@ func (a *InboundController) getInboundOptions(c *gin.Context) {
 		}
 		options = filtered
 	}
+	if !isOwner {
+		// Do not expose protocol secrets, private keys, node addresses, or
+		// generated server configuration to secondary admins. They only need
+		// this safe summary to inspect and select an inbound.
+		safeOptions := make([]gin.H, 0, len(options))
+		for _, option := range options {
+			safeOptions = append(safeOptions, gin.H{
+				"id": option.Id, "remark": option.Remark, "protocol": option.Protocol,
+				"port": option.Port, "enable": option.Enable, "network": option.Network,
+				"security": option.Security,
+			})
+		}
+		jsonObj(c, safeOptions, nil)
+		return
+	}
 	jsonObj(c, options, nil)
 }
 
