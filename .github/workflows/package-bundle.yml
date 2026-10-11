@@ -142,6 +142,7 @@ jobs:
           Branch: $GITHUB_REF_NAME
 
           This archive contains the full source tree, frontend dependencies, generated frontend build, and a Linux amd64 x-ui binary.
+          The secondary-admin portal includes inbound visibility, client creation, an owned-client list, and connection links/QR codes.
           No .env file, database, private key, or runtime credential is intentionally packaged.
           INFO
           cd "$RUNNER_TEMP"
