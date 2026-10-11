@@ -210,7 +210,7 @@ export default function AdminPortalPage() {
         minHeight: '100vh',
         padding: 'clamp(16px, 3vw, 36px)',
         background:
-          'radial-gradient(circle at 90% 0%, rgba(82, 110, 255, .12), transparent 34%), var(--ant-color-bg-layout, #f4f6fb)',
+          'radial-gradient(circle at 90% 0%, rgba(139, 92, 246, .14), transparent 34%), var(--ant-color-bg-layout, #f4f6fb)',
       }}
     >
       {messageContextHolder}
@@ -234,7 +234,7 @@ export default function AdminPortalPage() {
                 placeItems: 'center',
                 borderRadius: 16,
                 color: '#fff',
-                background: 'linear-gradient(135deg, #536dfe, #7c4dff)',
+                background: 'linear-gradient(135deg, #8b5cf6, #6d28d9)',
                 fontWeight: 800,
                 fontSize: 20,
               }}
