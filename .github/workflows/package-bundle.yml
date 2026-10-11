@@ -75,6 +75,10 @@ jobs:
         working-directory: frontend
         run: npm run typecheck
 
+      - name: Install Playwright Chromium
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+
       - name: Frontend tests
         working-directory: frontend
         run: npm test
@@ -86,6 +90,10 @@ jobs:
       - name: Compile Storybook
         working-directory: frontend
         run: npm run build-storybook
+
+      - name: Audit production dependencies
+        working-directory: frontend
+        run: npm audit --omit=dev --audit-level=high
 
       - name: Go lint
         uses: golangci/golangci-lint-action@v9
