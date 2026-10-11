@@ -106,3 +106,17 @@ func TestOwnerKeepsMasterAccess(t *testing.T) {
 		t.Fatalf("status = %d, want %d; body=%s", rec.Code, http.StatusOK, rec.Body.String())
 	}
 }
+
+
+func TestAdminQuickCreateProtocolAllowlist(t *testing.T) {
+	for _, protocol := range []string{"vless", "VMess", "trojan", "hysteria", "tuic", "masque"} {
+		if !supportsAdminQuickCreateProtocol(protocol) {
+			t.Errorf("protocol %q should support quick client creation", protocol)
+		}
+	}
+	for _, protocol := range []string{"wireguard", "amneziawg", "mtproto", "shadowsocks", "socks", "http", "unknown"} {
+		if supportsAdminQuickCreateProtocol(protocol) {
+			t.Errorf("protocol %q must not support quick client creation", protocol)
+		}
+	}
+}

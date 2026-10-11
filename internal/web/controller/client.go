@@ -22,6 +22,34 @@ func notifyClientsChanged() {
 	websocket.BroadcastInvalidate(websocket.MessageTypeClients)
 }
 
+func supportsAdminQuickCreateProtocol(protocol string) bool {
+	switch strings.ToLower(strings.TrimSpace(protocol)) {
+	case "vless", "vmess", "trojan", "hysteria", "tuic", "masque":
+		return true
+	default:
+		return false
+	}
+}
+
+func validateAdminQuickCreateInbounds(ids []int) error {
+	if len(ids) == 0 {
+		return panel.ErrAdminInvalid
+	}
+	var inbounds []model.Inbound
+	if err := database.GetDB().Where("id IN ?", ids).Find(&inbounds).Error; err != nil {
+		return err
+	}
+	if len(inbounds) != len(ids) {
+		return panel.ErrAdminInvalid
+	}
+	for _, inbound := range inbounds {
+		if !supportsAdminQuickCreateProtocol(inbound.Protocol) {
+			return panel.ErrAdminInvalid
+		}
+	}
+	return nil
+}
+
 func parseInboundIdsQuery(raw string) []int {
 	raw = strings.TrimSpace(raw)
 	if raw == "" {
@@ -229,6 +257,10 @@ func (a *ClientController) create(c *gin.Context) {
 		allowed, checkErr := a.adminService.CanUseInboundIDs(adminID, payload.InboundIds)
 		if checkErr != nil || !allowed {
 			jsonMsg(c, I18nWeb(c, "somethingWentWrong"), panel.ErrAdminInvalid)
+			return
+		}
+		if err := validateAdminQuickCreateInbounds(payload.InboundIds); err != nil {
+			jsonMsg(c, I18nWeb(c, "somethingWentWrong"), err)
 			return
 		}
 		if err := a.adminService.CanCreateClient(adminID, payload.Client.Email, payload.Client.TotalGB); err != nil {
