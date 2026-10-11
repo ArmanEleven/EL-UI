@@ -192,41 +192,6 @@ func (s *AdminService) CanUseInboundIDs(userID int, ids []int) (bool, error) {
 	return true, nil
 }
 
-func (s *AdminService) CanCreateClient(userID int, email string, totalBytes int64) error {
-	p, err := s.GetProfile(userID)
-	if err != nil { return err }
-	if !p.Enabled { return ErrAdminForbidden }
-	if strings.TrimSpace(email) == "" || (totalBytes <= 0 && !p.AllowUnlimitedTraffic) { return ErrAdminInvalid }
-	return database.GetDB().Transaction(func(tx *gorm.DB) error {
-		var count int64
-		if err := tx.Model(&model.ClientRecord{}).Where("email = ?", email).Count(&count).Error; err != nil { return err }
-		if count > 0 { return fmt.Errorf("%w: client already exists", ErrAdminInvalid) }
-		if err := tx.Model(&model.ClientOwnership{}).Where("client_email = ?", email).Count(&count).Error; err != nil { return err }
-		if count > 0 { return fmt.Errorf("%w: client email already assigned", ErrAdminInvalid) }
-		q := tx.Model(&model.AdminProfile{}).Where("user_id = ? AND enabled = ?", userID, true)
-		if !p.AllowUnlimitedClients { q = q.Where("allocated_clients < max_clients") }
-		if !p.AllowUnlimitedTraffic && totalBytes > 0 { q = q.Where("allocated_traffic_bytes + ? <= traffic_quota_bytes", totalBytes) }
-		updates := map[string]any{"allocated_clients": gorm.Expr("allocated_clients + 1")}
-		if totalBytes > 0 { updates["allocated_traffic_bytes"] = gorm.Expr("allocated_traffic_bytes + ?", totalBytes) }
-		res := q.Updates(updates)
-		if res.Error != nil { return res.Error }
-		if res.RowsAffected != 1 { return fmt.Errorf("%w: quota exceeded or account disabled", ErrAdminInvalid) }
-		return tx.Create(&model.ClientOwnership{ClientEmail: email, AdminUserID: userID}).Error
-	})
-}
-
-func (s *AdminService) CancelClientReservation(userID int, email string, totalBytes int64) error {
-	return database.GetDB().Transaction(func(tx *gorm.DB) error {
-		res := tx.Where("admin_user_id = ? AND client_email = ?", userID, email).Delete(&model.ClientOwnership{})
-		if res.Error != nil { return res.Error }
-		if res.RowsAffected == 0 { return nil }
-		return tx.Model(&model.AdminProfile{}).Where("user_id = ?", userID).Updates(map[string]any{
-			"allocated_clients": gorm.Expr("CASE WHEN allocated_clients > 0 THEN allocated_clients - 1 ELSE 0 END"),
-			"allocated_traffic_bytes": gorm.Expr("CASE WHEN allocated_traffic_bytes >= ? THEN allocated_traffic_bytes - ? ELSE 0 END", adminMaxInt64(totalBytes, 0), adminMaxInt64(totalBytes, 0)),
-		}).Error
-	})
-}
-
 func (s *AdminService) AdjustClientQuota(userID int, oldBytes, newBytes int64) error {
 	p, err := s.GetProfile(userID)
 	if err != nil { return err }
