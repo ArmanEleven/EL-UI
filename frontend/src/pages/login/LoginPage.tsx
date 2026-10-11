@@ -89,10 +89,8 @@ export default function LoginPage() {
             success?: boolean;
             obj?: { role?: string };
           };
-          const isSecondaryAdmin =
-            profile?.success && profile?.obj?.role === 'admin';
-          window.location.href =
-            basePath + (isSecondaryAdmin ? 'panel/portal' : 'panel/');
+          const isSecondaryAdmin = profile?.success && profile?.obj?.role === 'admin';
+          window.location.href = basePath + (isSecondaryAdmin ? 'panel/portal' : 'panel/');
         } catch {
           window.location.href = basePath + 'panel/';
         }
