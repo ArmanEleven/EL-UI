@@ -229,3 +229,13 @@ Tools and integrations built by the community around 3x-ui.
   <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/badge?repo=MHSanaei/3x-ui&type=rank&theme=dark" /><source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/badge?repo=MHSanaei/3x-ui&type=rank" /><img alt="Star History Rank" src="https://api.star-history.com/badge?repo=MHSanaei/3x-ui&type=rank" /></picture> <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/badge?repo=MHSanaei/3x-ui&type=trending&theme=dark" /><source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/badge?repo=MHSanaei/3x-ui&type=trending" /><img alt="GitHub Trending Repository of the Day" src="https://api.star-history.com/badge?repo=MHSanaei/3x-ui&type=trending" /></picture>
  </a>
 </p>
+
+## EL-UI
+
+EL-UI is a customized management-panel project built around the 3X-UI core.
+
+Project planning and integration notes:
+- [EL-UI Architecture](docs/ELUI-ARCHITECTURE.md)
+- [Feature Matrix](docs/FEATURE_MATRIX.md)
+- [Source Audit](docs/SOURCE_AUDIT.md)
+- [Decision Log](docs/DECISION_LOG.md)
