@@ -21,9 +21,9 @@ func newAdminAccessTestEngine(t *testing.T, enabled, secondaryActor bool) *gin.E
 	t.Setenv("XUI_DB_FOLDER", dbDir)
 	dbtest.InitDB(t, filepath.Join(dbDir, "x-ui.db"))
 
-	owner := model.User{Username: "owner", Password: "test-password"}
-	if err := database.GetDB().Create(&owner).Error; err != nil {
-		t.Fatalf("create owner: %v", err)
+	var owner model.User
+	if err := database.GetDB().Order("id ASC").First(&owner).Error; err != nil {
+		t.Fatalf("load primary owner: %v", err)
 	}
 	secondary := model.User{Username: "secondary", Password: "test-password"}
 	if err := database.GetDB().Create(&secondary).Error; err != nil {
