@@ -72,7 +72,7 @@ export default function AdminsPage() {
       messageApi.error(result.msg || 'دریافت فهرست ادمین‌ها ناموفق بود');
     }
     setLoading(false);
-  }, []);
+  }, [messageApi]);
 
   const loadInbounds = useCallback(async () => {
     const result = await HttpUtil.get<InboundOption[]>('/panel/api/inbounds/options', undefined, {
@@ -83,7 +83,7 @@ export default function AdminsPage() {
     } else {
       messageApi.error(result.msg || 'دریافت فهرست ورودی‌ها ناموفق بود');
     }
-  }, []);
+  }, [messageApi]);
 
   useEffect(() => {
     let active = true;
