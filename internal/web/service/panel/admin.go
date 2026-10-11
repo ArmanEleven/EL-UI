@@ -97,6 +97,11 @@ func (s *AdminService) Update(actorID,targetID int,username,password *string,ena
   if password!=nil&&*password!=""{if len(*password)<10{return ErrAdminInvalid};hash,err:=crypto.HashPasswordAsBcrypt(*password);if err!=nil{return err};if err:=tx.Model(&model.User{}).Where("id = ?",targetID).Updates(map[string]any{"password":hash,"login_epoch":gorm.Expr("login_epoch + 1")}).Error;err!=nil{return err}}
   if p.AllocatedClients>maxClients&&!allowUnlimitedClients{return fmt.Errorf("%w: سقف جدید از تخصیص فعلی کمتر است",ErrAdminInvalid)}
   if p.AllocatedTrafficBytes>trafficQuotaBytes&&!allowUnlimitedTraffic{return fmt.Errorf("%w: سهمیه جدید از تخصیص فعلی کمتر است",ErrAdminInvalid)}
+  if p.Enabled != enabled {
+   if err := tx.Model(&model.User{}).Where("id = ?", targetID).Update("login_epoch", gorm.Expr("login_epoch + 1")).Error; err != nil {
+    return err
+   }
+  }
   if err:=tx.Model(p).Updates(map[string]any{"enabled":enabled,"max_clients":maxClients,"allow_unlimited_clients":allowUnlimitedClients,"traffic_quota_bytes":trafficQuotaBytes,"allow_unlimited_traffic":allowUnlimitedTraffic,"allowed_inbound_ids":string(idsJSON)}).Error;err!=nil{return err}
   return writeAdminAudit(tx,actorID,"admin.update",targetID,map[string]any{"enabled":enabled,"maxClients":maxClients,"allowUnlimitedClients":allowUnlimitedClients,"trafficQuotaBytes":trafficQuotaBytes,"allowUnlimitedTraffic":allowUnlimitedTraffic})
  })
