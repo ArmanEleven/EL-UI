@@ -7,6 +7,8 @@ import {
   Form,
   Input,
   InputNumber,
+  Modal,
+  QRCode,
   Row,
   Select,
   Space,
@@ -50,8 +52,31 @@ type AdminProfile = {
 
 type ApiResponse<T> = { success?: boolean; msg?: string; obj?: T };
 
+type ClientSummary = {
+  email: string;
+  enable: boolean;
+  totalGB: number;
+  expiryTime: number;
+  inboundIds: number[];
+};
+
 const GB = 1024 * 1024 * 1024;
 const BASIC_CLIENT_PROTOCOLS = new Set(['vless', 'vmess', 'trojan', 'hysteria', 'tuic', 'masque']);
+
+function collectConnectionLinks(value: unknown): string[] {
+  const pattern = /^(?:vless|vmess|trojan|ss|ssr|hysteria2?|tuic|masque|socks|https?):\/\//i;
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    return pattern.test(trimmed) ? [trimmed] : [];
+  }
+  if (Array.isArray(value)) {
+    return value.flatMap(collectConnectionLinks);
+  }
+  if (value && typeof value === 'object') {
+    return Object.values(value).flatMap(collectConnectionLinks);
+  }
+  return [];
+}
 
 function generateUuid(): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
@@ -82,6 +107,9 @@ export default function AdminPortalPage() {
   const [messageApi, messageContextHolder] = message.useMessage();
   const [profile, setProfile] = useState<AdminProfile | null>(null);
   const [inbounds, setInbounds] = useState<InboundOption[]>([]);
+  const [clients, setClients] = useState<ClientSummary[]>([]);
+  const [selectedLinks, setSelectedLinks] = useState<{ email: string; links: string[] } | null>(null);
+  const [linksLoading, setLinksLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [createdCredential, setCreatedCredential] = useState<{
@@ -92,13 +120,16 @@ export default function AdminPortalPage() {
 
   const load = useCallback(async () => {
     try {
-      const [profileResponse, inboundResponse] = await Promise.all([
+      const [profileResponse, inboundResponse, clientResponse] = await Promise.all([
         HttpUtil.get('/panel/api/admins/me', undefined, { silent: true }) as Promise<
           ApiResponse<AdminProfile>
         >,
         HttpUtil.get('/panel/api/inbounds/options', undefined, { silent: true }) as Promise<
           ApiResponse<InboundOption[]>
         >,
+        HttpUtil.get('/panel/api/clients/list/paged?page=1&pageSize=100', undefined, {
+          silent: true,
+        }) as Promise<ApiResponse<{ items?: ClientSummary[] }>>,
       ]);
       if (!profileResponse?.success || !profileResponse.obj) {
         throw new Error(profileResponse?.msg || 'دریافت اطلاعات حساب ناموفق بود.');
@@ -112,6 +143,11 @@ export default function AdminPortalPage() {
         throw new Error(inboundResponse?.msg || 'دریافت فهرست اینباندها ناموفق بود.');
       }
       setInbounds(Array.isArray(inboundResponse.obj) ? inboundResponse.obj : []);
+      if (clientResponse?.success && clientResponse.obj) {
+        setClients(Array.isArray(clientResponse.obj.items) ? clientResponse.obj.items : []);
+      } else {
+        setClients([]);
+      }
     } catch (error) {
       messageApi.error(error instanceof Error ? error.message : 'خطا در دریافت اطلاعات پنل.');
     } finally {
@@ -172,6 +208,32 @@ export default function AdminPortalPage() {
       }
     },
     [form, load, messageApi],
+  );
+
+  const showClientLinks = useCallback(
+    async (email: string) => {
+      setLinksLoading(true);
+      try {
+        const response = (await HttpUtil.get(
+          '/panel/api/clients/links/' + encodeURIComponent(email),
+          undefined,
+          { silent: true },
+        )) as ApiResponse<unknown>;
+        if (!response?.success) {
+          throw new Error(response?.msg || 'دریافت لینک‌های اتصال ناموفق بود.');
+        }
+        const links = collectConnectionLinks(response.obj);
+        if (links.length === 0) {
+          throw new Error('برای این کاربر لینک اتصالی پیدا نشد.');
+        }
+        setSelectedLinks({ email, links: [...new Set(links)] });
+      } catch (error) {
+        messageApi.error(error instanceof Error ? error.message : 'دریافت لینک‌ها ناموفق بود.');
+      } finally {
+        setLinksLoading(false);
+      }
+    },
+    [messageApi],
   );
 
   const logout = useCallback(async () => {
@@ -342,6 +404,65 @@ export default function AdminPortalPage() {
             </Row>
           )}
         </Card>
+
+        <Card
+          title="کاربران من"
+          extra={<Tag color="purple">{clients.length.toLocaleString('fa-IR')} مورد</Tag>}
+          style={{ marginBottom: 20 }}
+        >
+          {clients.length === 0 ? (
+            <Typography.Text type="secondary">
+              هنوز کاربری نساخته‌ای یا فهرست خالی است.
+            </Typography.Text>
+          ) : (
+            <Row gutter={[12, 12]}>
+              {clients.map((client) => (
+                <Col xs={24} md={12} lg={8} key={client.email}>
+                  <Card
+                    size="small"
+                    title={client.email}
+                    extra={<Tag color={client.enable ? 'success' : 'default'}>{client.enable ? 'فعال' : 'غیرفعال'}</Tag>}
+                  >
+                    <Space direction="vertical" style={{ width: '100%' }}>
+                      <Typography.Text type="secondary">
+                        حجم کل: {(client.totalGB / GB).toLocaleString('fa-IR', { maximumFractionDigits: 2 })} GB
+                      </Typography.Text>
+                      <Typography.Text type="secondary">
+                        انقضا: {client.expiryTime > 0 ? new Date(client.expiryTime).toLocaleDateString('fa-IR') : 'بدون انقضا'}
+                      </Typography.Text>
+                      <Button block loading={linksLoading} onClick={() => void showClientLinks(client.email)}>
+                        نمایش لینک و QR
+                      </Button>
+                    </Space>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          )}
+        </Card>
+
+        <Modal
+          title={selectedLinks ? 'لینک اتصال · ' + selectedLinks.email : 'لینک اتصال'}
+          open={selectedLinks !== null}
+          onCancel={() => setSelectedLinks(null)}
+          footer={<Button onClick={() => setSelectedLinks(null)}>بستن</Button>}
+          width={720}
+        >
+          {selectedLinks && (
+            <Space direction="vertical" size="large" style={{ width: '100%' }}>
+              {selectedLinks.links.map((link, index) => (
+                <Card key={link + index} size="small">
+                  <Space direction="vertical" align="center" style={{ width: '100%' }}>
+                    <QRCode value={link} size={176} />
+                    <Typography.Paragraph copyable={{ text: link }} style={{ width: '100%', wordBreak: 'break-all' }}>
+                      {link}
+                    </Typography.Paragraph>
+                  </Space>
+                </Card>
+              ))}
+            </Space>
+          )}
+        </Modal>
 
         <Card title="ساخت کاربر جدید" extra={<PlusOutlined />}>
           <Typography.Paragraph type="secondary">
