@@ -798,7 +798,15 @@ func (a *ClientController) getSubLinks(c *gin.Context) {
 }
 
 func (a *ClientController) getClientLinks(c *gin.Context) {
-	links, err := a.inboundService.GetAllClientLinks(resolveHost(c), c.Param("email"))
+	email := c.Param("email")
+	if u := optionalLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
+		owned, err := a.adminService.OwnsClient(u.Id, email)
+		if err != nil || !owned {
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"success": false, "msg": "دسترسی به این کاربر مجاز نیست"})
+			return
+		}
+	}
+	links, err := a.inboundService.GetAllClientLinks(resolveHost(c), email)
 	if err != nil {
 		jsonMsg(c, I18nWeb(c, "pages.inbounds.toasts.obtain"), err)
 		return
