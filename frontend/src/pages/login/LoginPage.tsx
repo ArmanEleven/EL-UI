@@ -233,20 +233,18 @@ export default function LoginPage() {
                       />
                     </FormField>
 
-                    {twoFactorEnable && (
-                      <FormField
-                        name="twoFactorCode"
-                        label={t('twoFactorCode')}
-                        rules={{ validate: rhfZodValidate(TwoFactorCodeSchema) }}
-                      >
-                        <Input
-                          prefix={<KeyOutlined />}
-                          autoComplete="one-time-code"
-                          size="large"
-                          placeholder={t('twoFactorCode')}
-                        />
-                      </FormField>
-                    )}
+                    <FormField
+                      name="twoFactorCode"
+                      label={t('twoFactorCode')}
+                      rules={twoFactorEnable ? { validate: rhfZodValidate(TwoFactorCodeSchema) } : undefined}
+                    >
+                      <Input
+                        prefix={<KeyOutlined />}
+                        autoComplete="one-time-code"
+                        size="large"
+                        placeholder={t('twoFactorCode')}
+                      />
+                    </FormField>
 
                     <Form.Item className="submit-row">
                       <Button
