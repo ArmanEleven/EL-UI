@@ -125,7 +125,7 @@ func (a *APIController) enforceMultiAdminAccess(c *gin.Context) {
 		if settingErr != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"success": false,
-				"msg":     "بررسی تنظیمات تأیید دومرحله‌ای ناموفق بود",
+				"msg":     "بررسی تنظیمات تأیید دومرحله\u200cای ناموفق بود",
 			})
 			return
 		}
@@ -145,7 +145,7 @@ func (a *APIController) enforceMultiAdminAccess(c *gin.Context) {
 				}
 				c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
 					"success": false,
-					"msg":     "برای ادامه ابتدا تأیید دومرحله‌ای را فعال کن",
+					"msg":     "برای ادامه ابتدا تأیید دومرحله\u200cای را فعال کن",
 				})
 				return
 			}
