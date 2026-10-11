@@ -125,6 +125,7 @@ func (a *APIController) enforceMultiAdminAccess(c *gin.Context) {
 	allowed := (c.Request.Method == http.MethodGet && path == "/panel/api/admins/me") ||
 		(c.Request.Method == http.MethodGet && path == "/panel/api/inbounds/options") ||
 		(c.Request.Method == http.MethodGet && path == "/panel/api/clients/list") ||
+		(c.Request.Method == http.MethodGet && path == "/panel/api/clients/list/paged") ||
 		(c.Request.Method == http.MethodGet && path == "/panel/api/clients/links/:email") ||
 		(c.Request.Method == http.MethodPost && path == "/panel/api/clients/add")
 	if allowed {
