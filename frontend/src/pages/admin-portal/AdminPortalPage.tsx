@@ -60,6 +60,11 @@ type ClientSummary = {
   inboundIds: number[];
 };
 
+type TwoFactorStatus = {
+  panelTwoFactorEnabled: boolean;
+  twoFactorEnabled: boolean;
+};
+
 const GB = 1024 * 1024 * 1024;
 const BASIC_CLIENT_PROTOCOLS = new Set(['vless', 'vmess', 'trojan', 'hysteria', 'tuic', 'masque']);
 
@@ -122,16 +127,13 @@ export default function AdminPortalPage() {
 
   const load = useCallback(async () => {
     try {
-      const [profileResponse, inboundResponse, clientResponse] = await Promise.all([
+      const [profileResponse, twoFactorResponse] = await Promise.all([
         HttpUtil.get('/panel/api/admins/me', undefined, { silent: true }) as Promise<
           ApiResponse<AdminProfile>
         >,
-        HttpUtil.get('/panel/api/inbounds/options', undefined, { silent: true }) as Promise<
-          ApiResponse<InboundOption[]>
+        HttpUtil.get('/panel/api/admins/me/2fa', undefined, { silent: true }) as Promise<
+          ApiResponse<TwoFactorStatus>
         >,
-        HttpUtil.get('/panel/api/clients/list/paged?page=1&pageSize=100', undefined, {
-          silent: true,
-        }) as Promise<ApiResponse<{ items?: ClientSummary[] }>>,
       ]);
       if (!profileResponse?.success || !profileResponse.obj) {
         throw new Error(profileResponse?.msg || 'دریافت اطلاعات حساب ناموفق بود.');
@@ -141,6 +143,23 @@ export default function AdminPortalPage() {
         return;
       }
       setProfile(profileResponse.obj);
+      if (!twoFactorResponse?.success || !twoFactorResponse.obj) {
+        throw new Error(twoFactorResponse?.msg || 'بررسی وضعیت تأیید دومرحله‌ای ناموفق بود.');
+      }
+      setTwoFactorStatus(twoFactorResponse.obj);
+      if (twoFactorResponse.obj.panelTwoFactorEnabled && !twoFactorResponse.obj.twoFactorEnabled) {
+        setInbounds([]);
+        setClients([]);
+        return;
+      }
+      const [inboundResponse, clientResponse] = await Promise.all([
+        HttpUtil.get('/panel/api/inbounds/options', undefined, { silent: true }) as Promise<
+          ApiResponse<InboundOption[]>
+        >,
+        HttpUtil.get('/panel/api/clients/list/paged?page=1&pageSize=100', undefined, {
+          silent: true,
+        }) as Promise<ApiResponse<{ items?: ClientSummary[] }>>,
+      ]);
       if (!inboundResponse?.success) {
         throw new Error(inboundResponse?.msg || 'دریافت فهرست اینباندها ناموفق بود.');
       }
@@ -212,6 +231,49 @@ export default function AdminPortalPage() {
     [form, load, messageApi],
   );
 
+  const beginTwoFactorSetup = useCallback(async () => {
+    setSetupLoading(true);
+    try {
+      const response = (await HttpUtil.post('/panel/api/admins/me/2fa/setup', {})) as ApiResponse<{
+        secret: string;
+        otpauthUrl: string;
+      }>;
+      if (!response?.success || !response.obj) {
+        throw new Error(response?.msg || 'شروع راه‌اندازی 2FA ناموفق بود.');
+      }
+      setSetupSecret(response.obj);
+      setSetupCode('');
+    } catch (error) {
+      messageApi.error(error instanceof Error ? error.message : 'شروع راه‌اندازی 2FA ناموفق بود.');
+    } finally {
+      setSetupLoading(false);
+    }
+  }, [messageApi]);
+
+  const confirmTwoFactorSetup = useCallback(async () => {
+    if (!setupCode.trim()) {
+      messageApi.error('کد برنامه احراز هویت را وارد کن.');
+      return;
+    }
+    setSetupLoading(true);
+    try {
+      const response = (await HttpUtil.post('/panel/api/admins/me/2fa/confirm', {
+        code: setupCode.trim(),
+      })) as ApiResponse<unknown>;
+      if (!response?.success) {
+        throw new Error(response?.msg || 'تأیید کد ناموفق بود.');
+      }
+      setSetupSecret(null);
+      setSetupCode('');
+      messageApi.success('تأیید دومرحله‌ای فعال شد.');
+      await load();
+    } catch (error) {
+      messageApi.error(error instanceof Error ? error.message : 'تأیید کد ناموفق بود.');
+    } finally {
+      setSetupLoading(false);
+    }
+  }, [load, messageApi, setupCode]);
+
   const showClientLinks = useCallback(
     async (email: string) => {
       setLinksLoading(true);
@@ -256,6 +318,47 @@ export default function AdminPortalPage() {
       >
         {messageContextHolder}
         <Spin size="large" />
+      </div>
+    );
+  }
+
+  if (twoFactorStatus?.panelTwoFactorEnabled && !twoFactorStatus.twoFactorEnabled) {
+    return (
+      <div dir="rtl" style={{ minHeight: '100vh', padding: 24, display: 'grid', placeItems: 'center', background: 'var(--ant-color-bg-layout, #f4f6fb)' }}>
+        {messageContextHolder}
+        <Card title="فعال‌سازی تأیید دومرحله‌ای" style={{ width: 'min(560px, 100%)' }}>
+          <Alert
+            type="warning"
+            showIcon
+            message="برای امنیت پنل، ابتدا 2FA شخصی خودت را فعال کن"
+            description="تا قبل از تأیید کد برنامه احراز هویت، اطلاعات اینباندها و کاربران قفل می‌ماند."
+            style={{ marginBottom: 20 }}
+          />
+          {!setupSecret ? (
+            <Button type="primary" block loading={setupLoading} onClick={() => void beginTwoFactorSetup()}>
+              شروع راه‌اندازی
+            </Button>
+          ) : (
+            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+              <QRCode value={setupSecret.otpauthUrl} size={220} />
+              <Typography.Text>اگر QR اسکن نمی‌شود، این کلید را دستی وارد کن:</Typography.Text>
+              <Typography.Paragraph copyable>{setupSecret.secret}</Typography.Paragraph>
+              <Input
+                value={setupCode}
+                onChange={(event) => setSetupCode(event.target.value)}
+                inputMode="numeric"
+                placeholder="کد ۶ رقمی برنامه احراز هویت"
+                maxLength={8}
+              />
+              <Button type="primary" block loading={setupLoading} onClick={() => void confirmTwoFactorSetup()}>
+                تأیید و فعال‌سازی
+              </Button>
+            </Space>
+          )}
+          <Button block style={{ marginTop: 12 }} onClick={() => void logout()}>
+            خروج از حساب
+          </Button>
+        </Card>
       </div>
     );
   }
