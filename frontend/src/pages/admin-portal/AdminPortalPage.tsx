@@ -276,7 +276,7 @@ export default function AdminPortalPage() {
     } finally {
       setSetupLoading(false);
     }
-  }, [load, messageApi]);
+  }, [load, messageApi, setupCode]);
 
   const showClientLinks = useCallback(
     async (email: string) => {
