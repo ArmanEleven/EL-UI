@@ -85,6 +85,16 @@ func (s *UserService) CheckUser(username string, password string, twoFactorCode 
 		}
 	}
 
+	// Secondary administrators can be disabled independently of the owner account.
+	var adminProfile model.AdminProfile
+	profileErr := database.GetDB().Where("user_id = ?", user.Id).First(&adminProfile).Error
+	if profileErr == nil && !adminProfile.Enabled {
+		return nil, errors.New("account disabled")
+	}
+	if profileErr != nil && !errors.Is(profileErr, gorm.ErrRecordNotFound) {
+		return nil, profileErr
+	}
+
 	twoFactorEnable, err := s.settingService.GetTwoFactorEnable()
 	if err != nil {
 		logger.Warning("check two factor err:", err)

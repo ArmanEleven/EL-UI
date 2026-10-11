@@ -15,6 +15,7 @@ import (
 
 // APIController handles the main API routes for the 3x-ui panel, including inbounds and server management.
 type APIController struct {
+	adminService panel.AdminService
 	BaseController
 	inboundController     *InboundController
 	serverController      *ServerController
@@ -73,6 +74,17 @@ func (a *APIController) checkAPIAuth(c *gin.Context) {
 		return
 	}
 	c.Next()
+}
+
+func (a *APIController) enforceMultiAdminAccess(c *gin.Context) {
+ // API tokens and mTLS are governed by their existing explicit token scopes.
+ if authed, ok := c.Get("api_authed"); ok && authed == true { c.Next(); return }
+ u := session.GetLoginUser(c)
+ if u == nil { c.AbortWithStatus(http.StatusUnauthorized); return }
+ if a.adminService.IsOwner(u.Id) { c.Next(); return }
+ // Fail closed until an endpoint has explicit ownership enforcement.
+ if c.Request.Method == http.MethodGet && strings.HasSuffix(c.FullPath(), "/admins/me") { c.Next(); return }
+ c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"success": false, "msg": "این عملیات برای حساب ادمین مجاز نیست"})
 }
 
 // monitorScopeAllow exposes only status/metrics routes without sensitive data.
@@ -175,12 +187,14 @@ func (a *APIController) initRouter(g *gin.RouterGroup) {
 	api := g.Group("/panel/api")
 	api.Use(a.checkAPIAuth)
 	api.Use(a.enforceTokenScope)
+	api.Use(a.enforceMultiAdminAccess)
 	// Decode + verify the node config envelope (zstd + X-Config-Sha256) and
 	// advertise support, before CSRF/handlers read the body.
 	api.Use(middleware.ConfigEnvelopeMiddleware())
 	api.Use(middleware.CSRFMiddleware())
 
 	api.GET("/openapi.json", ServeOpenAPISpec)
+	NewAdminController(api)
 
 	// Inbounds API
 	inbounds := api.Group("/inbounds")
