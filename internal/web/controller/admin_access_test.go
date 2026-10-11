@@ -56,6 +56,7 @@ func newAdminAccessTestEngine(t *testing.T, enabled bool, actorID int) *gin.Engi
 	api.POST("/clients/add", func(c *gin.Context) { c.Status(http.StatusOK) })
 	api.GET("/server/status", func(c *gin.Context) { c.Status(http.StatusOK) })
 	api.POST("/inbounds/update/:id", func(c *gin.Context) { c.Status(http.StatusOK) })
+	engine.GET("/ws", (&WebSocketController{}).HandleWebSocket)
 	return engine
 }
 
@@ -72,6 +73,7 @@ func TestSecondaryAdminAccessIsNarrow(t *testing.T) {
 		{name: "create client", method: http.MethodPost, path: "/panel/api/clients/add", want: http.StatusOK},
 		{name: "master status denied", method: http.MethodGet, path: "/panel/api/server/status", want: http.StatusForbidden},
 		{name: "inbound mutation denied", method: http.MethodPost, path: "/panel/api/inbounds/update/1", want: http.StatusForbidden},
+		{name: "master websocket denied", method: http.MethodGet, path: "/ws", want: http.StatusForbidden},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
