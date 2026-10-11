@@ -28,3 +28,11 @@ Status meanings:
 HMPanel describes itself as a management layer **on top of native 3X-UI**, not merely a visual theme. That makes a blind source merge risky. EL-UI should first define a stable integration boundary and then port/adapt capabilities in small, testable increments.
 
 The exact status of every feature remains provisional until the corresponding implementation, schema, and tests have been inspected.
+
+
+## Source-level findings
+
+- 3X-UI already provides a Go-based native core, REST endpoints under `/panel/api`, scoped API tokens, CSRF middleware, native inbounds/clients, and local/remote node runtime behavior.
+- HMPanel uses a separate PostgreSQL/Prisma data model for management entities and a separate NestJS/Next.js stack. This makes a blind code merge inappropriate.
+- The HMPanel README says MIT, while `backend/package.json` declares `UNLICENSED` and the root LICENSE lookup did not find a file. Direct backend code reuse remains blocked pending license clarification.
+- The repository includes `docs/SOURCE_AUDIT.md` with the current evidence and the remaining decision gates.
