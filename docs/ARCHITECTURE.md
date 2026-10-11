@@ -61,3 +61,18 @@ These are target boundaries, not a claim that any of these components already ex
 ## UI direction
 
 The UI redesign should be implemented after the API/integration boundary is stable. Use a separate EL-UI design system (tokens, typography, spacing, components, navigation, responsive breakpoints) while preserving working backend behavior. The first UI milestone should be a tested shell and one real data-driven page, not a static mock dashboard.
+
+
+## Source-audit decision
+
+The initial source review confirms that 3X-UI is a Go/Gin/GORM application with a React/Vite frontend embedded into its Go binary. HMPanel is a separate NestJS/Node backend with a Next.js frontend, a Prisma/PostgreSQL management schema, and Redis/Bull-based background work. Their frontend and backend stacks are not a drop-in match.
+
+**Recommended baseline:** retain Sanaei 3X-UI as the protocol/Xray core and add an EL-UI management layer behind a narrowly scoped adapter. Do not blindly merge the two databases or service lifecycles.
+
+### Licensing gate
+
+The HMPanel README says MIT, but the root LICENSE lookup did not find a license file and `backend/package.json` says `UNLICENSED`. Until this discrepancy is resolved, direct reuse or redistribution of HMPanel backend code is blocked. The feature requirements and public API behavior can still guide an independent implementation. See [SOURCE_AUDIT.md](SOURCE_AUDIT.md).
+
+### Existing related project
+
+[ArmanEleven/ElevenPanel](https://github.com/ArmanEleven/ElevenPanel) is a separate related repository with a similar management-layer direction. It must be inspected before duplicating project-specific work, but no files will be merged from it automatically.
