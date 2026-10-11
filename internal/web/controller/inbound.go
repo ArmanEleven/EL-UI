@@ -10,6 +10,7 @@ import (
 	"github.com/mhsanaei/3x-ui/v3/internal/util/wirecodec"
 	"github.com/mhsanaei/3x-ui/v3/internal/web/middleware"
 	"github.com/mhsanaei/3x-ui/v3/internal/web/service"
+	"github.com/mhsanaei/3x-ui/v3/internal/web/service/panel"
 	"github.com/mhsanaei/3x-ui/v3/internal/web/session"
 	"github.com/mhsanaei/3x-ui/v3/internal/web/websocket"
 	"github.com/mhsanaei/3x-ui/v3/internal/xray"
@@ -23,6 +24,8 @@ type InboundController struct {
 	clientService   service.ClientService
 	xrayService     service.XrayService
 	fallbackService service.FallbackService
+	adminService    panel.AdminService
+	userService     panel.UserService
 }
 
 // NewInboundController creates a new InboundController and sets up its routes.
@@ -134,11 +137,50 @@ func (a *InboundController) getAllInboundLinks(c *gin.Context) {
 // (id, remark, protocol, port, tlsFlowCapable) for pickers in the clients UI.
 // Avoids shipping per-client settings and traffic stats just to fill a dropdown.
 func (a *InboundController) getInboundOptions(c *gin.Context) {
-	user := session.GetLoginUser(c)
-	options, err := a.inboundService.GetInboundOptions(user.Id)
+	user := optionalLoginUser(c)
+	if user == nil {
+		c.AbortWithStatus(401)
+		return
+	}
+
+	ownerID := user.Id
+	isOwner := a.adminService.IsOwner(user.Id)
+	if !isOwner {
+		owner, err := a.userService.GetFirstUser()
+		if err != nil {
+			jsonMsg(c, I18nWeb(c, "pages.inbounds.toasts.obtain"), err)
+			return
+		}
+		ownerID = owner.Id
+	}
+
+	options, err := a.inboundService.GetInboundOptions(ownerID)
 	if err != nil {
 		jsonMsg(c, I18nWeb(c, "pages.inbounds.toasts.obtain"), err)
 		return
+	}
+	if !isOwner {
+		profile, err := a.adminService.GetProfile(user.Id)
+		if err != nil {
+			jsonMsg(c, I18nWeb(c, "pages.inbounds.toasts.obtain"), err)
+			return
+		}
+		var allowedIDs []int
+		if err := json.Unmarshal([]byte(profile.AllowedInboundIDsJSON), &allowedIDs); err != nil {
+			jsonMsg(c, I18nWeb(c, "pages.inbounds.toasts.obtain"), err)
+			return
+		}
+		allowed := make(map[int]struct{}, len(allowedIDs))
+		for _, id := range allowedIDs {
+			allowed[id] = struct{}{}
+		}
+		filtered := make([]service.InboundOption, 0, len(options))
+		for _, option := range options {
+			if _, ok := allowed[option.Id]; ok {
+				filtered = append(filtered, option)
+			}
+		}
+		options = filtered
 	}
 	jsonObj(c, options, nil)
 }
