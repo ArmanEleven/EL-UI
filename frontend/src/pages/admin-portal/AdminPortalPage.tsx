@@ -63,7 +63,6 @@ export default function AdminPortalPage() {
   );
 
   const load = useCallback(async () => {
-    setLoading(true);
     try {
       const [profileResponse, inboundResponse] = await Promise.all([
         HttpUtil.get('/panel/api/admins/me', undefined, { silent: true }) as Promise<
