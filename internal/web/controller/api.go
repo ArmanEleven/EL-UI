@@ -102,6 +102,21 @@ func (a *APIController) enforceMultiAdminAccess(c *gin.Context) {
 		c.Next()
 		return
 	}
+	enabled, err := a.adminService.IsEnabledAdmin(u.Id)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"msg":     "بررسی وضعیت ادمین ناموفق بود",
+		})
+		return
+	}
+	if !enabled {
+		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
+			"success": false,
+			"msg":     "حساب ادمین غیرفعال است",
+		})
+		return
+	}
 
 	// Secondary admins may only use endpoints explicitly scoped to their owned clients.
 	path := c.FullPath()
