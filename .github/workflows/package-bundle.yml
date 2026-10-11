@@ -38,6 +38,8 @@ jobs:
         run: |
           test "$(tr -d '\r\n' < internal/config/version)" = "4.0.0"
           test "$(tr -d '\r\n' < internal/config/name)" = "x-ui"
+          grep -q 'resetAdminTwoFactor' main.go
+          grep -q 'TwoFactorPending' internal/database/model/admin.go
           test ! -e .github/workflows/temporary-format-pass.yml
 
       - name: Set up Go
