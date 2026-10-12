@@ -219,6 +219,8 @@ export default function AdminPortalPage() {
             enable: true,
           },
           inboundIds: values.inboundIds,
+        }, {
+          headers: { 'Content-Type': 'application/json' },
         })) as ApiResponse<unknown>;
         if (!response?.success) {
           throw new Error(response?.msg || 'ساخت کاربر ناموفق بود.');
