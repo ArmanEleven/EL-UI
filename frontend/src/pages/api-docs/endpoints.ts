@@ -2814,6 +2814,23 @@ export const sections: readonly Section[] = [
         summary: 'نمایش نقش و محدودیت‌های حساب واردشده.',
       },
       {
+        method: 'GET',
+        path: '/panel/api/admins/me/2fa',
+        summary: 'نمایش وضعیت تأیید دومرحله‌ای حساب ادمین فرعی.',
+      },
+      {
+        method: 'POST',
+        path: '/panel/api/admins/me/2fa/setup',
+        summary: 'ساخت کلید موقت برای راه‌اندازی تأیید دومرحله‌ای شخصی.',
+        response: '{"success":true,"obj":{"secret":"BASE32SECRET","otpauthUrl":"otpauth://totp/..."}}',
+      },
+      {
+        method: 'POST',
+        path: '/panel/api/admins/me/2fa/confirm',
+        summary: 'تأیید کد برنامه احراز هویت و فعال‌سازی 2FA شخصی.',
+        body: '{"code":"123456"}',
+      },
+      {
         method: 'POST',
         path: '/panel/api/admins',
         summary: 'ساخت حساب ادمین فرعی؛ فقط مالک اصلی.',
@@ -2833,6 +2850,11 @@ export const sections: readonly Section[] = [
         method: 'DELETE',
         path: '/panel/api/admins/:id',
         summary: 'حذف ادمین فرعی؛ فقط مالک اصلی. کاربران تخصیص‌یافته به محدوده مالک اصلی برمی‌گردند.',
+      },
+      {
+        method: 'POST',
+        path: '/panel/api/admins/:id/2fa/reset',
+        summary: 'بازنشانی 2FA ادمین فرعی؛ فقط مالک اصلی پنل.',
       },
     ],
   },
