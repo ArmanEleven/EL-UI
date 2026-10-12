@@ -27,24 +27,24 @@ type AdminController struct {
 }
 
 type adminCreateRequest struct {
-	Username              string `json:"username" binding:"required"`
-	Password              string `json:"password" binding:"required"`
-	MaxClients            int    `json:"maxClients"`
-	AllowUnlimitedClients bool   `json:"allowUnlimitedClients"`
-	TrafficQuotaBytes     int64  `json:"trafficQuotaBytes"`
-	AllowUnlimitedTraffic bool   `json:"allowUnlimitedTraffic"`
-	AllowedInboundIDs     []int  `json:"allowedInboundIds"`
+	Username              string `json:"username" form:"username" binding:"required"`
+	Password              string `json:"password" form:"password" binding:"required"`
+	MaxClients            int    `json:"maxClients" form:"maxClients"`
+	AllowUnlimitedClients bool   `json:"allowUnlimitedClients" form:"allowUnlimitedClients"`
+	TrafficQuotaBytes     int64  `json:"trafficQuotaBytes" form:"trafficQuotaBytes"`
+	AllowUnlimitedTraffic bool   `json:"allowUnlimitedTraffic" form:"allowUnlimitedTraffic"`
+	AllowedInboundIDs     []int  `json:"allowedInboundIds" form:"allowedInboundIds"`
 }
 
 type adminUpdateRequest struct {
-	Username              *string `json:"username"`
-	Password              *string `json:"password"`
-	Enabled               bool    `json:"enabled"`
-	MaxClients            int     `json:"maxClients"`
-	AllowUnlimitedClients bool    `json:"allowUnlimitedClients"`
-	TrafficQuotaBytes     int64   `json:"trafficQuotaBytes"`
-	AllowUnlimitedTraffic bool    `json:"allowUnlimitedTraffic"`
-	AllowedInboundIDs     []int   `json:"allowedInboundIds"`
+	Username              *string `json:"username" form:"username"`
+	Password              *string `json:"password" form:"password"`
+	Enabled               bool    `json:"enabled" form:"enabled"`
+	MaxClients            int     `json:"maxClients" form:"maxClients"`
+	AllowUnlimitedClients bool    `json:"allowUnlimitedClients" form:"allowUnlimitedClients"`
+	TrafficQuotaBytes     int64   `json:"trafficQuotaBytes" form:"trafficQuotaBytes"`
+	AllowUnlimitedTraffic bool    `json:"allowUnlimitedTraffic" form:"allowUnlimitedTraffic"`
+	AllowedInboundIDs     []int   `json:"allowedInboundIds" form:"allowedInboundIds"`
 }
 
 func NewAdminController(g *gin.RouterGroup, settings service.SettingService) *AdminController {
@@ -135,9 +135,9 @@ func (a *AdminController) twoFactorConfirm(c *gin.Context) {
 		return
 	}
 	var req struct {
-		Code string `json:"code" binding:"required"`
+		Code string `json:"code" form:"code" binding:"required"`
 	}
-	if err := c.ShouldBindJSON(&req); err != nil || strings.TrimSpace(req.Code) == "" {
+	if err := c.ShouldBind(&req); err != nil || strings.TrimSpace(req.Code) == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "msg": "کد تأیید معتبر نیست"})
 		return
 	}
@@ -244,7 +244,7 @@ func (a *AdminController) create(c *gin.Context) {
 		return
 	}
 	var req adminCreateRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "msg": "داده\u200cهای ادمین معتبر نیست"})
 		return
 	}
@@ -277,7 +277,7 @@ func (a *AdminController) update(c *gin.Context) {
 		return
 	}
 	var req adminUpdateRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "msg": "داده\u200cهای ادمین معتبر نیست"})
 		return
 	}
