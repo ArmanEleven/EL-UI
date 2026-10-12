@@ -1,0 +1,40 @@
+name: Temporary codegen and formatting pass
+
+on:
+  push:
+    branches:
+      - feature/multi-admin-v1
+
+permissions:
+  contents: write
+
+jobs:
+  generate-and-format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: feature/multi-admin-v1
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Generate API schema and format endpoint docs
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run gen
+          npx oxfmt src/pages/api-docs/endpoints.ts
+      - name: Commit generated and formatted files
+        run: |
+          git status --short
+          if git diff --quiet; then
+            echo "No generated or formatting changes needed."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add frontend/public/openapi.json frontend/src/pages/api-docs/endpoints.ts
+          git commit -m "Regenerate OpenAPI and format admin API docs"
+          git push origin HEAD:feature/multi-admin-v1
