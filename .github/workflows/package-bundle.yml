@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - feature/multi-admin-v1
-    paths:
-      - ".github/workflows/package-bundle.yml"
   workflow_dispatch:
 
 permissions:
