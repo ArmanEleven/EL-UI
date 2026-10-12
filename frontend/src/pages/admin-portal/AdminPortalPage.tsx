@@ -206,22 +206,24 @@ export default function AdminPortalPage() {
           values.expiryDays && values.expiryDays > 0
             ? Date.now() + values.expiryDays * 24 * 60 * 60 * 1000
             : 0;
-        const response = (await HttpUtil.post('/panel/api/clients/add', {
-          client: {
-            email: values.email.trim(),
-            id: uuid,
-            subId,
-            uuid,
-            password,
-            auth: password,
-            totalGB: Math.round(values.totalGB * GB),
-            expiryTime,
-            enable: true,
+        const response = (await HttpUtil.post(
+          '/panel/api/clients/add',
+          {
+            client: {
+              email: values.email.trim(),
+              id: uuid,
+              subId,
+              uuid,
+              password,
+              auth: password,
+              totalGB: Math.round(values.totalGB * GB),
+              expiryTime,
+              enable: true,
+            },
+            inboundIds: values.inboundIds,
           },
-          inboundIds: values.inboundIds,
-        }, {
-          headers: { 'Content-Type': 'application/json' },
-        })) as ApiResponse<unknown>;
+          { headers: { 'Content-Type': 'application/json' } },
+        )) as ApiResponse<unknown>;
         if (!response?.success) {
           throw new Error(response?.msg || 'ساخت کاربر ناموفق بود.');
         }
