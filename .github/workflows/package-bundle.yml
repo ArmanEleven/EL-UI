@@ -149,7 +149,7 @@ jobs:
           No .env file, database, private key, or runtime credential is intentionally packaged.
           INFO
           cd "$RUNNER_TEMP"
-          zip -0 -qr "$GITHUB_WORKSPACE/EL-UI-v4.0.0-full.zip" "EL-UI-v4.0.0"
+          zip -qr "$GITHUB_WORKSPACE/EL-UI-v4.0.0-full.zip" "EL-UI-v4.0.0"
           unzip -t "$GITHUB_WORKSPACE/EL-UI-v4.0.0-full.zip"
           size=$(stat -c '%s' "$GITHUB_WORKSPACE/EL-UI-v4.0.0-full.zip")
           echo "ZIP_SIZE_BYTES=$size" | tee "$GITHUB_WORKSPACE/ZIP-SIZE.txt"
