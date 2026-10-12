@@ -2822,7 +2822,8 @@ export const sections: readonly Section[] = [
         method: 'POST',
         path: '/panel/api/admins/me/2fa/setup',
         summary: 'ساخت کلید موقت برای راه‌اندازی تأیید دومرحله‌ای شخصی.',
-        response: '{"success":true,"obj":{"secret":"BASE32SECRET","otpauthUrl":"otpauth://totp/..."}}',
+        response:
+          '{"success":true,"obj":{"secret":"BASE32SECRET","otpauthUrl":"otpauth://totp/..."}}',
       },
       {
         method: 'POST',
