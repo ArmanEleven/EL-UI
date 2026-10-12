@@ -116,10 +116,8 @@ jobs:
           go test ./internal/web/service -run 'PostgresCommitFailure' -count=1
           go test ./internal/database -run '^(TestHostAutoMigrateCreatesColumns_Postgres|TestMigrate_Postgres|TestClientWeeklyRenewMigration_Postgres)$' -count=1
 
-      - name: Race tests
-        run: |
-          go list ./... | grep -v '/frontend/node_modules/' > /tmp/go-packages.txt
-          go test -race -shuffle=on -count=1 -timeout 25m $(cat /tmp/go-packages.txt)
+      # Race + shuffle is run by the required CI workflow on this same commit.
+      # Avoid running the full suite twice in the serial packaging job.
 
       - name: Master/node end-to-end test
         run: make node-e2e
