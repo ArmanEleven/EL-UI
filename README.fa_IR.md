@@ -1,31 +1,41 @@
 [English](/README.md) | [فارسی](/README.fa_IR.md) | [العربية](/README.ar_EG.md) | [中文](/README.zh_CN.md) | [Español](/README.es_ES.md) | [Русский](/README.ru_RU.md) | [Türkçe](/README.tr_TR.md)
 
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./media/3x-ui-dark.png">
-    <img alt="3x-ui" src="./media/3x-ui-light.png">
-  </picture>
-</p>
+# Eleven Panel (EL-UI) نسخهٔ ۴٫۰٫۰
 
-<p align="center">
-  <a href="https://github.com/MHSanaei/3x-ui/releases"><img src="https://img.shields.io/github/v/release/mhsanaei/3x-ui" alt="Release"></a>
-  <a href="https://github.com/MHSanaei/3x-ui/actions"><img src="https://img.shields.io/github/actions/workflow/status/mhsanaei/3x-ui/release.yml.svg" alt="Build"></a>
-  <a href="#"><img src="https://img.shields.io/github/go-mod/go-version/mhsanaei/3x-ui.svg" alt="GO Version"></a>
-  <a href="https://github.com/MHSanaei/3x-ui/releases/latest"><img src="https://img.shields.io/github/downloads/mhsanaei/3x-ui/total.svg" alt="Downloads"></a>
-  <a href="https://www.gnu.org/licenses/gpl-3.0.en.html"><img src="https://img.shields.io/badge/license-GPL%20V3-blue.svg?longCache=true" alt="License"></a>
-  <a href="https://pkg.go.dev/github.com/mhsanaei/3x-ui/v3"><img src="https://pkg.go.dev/badge/github.com/mhsanaei/3x-ui/v3.svg" alt="Go Reference"></a>
-  <a href="https://docs.sanaei.dev"><img src="https://img.shields.io/badge/docs-docs.sanaei.dev-22d3ee" alt="Documentation"></a>
-</p>
+**پنل کنترل Xray با رابط فارسی، پشتیبانی RTL، تم اختصاصی Eleven و پرتال ادمین‌های فرعی.**
 
-**3X-UI** یک پنل کنترل وب پیشرفته و متن‌باز برای مدیریت سرورهای [Xray-core](https://github.com/XTLS/Xray-core) است. این پنل یک رابط کاربری تمیز و چندزبانه برای استقرار، پیکربندی و نظارت بر طیف گسترده‌ای از پروتکل‌های پراکسی و VPN ارائه می‌دهد — از یک VPS تکی تا استقرارهای چندنودی.
+این پروژه فورک توسعه‌یافتهٔ 3X-UI است. تغییرات EL-UI شامل مدیریت ادمین‌های فرعی با سهمیهٔ کاربر/ترافیک، محدودسازی اینباندها، مالکیت کلاینت‌ها و پرتال جداگانه برای ساخت کاربر است. ادمین فرعی به تنظیمات و پنل اصلی دسترسی ندارد.
 
-‏3X-UI که به‌عنوان یک فورک بهبودیافته از پروژه‌ی اصلی X-UI ساخته شده است، پشتیبانی گسترده‌تر از پروتکل‌ها، پایداری بهتر، حسابداری ترافیک به‌ازای هر کلاینت و بسیاری از ویژگی‌های رفاهی را اضافه می‌کند.
+> **وضعیت نسخه:** شاخهٔ توسعهٔ v4.0.0 است؛ پیش از استفادهٔ عملیاتی، تست‌های CI و فرایند نصب/به‌روزرسانی مخصوص EL-UI باید تأیید شوند. از اسکریپت نصب نسخهٔ اصلی 3X-UI برای نصب EL-UI استفاده نکنید.
+
+## ساخت از سورس
+
+نیازمندی‌ها: Go مطابق نسخهٔ تعریف‌شده در go.mod و Node.js نسخهٔ ۲۶ یا جدیدتر.
+
+~~~bash
+git clone --branch feature/multi-admin-v1 https://github.com/ArmanEleven/EL-UI.git
+cd EL-UI
+cd frontend && npm ci && npm run build
+cd ..
+go build -o x-ui .
+~~~
+
+x-ui باینری ساخته‌شده است؛ پیکربندی سرویس و نصب روی سرور را مطابق محیط خود انجام دهید. این دستورات به‌تنهایی سرویس systemd یا TLS را پیکربندی نمی‌کنند.
+
+---
+
+‏**Eleven Panel (EL-UI)** یک پنل کنترل وب برای مدیریت سرورهای [Xray-core](https://github.com/XTLS/Xray-core) است.
+
+‏EL-UI قابلیت‌های اصلی موتور 3X-UI را حفظ می‌کند و لایهٔ برندینگ، تجربهٔ فارسی و مدیریت دسترسی ادمین‌های فرعی را به آن اضافه می‌کند.
 
 > [!IMPORTANT]
 > این پروژه فقط برای استفاده‌ی شخصی در نظر گرفته شده است. لطفاً از آن برای اهداف غیرقانونی یا در محیط تولید (production) استفاده نکنید.
 
 ## ویژگی‌ها
 
+- **مدیریت چندادمینه** — ساخت و غیرفعال‌سازی ادمین فرعی، سهمیهٔ کاربر و ترافیک، محدودسازی اینباندهای مجاز و ثبت رویدادهای مدیریتی.
+- **پرتال جداگانهٔ ادمین فرعی** — مشاهدهٔ فقط‌خواندنی اطلاعات امن اینباند و ساخت کلاینت؛ بدون دسترسی به تنظیمات و پنل مستر.
+- **تم اختصاصی Eleven** — رنگ تأکیدی بنفش، پشتیبانی از حالت تیره و روشن و چیدمان RTL.
 - **اینباندهای چندپروتکلی** — VLESS، VMess، Trojan، Shadowsocks، WireGuard، AmneziaWG، TUIC v5، Hysteria2، MTProto، HTTP، SOCKS (Mixed)، Dokodemo-door / Tunnel و TUN.
 - **ترنسپورت‌ها و امنیت مدرن** — TCP (Raw)، mKCP، WebSocket، gRPC، HTTPUpgrade و XHTTP، ایمن‌شده با TLS، XTLS و REALITY.
 - **‏AmneziaWG داخلی** — نسخه‌ی مقاوم در برابر DPI از WireGuard مستقیماً درون پنل و روی یک پشته‌ی شبکه‌ی فضای کاربر اجرا می‌شود؛ بدون ماژول کرنل، DKMS یا بسته‌های اضافی.
@@ -70,40 +80,6 @@
 </picture>
 
 </details>
-
-## شروع سریع
-
-```bash
-bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
-```
-
-برای نصب یک نسخه‌ی مشخص، تگ آن را در انتها اضافه کنید (مثلاً `v3.7.0`):
-
-```bash
-bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) v3.7.0
-```
-
-برای نصب نسخه‌ی غلتانِ **dev** (آخرین پیش‌انتشار به‌ازای هر کامیت از شاخه‌ی `main`، نه یک انتشار پایدار)، مقدار `dev-latest` را پاس دهید:
-
-```bash
-bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) dev-latest
-```
-
-در حین نصب، یک نام کاربری، رمز عبور و مسیر دسترسی تصادفی تولید می‌شود. پس از نصب، دستور `x-ui` را اجرا کنید تا منوی مدیریت باز شود؛ در آنجا می‌توانید سرویس را شروع/متوقف کنید، اطلاعات ورود خود را ببینید یا بازنشانی کنید، گواهی‌های SSL را مدیریت کنید و کارهای دیگری انجام دهید.
-
-هر فایل انتشار به‌همراه یک جمع کنترلی `.sha256` در کنارش منتشر می‌شود. هم `install.sh` و هم به‌روزرسان، آرشیو را در برابر آن جمع کنترلی بررسی می‌کنند و در صورت عدم تطابق متوقف می‌شوند.
-
-برای مستندات کامل — نصب، پیکربندی، بهره‌برداری و مرجع کامل API — به **[docs.sanaei.dev](https://docs.sanaei.dev/fa)** مراجعه کنید.
-
-### نصب بدون نظارت
-
-نصب‌کننده به‌صورت **غیرتعاملی** نیز برای cloud-init اجرا می‌شود.
-‏`XUI_NONINTERACTIVE=1` را تنظیم کنید (یا بدون TTY از طریق pipe اجرا کنید) تا نصب به‌صورت سرتاسری و بدون
-هیچ پرسشی انجام شود، اطلاعات ورود تصادفی تولید کرده و آن‌ها را در
-`/etc/x-ui/install-result.env` می‌نویسد. برای موارد زیر به [`deploy/`](deploy/) مراجعه کنید:
-
-- [user-data مربوط به Cloud-init](deploy/cloud-init/) — نصب بدون نظارت روی هر ابری (Hetzner/AWS/DO/Vultr/GCP/Azure/Oracle)
-- [یادداشت‌های Hetzner Cloud](deploy/marketplace/hetzner/) — استقرار مبتنی بر cloud-init روی Hetzner
 
 ## پلتفرم‌های پشتیبانی‌شده
 

@@ -28,7 +28,7 @@ import { FormField, rhfZodValidate } from '@/components/form/rhf';
 import { setMessageInstance } from '@/utils/messageBus';
 import SponsorSlot from '@/components/sponsor/SponsorSlot';
 import { pauseAnimationsUntilLeave, useTheme } from '@/hooks/useTheme';
-import { LoginFormSchema, TwoFactorCodeSchema, type LoginFormValues } from '@/schemas/login';
+import { LoginFormSchema, type LoginFormValues } from '@/schemas/login';
 import './LoginPage.css';
 
 const HEADLINE_INTERVAL_MS = 2000;
@@ -81,7 +81,20 @@ export default function LoginPage() {
     setSubmitting(true);
     try {
       const msg = await HttpUtil.post('/login', values);
-      if (msg.success) window.location.href = basePath + 'panel/';
+      if (msg.success) {
+        try {
+          const profile = (await HttpUtil.get('/panel/api/admins/me', undefined, {
+            silent: true,
+          })) as {
+            success?: boolean;
+            obj?: { role?: string };
+          };
+          const isSecondaryAdmin = profile?.success && profile?.obj?.role === 'admin';
+          window.location.href = basePath + (isSecondaryAdmin ? 'panel/portal' : 'panel/');
+        } catch {
+          window.location.href = basePath + 'panel/';
+        }
+      }
     } finally {
       setSubmitting(false);
     }
@@ -180,7 +193,7 @@ export default function LoginPage() {
             ) : (
               <div className="login-card">
                 <div className="brand">
-                  <span className="brand-name">3X-UI</span>
+                  <span className="brand-name">Eleven Panel</span>
                   <span className="brand-accent" aria-hidden="true" />
                 </div>
                 <h2 className="welcome">
@@ -220,20 +233,19 @@ export default function LoginPage() {
                       />
                     </FormField>
 
-                    {twoFactorEnable && (
-                      <FormField
-                        name="twoFactorCode"
-                        label={t('twoFactorCode')}
-                        rules={{ validate: rhfZodValidate(TwoFactorCodeSchema) }}
-                      >
-                        <Input
-                          prefix={<KeyOutlined />}
-                          autoComplete="one-time-code"
-                          size="large"
-                          placeholder={t('twoFactorCode')}
-                        />
-                      </FormField>
-                    )}
+                    <FormField
+                      name="twoFactorCode"
+                      label={
+                        twoFactorEnable ? t('twoFactorCode') : `${t('twoFactorCode')} (اختیاری)`
+                      }
+                    >
+                      <Input
+                        prefix={<KeyOutlined />}
+                        autoComplete="one-time-code"
+                        size="large"
+                        placeholder={t('twoFactorCode')}
+                      />
+                    </FormField>
 
                     <Form.Item className="submit-row">
                       <Button

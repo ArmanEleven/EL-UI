@@ -7,9 +7,12 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/mhsanaei/3x-ui/v3/internal/database"
 	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
+	"github.com/mhsanaei/3x-ui/v3/internal/logger"
 	"github.com/mhsanaei/3x-ui/v3/internal/web/entity"
 	"github.com/mhsanaei/3x-ui/v3/internal/web/service"
+	"github.com/mhsanaei/3x-ui/v3/internal/web/service/panel"
 	"github.com/mhsanaei/3x-ui/v3/internal/web/websocket"
 
 	"github.com/gin-gonic/gin"
@@ -17,6 +20,34 @@ import (
 
 func notifyClientsChanged() {
 	websocket.BroadcastInvalidate(websocket.MessageTypeClients)
+}
+
+func supportsAdminQuickCreateProtocol(protocol string) bool {
+	switch strings.ToLower(strings.TrimSpace(protocol)) {
+	case "vless", "vmess", "trojan", "hysteria", "tuic", "masque":
+		return true
+	default:
+		return false
+	}
+}
+
+func validateAdminQuickCreateInbounds(ids []int) error {
+	if len(ids) == 0 {
+		return panel.ErrAdminInvalid
+	}
+	var inbounds []model.Inbound
+	if err := database.GetDB().Where("id IN ?", ids).Find(&inbounds).Error; err != nil {
+		return err
+	}
+	if len(inbounds) != len(ids) {
+		return panel.ErrAdminInvalid
+	}
+	for _, inbound := range inbounds {
+		if !supportsAdminQuickCreateProtocol(string(inbound.Protocol)) {
+			return panel.ErrAdminInvalid
+		}
+	}
+	return nil
 }
 
 func parseInboundIdsQuery(raw string) []int {
@@ -40,6 +71,7 @@ type ClientController struct {
 	xrayService    service.XrayService
 	settingService service.SettingService
 	happGenerator  service.HappLinkGenerator
+	adminService   panel.AdminService
 }
 
 func NewClientController(g *gin.RouterGroup) *ClientController {
@@ -99,6 +131,20 @@ func (a *ClientController) list(c *gin.Context) {
 		jsonMsg(c, I18nWeb(c, "pages.inbounds.toasts.obtain"), err)
 		return
 	}
+	if u := optionalLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
+		owned, ownErr := a.adminService.OwnedEmails(u.Id)
+		if ownErr != nil {
+			jsonMsg(c, I18nWeb(c, "pages.inbounds.toasts.obtain"), ownErr)
+			return
+		}
+		filtered := make([]service.ClientWithAttachments, 0, len(rows))
+		for _, row := range rows {
+			if _, ok := owned[row.Email]; ok {
+				filtered = append(filtered, row)
+			}
+		}
+		rows = filtered
+	}
 	jsonObj(c, rows, nil)
 }
 
@@ -117,6 +163,9 @@ func (a *ClientController) listPaged(c *gin.Context) {
 	if err := c.ShouldBindQuery(&params); err != nil {
 		jsonMsg(c, I18nWeb(c, "pages.inbounds.toasts.obtain"), err)
 		return
+	}
+	if u := optionalLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
+		params.OwnerAdminID = u.Id
 	}
 	resp, err := a.clientService.ListPaged(&a.inboundService, &a.settingService, params)
 	if err != nil {
@@ -202,7 +251,30 @@ func (a *ClientController) create(c *gin.Context) {
 		jsonMsg(c, I18nWeb(c, "somethingWentWrong"), err)
 		return
 	}
+	adminID, reserved := 0, false
+	if u := optionalLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
+		adminID = u.Id
+		allowed, checkErr := a.adminService.CanUseInboundIDs(adminID, payload.InboundIds)
+		if checkErr != nil || !allowed {
+			jsonMsg(c, I18nWeb(c, "somethingWentWrong"), panel.ErrAdminInvalid)
+			return
+		}
+		if err := validateAdminQuickCreateInbounds(payload.InboundIds); err != nil {
+			jsonMsg(c, I18nWeb(c, "somethingWentWrong"), err)
+			return
+		}
+		if err := a.adminService.CanCreateClient(adminID, payload.Client.Email, payload.Client.TotalGB); err != nil {
+			jsonMsg(c, I18nWeb(c, "somethingWentWrong"), err)
+			return
+		}
+		reserved = true
+	}
 	needRestart, err := a.clientService.Create(&a.inboundService, &payload)
+	if reserved && err != nil && !needRestart {
+		if rollbackErr := a.adminService.CancelClientReservation(adminID, payload.Client.Email, payload.Client.TotalGB); rollbackErr != nil {
+			logger.Warning("admin reservation rollback failed:", rollbackErr)
+		}
+	}
 	// Flagged before the error check: a partly-applied create leaves clients
 	// committed on the inbounds that succeeded, and those still need the restart.
 	if needRestart {
@@ -231,7 +303,31 @@ func (a *ClientController) update(c *gin.Context) {
 		return
 	}
 	inboundFilter := parseInboundIdsQuery(c.Query("inboundIds"))
+	adminID, oldTotal, quotaAdjusted := 0, int64(0), false
+	if u := optionalLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
+		adminID = u.Id
+		if req.Email != "" && req.Email != email {
+			jsonMsg(c, I18nWeb(c, "somethingWentWrong"), panel.ErrAdminInvalid)
+			return
+		}
+		var old model.ClientRecord
+		if e := database.GetDB().Where("email = ?", email).First(&old).Error; e != nil {
+			jsonMsg(c, I18nWeb(c, "somethingWentWrong"), e)
+			return
+		}
+		oldTotal = old.TotalGB
+		if e := a.adminService.AdjustClientQuota(adminID, oldTotal, req.TotalGB); e != nil {
+			jsonMsg(c, I18nWeb(c, "somethingWentWrong"), e)
+			return
+		}
+		quotaAdjusted = true
+	}
 	needRestart, err := a.clientService.UpdateByEmail(&a.inboundService, email, req.Client, req.LimitHwid, inboundFilter...)
+	if quotaAdjusted && err != nil && !needRestart {
+		if e := a.adminService.AdjustClientQuota(adminID, req.TotalGB, oldTotal); e != nil {
+			logger.Warning("admin quota rollback failed:", e)
+		}
+	}
 	// Flagged before the error check: a partly-applied edit leaves the change
 	// committed on the inbounds that succeeded, and those still need the restart.
 	if needRestart {
@@ -252,7 +348,23 @@ func (a *ClientController) update(c *gin.Context) {
 func (a *ClientController) delete(c *gin.Context) {
 	email := c.Param("email")
 	keepTraffic := c.Query("keepTraffic") == "1"
+	adminID, oldTotal := 0, int64(0)
+	if u := optionalLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
+		adminID = u.Id
+		var old model.ClientRecord
+		if e := database.GetDB().Where("email = ?", email).First(&old).Error; e != nil {
+			jsonMsg(c, I18nWeb(c, "somethingWentWrong"), e)
+			return
+		}
+		oldTotal = old.TotalGB
+	}
 	needRestart, err := a.clientService.DeleteByEmail(&a.inboundService, email, keepTraffic)
+	if adminID > 0 && err == nil {
+		if e := a.adminService.ReleaseOwnedClient(adminID, email, oldTotal); e != nil {
+			jsonMsg(c, I18nWeb(c, "somethingWentWrong"), e)
+			return
+		}
+	}
 	// Flagged before the error check: a partly-applied delete already removed
 	// the client from the inbounds that succeeded, and those need the restart.
 	if needRestart {
@@ -284,6 +396,13 @@ func (a *ClientController) attach(c *gin.Context) {
 	if err := c.ShouldBindJSON(&body); err != nil {
 		jsonMsg(c, I18nWeb(c, "somethingWentWrong"), err)
 		return
+	}
+	if u := optionalLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
+		allowed, e := a.adminService.CanUseInboundIDs(u.Id, body.InboundIds)
+		if e != nil || !allowed {
+			jsonMsg(c, I18nWeb(c, "somethingWentWrong"), panel.ErrAdminInvalid)
+			return
+		}
 	}
 	needRestart, err := a.clientService.AttachByEmail(&a.inboundService, email, body.InboundIds)
 	if needRestart {
@@ -623,7 +742,27 @@ func (a *ClientController) deleteHwid(c *gin.Context) {
 }
 
 func (a *ClientController) onlines(c *gin.Context) {
-	jsonObj(c, a.inboundService.GetOnlineClients(), nil)
+	online := a.inboundService.GetOnlineClients()
+	user := optionalLoginUser(c)
+	if user != nil && !a.adminService.IsOwner(user.Id) {
+		owned, err := a.adminService.OwnedEmails(user.Id)
+		if err != nil {
+			jsonMsg(c, I18nWeb(c, "somethingWentWrong"), err)
+			return
+		}
+		ownedLower := make(map[string]struct{}, len(owned))
+		for email := range owned {
+			ownedLower[strings.ToLower(email)] = struct{}{}
+		}
+		filtered := make([]string, 0, len(online))
+		for _, email := range online {
+			if _, ok := ownedLower[strings.ToLower(email)]; ok {
+				filtered = append(filtered, email)
+			}
+		}
+		online = filtered
+	}
+	jsonObj(c, online, nil)
 }
 
 func (a *ClientController) onlinesByGuid(c *gin.Context) {
@@ -659,7 +798,15 @@ func (a *ClientController) getSubLinks(c *gin.Context) {
 }
 
 func (a *ClientController) getClientLinks(c *gin.Context) {
-	links, err := a.inboundService.GetAllClientLinks(resolveHost(c), c.Param("email"))
+	email := c.Param("email")
+	if u := optionalLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
+		owned, err := a.adminService.OwnsClient(u.Id, email)
+		if err != nil || !owned {
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"success": false, "msg": "دسترسی به این کاربر مجاز نیست"})
+			return
+		}
+	}
+	links, err := a.inboundService.GetAllClientLinks(resolveHost(c), email)
 	if err != nil {
 		jsonMsg(c, I18nWeb(c, "pages.inbounds.toasts.obtain"), err)
 		return
@@ -693,6 +840,13 @@ func (a *ClientController) detach(c *gin.Context) {
 	if err := c.ShouldBindJSON(&body); err != nil {
 		jsonMsg(c, I18nWeb(c, "somethingWentWrong"), err)
 		return
+	}
+	if u := optionalLoginUser(c); u != nil && !a.adminService.IsOwner(u.Id) {
+		allowed, e := a.adminService.CanUseInboundIDs(u.Id, body.InboundIds)
+		if e != nil || !allowed {
+			jsonMsg(c, I18nWeb(c, "somethingWentWrong"), panel.ErrAdminInvalid)
+			return
+		}
 	}
 	needRestart, err := a.clientService.DetachByEmailMany(&a.inboundService, email, body.InboundIds)
 	// Flagged before the error check: a partly-applied detach already removed

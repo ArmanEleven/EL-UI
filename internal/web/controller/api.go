@@ -15,6 +15,7 @@ import (
 
 // APIController handles the main API routes for the 3x-ui panel, including inbounds and server management.
 type APIController struct {
+	adminService panel.AdminService
 	BaseController
 	inboundController     *InboundController
 	serverController      *ServerController
@@ -73,6 +74,103 @@ func (a *APIController) checkAPIAuth(c *gin.Context) {
 		return
 	}
 	c.Next()
+}
+
+// optionalLoginUser keeps controller handlers safe in focused tests that do not install session middleware.
+func optionalLoginUser(c *gin.Context) *model.User {
+	if _, ok := c.Get("api_auth_user"); ok {
+		return session.GetLoginUser(c)
+	}
+	if _, ok := c.Get("github.com/gin-contrib/sessions"); !ok {
+		return nil
+	}
+	return session.GetLoginUser(c)
+}
+
+func (a *APIController) enforceMultiAdminAccess(c *gin.Context) {
+	// API tokens and mTLS keep their separate, explicit token-scope policy.
+	if authed, ok := c.Get("api_authed"); ok && authed == true {
+		c.Next()
+		return
+	}
+	u := session.GetLoginUser(c)
+	if u == nil {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+	if a.adminService.IsOwner(u.Id) {
+		c.Next()
+		return
+	}
+	enabled, err := a.adminService.IsEnabledAdmin(u.Id)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"msg":     "بررسی وضعیت ادمین ناموفق بود",
+		})
+		return
+	}
+	if !enabled {
+		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
+			"success": false,
+			"msg":     "حساب ادمین غیرفعال است",
+		})
+		return
+	}
+
+	// If the master panel requires 2FA, a secondary admin must enroll their own
+	// authenticator before any inbound or client data is exposed.
+	if a.settingController != nil {
+		required, settingErr := a.settingController.settingService.GetTwoFactorEnable()
+		if settingErr != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"success": false,
+				"msg":     "بررسی تنظیمات تأیید دومرحله\u200cای ناموفق بود",
+			})
+			return
+		}
+		if required {
+			profile, profileErr := a.adminService.GetProfile(u.Id)
+			if profileErr != nil {
+				c.AbortWithStatus(http.StatusForbidden)
+				return
+			}
+			if !profile.TwoFactorEnabled {
+				path := c.FullPath()
+				setupAllowed := (c.Request.Method == http.MethodGet && (path == "/panel/api/admins/me" || path == "/panel/api/admins/me/2fa")) ||
+					(c.Request.Method == http.MethodPost && (path == "/panel/api/admins/me/2fa/setup" || path == "/panel/api/admins/me/2fa/confirm"))
+				if setupAllowed {
+					c.Next()
+					return
+				}
+				c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
+					"success": false,
+					"msg":     "برای ادامه ابتدا تأیید دومرحله\u200cای را فعال کن",
+				})
+				return
+			}
+		}
+	}
+
+	// The secondary-admin portal is intentionally narrow: inspect the safe
+	// inbound summary, read its own profile, and create clients only. All
+	// master-panel routes and every other mutation are denied by default.
+	path := c.FullPath()
+	allowed := (c.Request.Method == http.MethodGet && (path == "/panel/api/admins/me" || path == "/panel/api/admins/me/2fa")) ||
+		(c.Request.Method == http.MethodPost && (path == "/panel/api/admins/me/2fa/setup" || path == "/panel/api/admins/me/2fa/confirm")) ||
+		(c.Request.Method == http.MethodGet && path == "/panel/api/inbounds/options") ||
+		(c.Request.Method == http.MethodGet && path == "/panel/api/clients/list") ||
+		(c.Request.Method == http.MethodGet && path == "/panel/api/clients/list/paged") ||
+		(c.Request.Method == http.MethodGet && path == "/panel/api/clients/links/:email") ||
+		(c.Request.Method == http.MethodPost && path == "/panel/api/clients/add")
+	if allowed {
+		c.Next()
+		return
+	}
+	c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
+		"success": false,
+		"msg":     "این عملیات در پنل ادمین مجاز نیست",
+	})
 }
 
 // monitorScopeAllow exposes only status/metrics routes without sensitive data.
@@ -175,12 +273,15 @@ func (a *APIController) initRouter(g *gin.RouterGroup) {
 	api := g.Group("/panel/api")
 	api.Use(a.checkAPIAuth)
 	api.Use(a.enforceTokenScope)
+	api.Use(a.enforceMultiAdminAccess)
 	// Decode + verify the node config envelope (zstd + X-Config-Sha256) and
 	// advertise support, before CSRF/handlers read the body.
 	api.Use(middleware.ConfigEnvelopeMiddleware())
 	api.Use(middleware.CSRFMiddleware())
 
 	api.GET("/openapi.json", ServeOpenAPISpec)
+	a.settingController = NewSettingController(api)
+	NewAdminController(api, a.settingController.settingService)
 
 	// Inbounds API
 	inbounds := api.Group("/inbounds")
@@ -205,7 +306,6 @@ func (a *APIController) initRouter(g *gin.RouterGroup) {
 	// Settings + Xray config management live under the API surface too, so the
 	// same API token drives them. Paths are /panel/api/setting/* and
 	// /panel/api/xray/*.
-	a.settingController = NewSettingController(api)
 	a.xraySettingController = NewXraySettingController(api)
 
 	// Subscription balancers — client-side balancers for the JSON sub output

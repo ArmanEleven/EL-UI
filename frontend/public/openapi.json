@@ -4872,6 +4872,10 @@
     {
       "name": "WebSocket",
       "description": "Real-time status updates via WebSocket. Connect once at <code>ws://<panel>/ws</code> to receive a stream of JSON messages without polling. Requires an authenticated session cookie (Bearer token auth is not supported). Each message has a <code>type</code> field that identifies the payload shape."
+    },
+    {
+      "name": "مدیریت ادمین‌ها",
+      "description": "مدیریت حساب‌های فرعی فقط برای مالک اصلی پنل مجاز است. ادمین فرعی فقط می‌تواند پروفایل خودش را بخواند."
     }
   ],
   "paths": {
@@ -16499,6 +16503,395 @@
             }
           }
         ]
+      }
+    },
+    "/panel/api/admins": {
+      "get": {
+        "tags": [
+          "مدیریت ادمین‌ها"
+        ],
+        "summary": "فهرست ادمین‌های فرعی؛ فقط مالک اصلی.",
+        "operationId": "get_panel_api_admins",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "msg": {
+                      "type": "string"
+                    },
+                    "obj": {}
+                  }
+                },
+                "example": [
+                  {
+                    "userId": 2,
+                    "username": "operator",
+                    "enabled": true,
+                    "maxClients": 20,
+                    "trafficQuotaBytes": 107374182400
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "مدیریت ادمین‌ها"
+        ],
+        "summary": "ساخت حساب ادمین فرعی؛ فقط مالک اصلی.",
+        "operationId": "post_panel_api_admins",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {
+                "username": "operator",
+                "password": "replace-with-a-strong-password",
+                "maxClients": 20,
+                "allowUnlimitedClients": false,
+                "trafficQuotaBytes": 107374182400,
+                "allowUnlimitedTraffic": false,
+                "allowedInboundIds": [
+                  1,
+                  2
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "msg": {
+                      "type": "string"
+                    },
+                    "obj": {}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/panel/api/admins/me": {
+      "get": {
+        "tags": [
+          "مدیریت ادمین‌ها"
+        ],
+        "summary": "نمایش نقش و محدودیت‌های حساب واردشده.",
+        "operationId": "get_panel_api_admins_me",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "msg": {
+                      "type": "string"
+                    },
+                    "obj": {}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/panel/api/admins/me/2fa": {
+      "get": {
+        "tags": [
+          "مدیریت ادمین‌ها"
+        ],
+        "summary": "نمایش وضعیت تأیید دومرحله‌ای حساب ادمین فرعی.",
+        "operationId": "get_panel_api_admins_me_2fa",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "msg": {
+                      "type": "string"
+                    },
+                    "obj": {}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/panel/api/admins/me/2fa/setup": {
+      "post": {
+        "tags": [
+          "مدیریت ادمین‌ها"
+        ],
+        "summary": "ساخت کلید موقت برای راه‌اندازی تأیید دومرحله‌ای شخصی.",
+        "operationId": "post_panel_api_admins_me_2fa_setup",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "msg": {
+                      "type": "string"
+                    },
+                    "obj": {}
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "obj": {
+                    "secret": "BASE32SECRET",
+                    "otpauthUrl": "otpauth://totp/..."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/panel/api/admins/me/2fa/confirm": {
+      "post": {
+        "tags": [
+          "مدیریت ادمین‌ها"
+        ],
+        "summary": "تأیید کد برنامه احراز هویت و فعال‌سازی 2FA شخصی.",
+        "operationId": "post_panel_api_admins_me_2fa_confirm",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {
+                "code": "123456"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "msg": {
+                      "type": "string"
+                    },
+                    "obj": {}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/panel/api/admins/{id}": {
+      "put": {
+        "tags": [
+          "مدیریت ادمین‌ها"
+        ],
+        "summary": "ویرایش حساب، وضعیت، سهمیه و inboundهای مجاز؛ فقط مالک اصلی.",
+        "operationId": "put_panel_api_admins_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "msg": {
+                      "type": "string"
+                    },
+                    "obj": {}
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "مدیریت ادمین‌ها"
+        ],
+        "summary": "مسیر جایگزین برای ویرایش ادمین؛ فقط مالک اصلی.",
+        "operationId": "post_panel_api_admins_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "msg": {
+                      "type": "string"
+                    },
+                    "obj": {}
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "مدیریت ادمین‌ها"
+        ],
+        "summary": "حذف ادمین فرعی؛ فقط مالک اصلی. کاربران تخصیص‌یافته به محدوده مالک اصلی برمی‌گردند.",
+        "operationId": "delete_panel_api_admins_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "msg": {
+                      "type": "string"
+                    },
+                    "obj": {}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/panel/api/admins/{id}/2fa/reset": {
+      "post": {
+        "tags": [
+          "مدیریت ادمین‌ها"
+        ],
+        "summary": "بازنشانی 2FA ادمین فرعی؛ فقط مالک اصلی پنل.",
+        "operationId": "post_panel_api_admins_id_2fa_reset",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "msg": {
+                      "type": "string"
+                    },
+                    "obj": {}
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   }

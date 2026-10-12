@@ -55,14 +55,15 @@ type ClientPageParams struct {
 	Sort     string `form:"sort"`
 	Order    string `form:"order"`
 
-	ExpiryFrom int64  `form:"expiryFrom"`
-	ExpiryTo   int64  `form:"expiryTo"`
-	UsageFrom  int64  `form:"usageFrom"`
-	UsageTo    int64  `form:"usageTo"`
-	AutoRenew  string `form:"autoRenew"`
-	HasTgID    string `form:"hasTgId"`
-	HasComment string `form:"hasComment"`
-	Group      string `form:"group"`
+	ExpiryFrom   int64  `form:"expiryFrom"`
+	ExpiryTo     int64  `form:"expiryTo"`
+	UsageFrom    int64  `form:"usageFrom"`
+	UsageTo      int64  `form:"usageTo"`
+	AutoRenew    string `form:"autoRenew"`
+	HasTgID      string `form:"hasTgId"`
+	HasComment   string `form:"hasComment"`
+	Group        string `form:"group"`
+	OwnerAdminID int    `form:"-" json:"-"`
 }
 
 // ClientPageResponse is the shape returned by ListPaged. `Total` is the
@@ -169,6 +170,7 @@ type clientQuery struct {
 	nowMs            int64
 	expireDiffMs     int64
 	trafficDiffBytes int64
+	ownerAdminID     int
 }
 
 type clientQueryJoin struct {
@@ -209,6 +211,9 @@ func (q clientQuery) from() *gorm.DB {
 	tx := q.db.Table("clients AS c")
 	for _, j := range q.joins {
 		tx = tx.Joins(j.sql, j.args...)
+	}
+	if q.ownerAdminID > 0 {
+		tx = tx.Joins("JOIN client_ownership co ON co.client_email = c.email AND co.admin_user_id = ?", q.ownerAdminID)
 	}
 	return tx
 }
@@ -397,9 +402,14 @@ func (s *ClientService) ListPaged(inboundSvc *InboundService, settingSvc *Settin
 
 	onlines := inboundSvc.GetOnlineClients()
 	q := newClientQuery(db, time.Now().UnixMilli(), expireDiffMs, trafficDiffBytes)
+	q.ownerAdminID = params.OwnerAdminID
 
 	var total int64
-	if err := db.Model(&model.ClientRecord{}).Count(&total).Error; err != nil {
+	totalQuery := db.Model(&model.ClientRecord{})
+	if params.OwnerAdminID > 0 {
+		totalQuery = totalQuery.Joins("JOIN client_ownership co ON co.client_email = clients.email AND co.admin_user_id = ?", params.OwnerAdminID)
+	}
+	if err := totalQuery.Count(&total).Error; err != nil {
 		return nil, err
 	}
 
@@ -424,7 +434,12 @@ func (s *ClientService) ListPaged(inboundSvc *InboundService, settingSvc *Settin
 		}
 	}
 
-	groups, err := s.listGroupNames()
+	var groups []string
+	if params.OwnerAdminID > 0 {
+		err = db.Table("clients c").Select("DISTINCT c.group_name").Joins("JOIN client_ownership co ON co.client_email = c.email AND co.admin_user_id = ?", params.OwnerAdminID).Where("COALESCE(c.group_name, '') <> ''").Order("c.group_name ASC").Pluck("c.group_name", &groups).Error
+	} else {
+		groups, err = s.listGroupNames()
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -578,8 +593,11 @@ func (q clientQuery) onlineEmails(onlines []string) ([]string, int, error) {
 	count := 0
 	for _, batch := range chunkStrings(onlines, sqlInChunk) {
 		var page []string
-		if err := q.db.Model(&model.ClientRecord{}).
-			Where("COALESCE(enable, FALSE) = TRUE AND email IN ?", batch).
+		query := q.db.Model(&model.ClientRecord{}).Where("COALESCE(enable, FALSE) = TRUE AND email IN ?", batch)
+		if q.ownerAdminID > 0 {
+			query = query.Where("email IN (SELECT client_email FROM client_ownership WHERE admin_user_id = ?)", q.ownerAdminID)
+		}
+		if err := query.
 			Order("id ASC").
 			Pluck("email", &page).Error; err != nil {
 			return nil, 0, err

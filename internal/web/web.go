@@ -601,6 +601,12 @@ func (s *Server) start(restartXray bool, startTgBot bool) (err error) {
 	if err != nil {
 		return err
 	}
+	// XUI_LISTEN can pin the panel to a specific interface in portable/local
+	// deployments without changing the configured default for server installs.
+	if envListen := strings.TrimSpace(os.Getenv("XUI_LISTEN")); envListen != "" {
+		listen = envListen
+		logger.Info("Using XUI_LISTEN override for web panel listener:", listen)
+	}
 	port, err := s.settingService.GetPort()
 	if err != nil {
 		return err

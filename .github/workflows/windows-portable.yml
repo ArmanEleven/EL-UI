@@ -1,0 +1,229 @@
+name: Build EL-UI v4 Windows full ZIP
+
+on:
+  push:
+    branches:
+      - feature/multi-admin-v1
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows-full:
+    name: Build portable Windows bundle
+    runs-on: windows-latest
+    steps:
+      - name: Checkout EL-UI
+        uses: actions/checkout@v7
+
+      - name: Verify release identity
+        shell: pwsh
+        run: |
+          if ((Get-Content internal/config/version -Raw).Trim() -ne "4.0.0") { throw "Unexpected EL-UI version" }
+          if ((Get-Content internal/config/name -Raw).Trim() -ne "x-ui") { throw "Unexpected binary name" }
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          check-latest: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build embedded frontend
+        working-directory: frontend
+        shell: pwsh
+        run: |
+          npm ci
+          npm run build
+
+      - name: Install MSYS2 C toolchain for SQLite
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            git
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-sqlite3
+            mingw-w64-x86_64-pkg-config
+
+      - name: Build native Windows executable
+        shell: msys2 {0}
+        run: |
+          export PATH="/c/hostedtoolcache/windows/go/$(ls /c/hostedtoolcache/windows/go | sort -V | tail -n1)/x64/bin:$PATH"
+          export CGO_ENABLED=1
+          export GOOS=windows
+          export GOARCH=amd64
+          export CC=x86_64-w64-mingw32-gcc
+          go version
+          gcc --version
+          LDFLAGS="-w -s"
+          LDFLAGS="$LDFLAGS -X github.com/mhsanaei/3x-ui/v3/internal/config.buildCommit=$(git rev-parse --short=8 HEAD)"
+          LDFLAGS="$LDFLAGS -X github.com/mhsanaei/3x-ui/v3/internal/config.buildDate=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          go build -buildvcs=false -ldflags "$LDFLAGS" -o x-ui-windows-amd64.exe .
+
+      - name: Assemble portable bundle and fetch runtime dependencies
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $packageRoot = Join-Path $env:RUNNER_TEMP "EL-UI-v4.0.0-Windows"
+          if (Test-Path $packageRoot) { Remove-Item -Recurse -Force $packageRoot }
+          New-Item -ItemType Directory -Path $packageRoot | Out-Null
+
+          # Include the complete source tree and frontend dependency tree, but no runtime secrets/data.
+          robocopy "$env:GITHUB_WORKSPACE" "$packageRoot" /E /XD "$env:GITHUB_WORKSPACE\.git" "$env:GITHUB_WORKSPACE\.cache" "$env:GITHUB_WORKSPACE\data" "$env:GITHUB_WORKSPACE\logs" /XF .env .env.local .env.production .env.* *.db *.sqlite *.sqlite3 *.pem *.key *.p12 *.pfx
+          if ($LASTEXITCODE -ge 8) { throw "Source copy failed with robocopy exit code $LASTEXITCODE" }
+          $global:LASTEXITCODE = 0
+
+          Copy-Item "$env:GITHUB_WORKSPACE\x-ui-windows-amd64.exe" (Join-Path $packageRoot "x-ui.exe") -Force
+          $bin = Join-Path $packageRoot "bin"
+          New-Item -ItemType Directory -Force -Path $bin | Out-Null
+          $retry = @{ MaximumRetryCount = 5; RetryIntervalSec = 10 }
+
+          # Xray core for Windows (matches the upstream EL-UI build workflow).
+          $xrayZip = Join-Path $bin "Xray-windows-64.zip"
+          Invoke-WebRequest @retry -Uri "https://github.com/XTLS/Xray-core/releases/download/v26.10.10/Xray-windows-64.zip" -OutFile $xrayZip
+          Expand-Archive -Path $xrayZip -DestinationPath $bin -Force
+          Remove-Item $xrayZip -Force
+          Remove-Item (Join-Path $bin "geoip.dat"), (Join-Path $bin "geosite.dat") -ErrorAction SilentlyContinue
+          Rename-Item (Join-Path $bin "xray.exe") (Join-Path $bin "xray-windows-amd64.exe") -Force
+
+          # GeoIP / GeoSite datasets used by the bundled Xray runtime.
+          Invoke-WebRequest @retry -Uri "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat" -OutFile (Join-Path $bin "geoip.dat")
+          Invoke-WebRequest @retry -Uri "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat" -OutFile (Join-Path $bin "geosite.dat")
+          Invoke-WebRequest @retry -Uri "https://github.com/chocolate4u/Iran-v2ray-rules/releases/latest/download/geoip.dat" -OutFile (Join-Path $bin "geoip_IR.dat")
+          Invoke-WebRequest @retry -Uri "https://github.com/chocolate4u/Iran-v2ray-rules/releases/latest/download/geosite.dat" -OutFile (Join-Path $bin "geosite_IR.dat")
+          Invoke-WebRequest @retry -Uri "https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geoip.dat" -OutFile (Join-Path $bin "geoip_RU.dat")
+          Invoke-WebRequest @retry -Uri "https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geosite.dat" -OutFile (Join-Path $bin "geosite_RU.dat")
+
+          # Windows MTProto sidecar.
+          $mtgVersion = (curl.exe -sf --retry 5 --retry-all-errors --retry-delay 3 -o NUL -w '%{redirect_url}' "https://github.com/mhsanaei/mtg-multi/releases/latest") -replace '^.*/releases/tag/', ''
+          if (-not $mtgVersion -or $mtgVersion -notmatch '^v[\d.]+$') { throw "Could not resolve the latest mtg-multi release tag" }
+          $mtgPackage = "mtg-multi-$($mtgVersion.TrimStart('v'))-windows-amd64"
+          $mtgZip = Join-Path $bin "$mtgPackage.zip"
+          curl.exe -sfL --retry 5 --retry-all-errors --retry-delay 3 "https://github.com/mhsanaei/mtg-multi/releases/download/$mtgVersion/$mtgPackage.zip" -o $mtgZip
+          $mtgTemp = Join-Path $bin "mtg-tmp"
+          Expand-Archive -Path $mtgZip -DestinationPath $mtgTemp -Force
+          Copy-Item (Join-Path $mtgTemp "$mtgPackage\mtg-multi.exe") (Join-Path $bin "mtg-windows-amd64.exe") -Force
+          Remove-Item $mtgZip -Force
+          Remove-Item $mtgTemp -Recurse -Force
+
+          # Store runtime state beside this portable copy, and bind the panel to loopback only.
+          @'
+          @echo off
+          setlocal
+          cd /d "%~dp0"
+          if not exist "x-ui.exe" (
+            echo x-ui.exe is missing. Extract the entire ZIP first.
+            pause
+            exit /b 1
+          )
+          if not exist "bin\xray-windows-amd64.exe" (
+            echo The bundled Xray runtime is missing from the bin folder.
+            pause
+            exit /b 1
+          )
+          if not exist "data" mkdir "data"
+          if not exist "logs" mkdir "logs"
+          set "XUI_MAIN_FOLDER=%~dp0"
+          set "XUI_DB_FOLDER=%~dp0data"
+          set "XUI_LOG_FOLDER=%~dp0logs"
+          set "XUI_BIN_FOLDER=%~dp0bin"
+          set "XUI_LISTEN=127.0.0.1"
+          set "XUI_PORT=2053"
+          echo.
+          echo Eleven Panel is starting on http://127.0.0.1:2053/
+          echo Keep this window open. Press Ctrl+C to stop the panel.
+          start "" /b powershell.exe -NoProfile -Command "Start-Sleep -Seconds 3; Start-Process 'http://127.0.0.1:2053/'"
+          "x-ui.exe"
+          echo.
+          echo Eleven Panel has stopped.
+          pause
+          '@ | Set-Content -Encoding ASCII (Join-Path $packageRoot "Start-EL-UI.bat")
+
+          @'
+          Eleven Panel (EL-UI) v4.0.0 - Windows x64 portable bundle
+          ==========================================================
+
+          Quick start:
+          1. Extract the entire ZIP to a writable folder, for example C:\EL-UI.
+          2. Double-click Start-EL-UI.bat.
+          3. The script starts x-ui.exe and opens http://127.0.0.1:2053/ in your browser.
+          4. On a fresh database, the initial login is admin / admin. Change the password immediately.
+
+          This is a portable local Windows build. No Go, Node.js, Docker, WSL, or separate Xray install is
+          required to start the panel. Xray, MTProto, geoip/geosite data and the built frontend are bundled.
+          The console window must stay open while you use the panel; press Ctrl+C there to stop it.
+
+          Safety and limitations:
+          - The launcher forces the web panel to 127.0.0.1 so it is not intentionally exposed to your LAN.
+          - Runtime database and logs are stored in the data and logs folders beside this launcher.
+          - Do not share the folder after you have created accounts or added private keys/configuration.
+          - If Windows SmartScreen warns about the executable, do not bypass it unless you trust this build
+            and its checksum. The executable is not code-signed.
+          - Creating inbounds on privileged ports, binding public interfaces, firewall setup, automatic
+            service installation, and certificate automation may need extra Windows-specific configuration.
+          - This portable build is suitable for local testing; do not use it as a public production server
+            until Windows-specific operations and your firewall/TLS setup have been independently tested.
+
+          Build checks: see PACKAGE-WINDOWS-INFO.txt and the associated release pipeline run.
+          '@ | Set-Content -Encoding UTF8 (Join-Path $packageRoot "README-Windows-fa.txt")
+
+          @'
+          This folder is inherited from upstream 3X-UI. It is not needed by Start-EL-UI.bat.
+          The OpenSSL installer is optional and is not run automatically.
+          Use the instructions in README-Windows-fa.txt at the package root.
+          '@ | Set-Content -Encoding UTF8 (Join-Path $packageRoot "windows_files\readme.txt")
+
+          @"
+          Eleven Panel (EL-UI) v4.0.0 Windows portable build
+          Commit: $(git rev-parse HEAD)
+          Architecture: windows/amd64
+          Runtime: bundled Xray + mtg-multi + geoip/geosite datasets
+          Launcher: Start-EL-UI.bat (loopback-only listener)
+          No environment files, database, TLS keys, or runtime credentials are intentionally included.
+          "@ | Set-Content -Encoding UTF8 (Join-Path $packageRoot "PACKAGE-WINDOWS-INFO.txt")
+
+          if (!(Test-Path (Join-Path $packageRoot "x-ui.exe"))) { throw "x-ui.exe was not packaged" }
+          if (!(Test-Path (Join-Path $bin "xray-windows-amd64.exe"))) { throw "Xray executable was not packaged" }
+          if (!(Test-Path (Join-Path $bin "mtg-windows-amd64.exe"))) { throw "MTProto executable was not packaged" }
+
+          $zipPath = Join-Path $env:GITHUB_WORKSPACE "EL-UI-v4.0.0-Windows-full.zip"
+          $zipSizePath = Join-Path $env:GITHUB_WORKSPACE "ZIP-WINDOWS-SIZE.txt"
+          $hashPath = Join-Path $env:GITHUB_WORKSPACE "EL-UI-v4.0.0-Windows-full.zip.sha256"
+          $sevenZip = "C:\Program Files\7-Zip\7z.exe"
+          if (!(Test-Path $sevenZip)) { throw "7-Zip was not found on the Windows runner" }
+          Push-Location $env:RUNNER_TEMP
+          & $sevenZip a -tzip -mx=5 $zipPath "EL-UI-v4.0.0-Windows" -r | Out-Host
+          if ($LASTEXITCODE -ne 0) { throw "7-Zip failed with exit code $LASTEXITCODE" }
+          Pop-Location
+          $size = (Get-Item $zipPath).Length
+          "ZIP_SIZE_BYTES=$size" | Set-Content -Encoding ASCII $zipSizePath
+          if ($size -lt 73400320) { throw "ZIP is smaller than the requested 70 MiB minimum: $size bytes" }
+          $hash = (Get-FileHash $zipPath -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$hash  EL-UI-v4.0.0-Windows-full.zip" | Set-Content -Encoding ASCII $hashPath
+          Write-Host "Created $zipPath ($size bytes; SHA-256 $hash)"
+
+      - name: Verify archive integrity
+        shell: pwsh
+        run: |
+          & "C:\Program Files\7-Zip\7z.exe" t "$env:GITHUB_WORKSPACE\EL-UI-v4.0.0-Windows-full.zip"
+          if ($LASTEXITCODE -ne 0) { throw "The ZIP integrity test failed" }
+
+      - name: Upload verified Windows ZIP
+        uses: actions/upload-artifact@v7
+        with:
+          name: EL-UI-v4.0.0-Windows-full-zip
+          path: |
+            EL-UI-v4.0.0-Windows-full.zip
+            EL-UI-v4.0.0-Windows-full.zip.sha256
+            ZIP-WINDOWS-SIZE.txt
+          if-no-files-found: error
+          retention-days: 7

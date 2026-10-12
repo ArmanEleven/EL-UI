@@ -85,13 +85,30 @@ func (s *UserService) CheckUser(username string, password string, twoFactorCode 
 		}
 	}
 
+	// Secondary administrators can be disabled independently of the owner account.
+	var adminProfile model.AdminProfile
+	profileErr := database.GetDB().Where("user_id = ?", user.Id).First(&adminProfile).Error
+	if profileErr == nil && !adminProfile.Enabled {
+		return nil, errors.New("account disabled")
+	}
+	if profileErr != nil && !errors.Is(profileErr, gorm.ErrRecordNotFound) {
+		return nil, profileErr
+	}
+
 	twoFactorEnable, err := s.settingService.GetTwoFactorEnable()
 	if err != nil {
 		logger.Warning("check two factor err:", err)
 		return nil, err
 	}
 
-	if twoFactorEnable {
+	if profileErr == nil {
+		// Secondary administrators always use their own authenticator once enrolled.
+		if adminProfile.TwoFactorEnabled && !totp.VerifyWithSkew(adminProfile.TwoFactorSecret, twoFactorCode, time.Now()) {
+			return nil, errors.New("invalid 2fa code")
+		}
+		// When panel-wide 2FA is enabled, an unenrolled secondary admin may sign
+		// in only to reach the enrollment gate; the API middleware blocks all data.
+	} else if twoFactorEnable {
 		twoFactorToken, err := s.settingService.GetTwoFactorToken()
 		if err != nil {
 			logger.Warning("check two factor token err:", err)

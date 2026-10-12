@@ -66,6 +66,9 @@ const (
 func allModels() []any {
 	return []any{
 		&model.User{},
+		&model.AdminProfile{},
+		&model.ClientOwnership{},
+		&model.AdminAuditLog{},
 		&model.Inbound{},
 		&model.OutboundTraffics{},
 		&model.Setting{},

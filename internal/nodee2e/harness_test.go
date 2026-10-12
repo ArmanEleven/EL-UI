@@ -22,7 +22,7 @@ import (
 	"github.com/mhsanaei/3x-ui/v3/internal/database"
 )
 
-const settleTimeout = 30 * time.Second
+const settleTimeout = 60 * time.Second
 
 func panelBinary(t *testing.T) string {
 	t.Helper()

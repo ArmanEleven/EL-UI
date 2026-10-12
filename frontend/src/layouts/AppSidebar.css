@@ -43,6 +43,15 @@
   overflow: hidden;
 }
 
+.brand-text {
+  font-size: 15px;
+  font-weight: 750;
+  letter-spacing: 0.2px;
+  background: linear-gradient(110deg, #c4b5fd 0%, #8b5cf6 48%, #6d28d9 100%);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .brand-block {
   display: inline-flex;
   align-items: center;
