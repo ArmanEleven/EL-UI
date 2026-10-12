@@ -130,9 +130,10 @@ export default function AdminsPage() {
       allowUnlimitedTraffic: values.allowUnlimitedTraffic,
       allowedInboundIds: inboundIds,
     };
+    const jsonOptions = { headers: { 'Content-Type': 'application/json' } };
     const result = selectedAdmin
-      ? await HttpUtil.post(`/panel/api/admins/${selectedAdmin.userId}`, payload)
-      : await HttpUtil.post('/panel/api/admins', payload);
+      ? await HttpUtil.post(`/panel/api/admins/${selectedAdmin.userId}`, payload, jsonOptions)
+      : await HttpUtil.post('/panel/api/admins', payload, jsonOptions);
     setSaving(false);
     if (result.success) {
       resetForm();
