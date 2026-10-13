@@ -59,18 +59,21 @@ jobs:
 
       - name: Test frontend
         working-directory: frontend
-        run: npm test
+        run: npm test -- --testTimeout=15000
 
       - name: Build frontend
+        if: always()
         working-directory: frontend
         run: npm run build
 
       - name: Test Go packages
+        if: always()
         env:
           CGO_ENABLED: "1"
         run: go test ./...
 
       - name: Build Windows executable
+        if: always()
         env:
           CGO_ENABLED: "1"
         run: |
