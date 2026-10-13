@@ -53,6 +53,10 @@ jobs:
         working-directory: frontend
         run: npm run typecheck
 
+      - name: Install Playwright Chromium
+        working-directory: frontend
+        run: npx playwright install chromium
+
       - name: Test frontend
         working-directory: frontend
         run: npm test
