@@ -48,6 +48,8 @@ docker-compose.override.yml
 .env.*
 !.env.example
 *.pem
+# Keep the upstream PIA server-list verification public key tracked.
+!internal/pia/trust/serverlist_public_key.pem
 *.key
 *.p12
 *.pfx
