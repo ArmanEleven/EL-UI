@@ -63,12 +63,18 @@ func ManagementAdminID(c *gin.Context) int {
 	s := sessions.Default(c)
 	switch v := s.Get(managementAdminIDKey).(type) {
 	case int:
-		if v > 0 { return v }
+		if v > 0 {
+			return v
+		}
 	case int64:
-		if v > 0 && int64(int(v)) == v { return int(v) }
+		if v > 0 && int64(int(v)) == v {
+			return int(v)
+		}
 	case float64:
 		id := int(v)
-		if v == float64(id) && id > 0 { return id }
+		if v == float64(id) && id > 0 {
+			return id
+		}
 	}
 	return 0
 }
