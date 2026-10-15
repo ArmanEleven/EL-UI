@@ -184,22 +184,6 @@ jobs:
           cache: true
       - name: Stub internal/web/dist for go:embed
         run: mkdir -p internal/web/dist && touch internal/web/dist/.gitkeep
-      - name: DEBUG temporary gofumpt diff
-        run: |
-          go install mvdan.cc/gofumpt@latest
-          "$(go env GOPATH)/bin/gofumpt" -w \
-            internal/database/model/admin_management.go \
-            internal/database/model/admin_management_test.go \
-            internal/management/rbac/model.go \
-            internal/management/rbac/permissions.go \
-            internal/management/rbac/permissions_test.go
-          git diff -- \
-            internal/database/model/admin_management.go \
-            internal/database/model/admin_management_test.go \
-            internal/management/rbac/model.go \
-            internal/management/rbac/permissions.go \
-            internal/management/rbac/permissions_test.go
-        shell: bash
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v9
         with:
