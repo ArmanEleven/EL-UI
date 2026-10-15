@@ -133,8 +133,9 @@ export default function AdminPortalPage() {
   }, [load]);
 
   useEffect(() => {
-    const timeoutId = window.setTimeout(() => void load(), 0);
-    return () => window.clearTimeout(timeoutId);
+    // The initial fetch is asynchronous; state updates happen after the network requests settle.
+    // oxlint-disable-next-line react-hooks/set-state-in-effect
+    void load();
   }, [load]);
 
   const createClient = useCallback(
