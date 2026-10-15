@@ -653,7 +653,7 @@ update_x-ui() {
     echo -e "${green}Downloading and installing x-ui.sh script...${plain}"
     local xui_script_temp="/usr/bin/x-ui-temp.$$"
     rm -f "${xui_script_temp}"
-    ${curl_bin} -fLRo "${xui_script_temp}" "https://raw.githubusercontent.com/MHSanaei/3x-ui/${script_ref}/x-ui.sh" > /dev/null 2>&1
+    ${curl_bin} -fLRo "${xui_script_temp}" "https://raw.githubusercontent.com/ArmanEleven/EL-UI/main/x-ui.sh" > /dev/null 2>&1
     if [[ $? -ne 0 ]]; then
         rm -f "${xui_script_temp}"
         _fail "ERROR: Failed to download x-ui.sh script, please be sure that your server can access GitHub"
@@ -670,6 +670,9 @@ update_x-ui() {
 
     chmod +x ${xui_folder}/x-ui.sh > /dev/null 2>&1
     chmod +x /usr/bin/x-ui > /dev/null 2>&1
+    # Preferred public EL-UI command; retain the previous launcher as an internal compatibility target.
+    install -d -m 755 /usr/local/bin
+    ln -sfn /usr/bin/x-ui /usr/local/bin/el-ui
     mkdir -p /var/log/x-ui > /dev/null 2>&1
 
     echo -e "${green}Changing owner...${plain}"
@@ -781,22 +784,22 @@ update_x-ui() {
     echo -e "${green}x-ui ${tag_version}${plain} updating finished, it is running now..."
     echo -e ""
     echo -e "┌───────────────────────────────────────────────────────┐
-│  ${blue}x-ui control menu usages (subcommands):${plain}              │
+│  ${blue}EL-UI control menu usages (subcommands):${plain}              │
 │                                                       │
-│  ${blue}x-ui${plain}              - Admin Management Script          │
-│  ${blue}x-ui start${plain}        - Start                            │
-│  ${blue}x-ui stop${plain}         - Stop                             │
-│  ${blue}x-ui restart${plain}      - Restart                          │
-│  ${blue}x-ui status${plain}       - Current Status                   │
-│  ${blue}x-ui settings${plain}     - Current Settings                 │
-│  ${blue}x-ui enable${plain}       - Enable Autostart on OS Startup   │
-│  ${blue}x-ui disable${plain}      - Disable Autostart on OS Startup  │
-│  ${blue}x-ui log${plain}          - Check logs                       │
-│  ${blue}x-ui banlog${plain}       - Check Fail2ban ban logs          │
-│  ${blue}x-ui update${plain}       - Update                           │
-│  ${blue}x-ui legacy${plain}       - Legacy version                   │
-│  ${blue}x-ui install${plain}      - Install                          │
-│  ${blue}x-ui uninstall${plain}    - Uninstall                        │
+│  ${blue}el-ui${plain}              - Admin Management Script          │
+│  ${blue}el-ui start${plain}        - Start                            │
+│  ${blue}el-ui stop${plain}         - Stop                             │
+│  ${blue}el-ui restart${plain}      - Restart                          │
+│  ${blue}el-ui status${plain}       - Current Status                   │
+│  ${blue}el-ui settings${plain}     - Current Settings                 │
+│  ${blue}el-ui enable${plain}       - Enable Autostart on OS Startup   │
+│  ${blue}el-ui disable${plain}      - Disable Autostart on OS Startup  │
+│  ${blue}el-ui log${plain}          - Check logs                       │
+│  ${blue}el-ui banlog${plain}       - Check Fail2ban ban logs          │
+│  ${blue}el-ui update${plain}       - Update                           │
+│  ${blue}el-ui legacy${plain}       - Legacy version                   │
+│  ${blue}el-ui install${plain}      - Install                          │
+│  ${blue}el-ui uninstall${plain}    - Uninstall                        │
 └───────────────────────────────────────────────────────┘"
 }
 
