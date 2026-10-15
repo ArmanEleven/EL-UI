@@ -11,7 +11,6 @@ import {
   Row,
   Select,
   Space,
-  Spin,
   Table,
   Tag,
   Typography,
@@ -38,7 +37,6 @@ type AdminRow = {
   lastLoginAt?: string;
 };
 type InboundRow = { id: number; remark: string; port: number; protocol: string };
-type Result<T> = { success: boolean; msg?: string; obj: T | null };
 type RoleForm = {
   name: string;
   permissionsJSON: string;
@@ -95,7 +93,6 @@ export default function AdminManagementPage() {
   const [roles, setRoles] = useState<RoleRow[]>([]);
   const [admins, setAdmins] = useState<AdminRow[]>([]);
   const [inbounds, setInbounds] = useState<InboundRow[]>([]);
-  const [loading, setLoading] = useState(true);
   const [savingRole, setSavingRole] = useState(false);
   const [savingAdmin, setSavingAdmin] = useState(false);
   const [selectedRole, setSelectedRole] = useState<RoleRow | null>(null);
@@ -104,20 +101,23 @@ export default function AdminManagementPage() {
   const allInbounds = Form.useWatch('allInbounds', roleForm);
 
   const load = useCallback(async () => {
-    const [roleResponse, adminResponse, inboundResponse] = await Promise.all([
-      HttpUtil.get<RoleRow[]>('/management-api/master/roles', undefined, { silent: true }),
-      HttpUtil.get<AdminRow[]>('/management-api/master/admins', undefined, { silent: true }),
-      HttpUtil.get<InboundRow[]>('/management-api/master/inbounds', undefined, { silent: true }),
-    ]);
-    if (!roleResponse.success || !adminResponse.success || !inboundResponse.success) {
-      messageApi.error(
-        roleResponse.msg || adminResponse.msg || inboundResponse.msg || 'Master access required',
-      );
+    try {
+      const [roleResponse, adminResponse, inboundResponse] = await Promise.all([
+        HttpUtil.get<RoleRow[]>('/management-api/master/roles', undefined, { silent: true }),
+        HttpUtil.get<AdminRow[]>('/management-api/master/admins', undefined, { silent: true }),
+        HttpUtil.get<InboundRow[]>('/management-api/master/inbounds', undefined, { silent: true }),
+      ]);
+      if (!roleResponse.success || !adminResponse.success || !inboundResponse.success) {
+        messageApi.error(
+          roleResponse.msg || adminResponse.msg || inboundResponse.msg || 'Master access required',
+        );
+      }
+      setRoles(roleResponse.success && roleResponse.obj ? roleResponse.obj : []);
+      setAdmins(adminResponse.success && adminResponse.obj ? adminResponse.obj : []);
+      setInbounds(inboundResponse.success && inboundResponse.obj ? inboundResponse.obj : []);
+    } catch (error) {
+      messageApi.error(error instanceof Error ? error.message : 'Could not load admin settings');
     }
-    setRoles(roleResponse.success && roleResponse.obj ? roleResponse.obj : []);
-    setAdmins(adminResponse.success && adminResponse.obj ? adminResponse.obj : []);
-    setInbounds(inboundResponse.success && inboundResponse.obj ? inboundResponse.obj : []);
-    setLoading(false);
   }, [messageApi]);
 
   useEffect(() => {
@@ -276,8 +276,6 @@ export default function AdminManagementPage() {
       ),
     },
   ], [roles, setAdminStatus]);
-
-  if (loading) return <div className="admin-management-loading"><Spin size="large" /></div>;
 
   return (
     <div className="admin-management-page">

@@ -184,6 +184,17 @@ jobs:
           cache: true
       - name: Stub internal/web/dist for go:embed
         run: mkdir -p internal/web/dist && touch internal/web/dist/.gitkeep
+      - name: Diagnose Go formatting (temporary)
+        run: |
+          go install mvdan.cc/gofumpt@latest
+          "$(go env GOPATH)/bin/gofumpt" -w \
+            internal/management/rbac/permissions_test.go \
+            internal/web/controller/management.go \
+            internal/web/controller/management_test.go
+          git diff -- \
+            internal/management/rbac/permissions_test.go \
+            internal/web/controller/management.go \
+            internal/web/controller/management_test.go
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v9
         with:
@@ -206,6 +217,21 @@ jobs:
         working-directory: frontend
       - name: Lint
         run: npm run lint
+        working-directory: frontend
+      - name: Diagnose oxfmt output (temporary)
+        run: |
+          npx oxfmt \
+            src/pages/admin/AdminPortalPage.tsx \
+            src/pages/master/AdminManagementPage.tsx \
+            src/pages/master/AdminManagementPage.css \
+            src/routes.tsx \
+            src/layouts/AppSidebar.tsx
+          git diff -- \
+            src/pages/admin/AdminPortalPage.tsx \
+            src/pages/master/AdminManagementPage.tsx \
+            src/pages/master/AdminManagementPage.css \
+            src/routes.tsx \
+            src/layouts/AppSidebar.tsx
         working-directory: frontend
       - name: Format check
         run: npm run format:check
