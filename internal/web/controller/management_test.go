@@ -96,6 +96,13 @@ func TestCanManagementAccessInboundAllScopeMayBeRestrictedByAllowList(t *testing
 }
 
 func TestManagementPortalKeepsInboundRoutesReadOnlyAndMasterRoutesProtected(t *testing.T) {
+	if !isNativeOwnerUser(&model.User{Id: 1}, 1) {
+		t.Fatal("native owner should be allowed")
+	}
+	if isNativeOwnerUser(&model.User{Id: 2}, 1) || isNativeOwnerUser(nil, 1) || isNativeOwnerUser(&model.User{Id: 1}, 0) {
+		t.Fatal("only the exact native owner may access master management routes")
+	}
+
 	previousMode := gin.Mode()
 	gin.SetMode(gin.TestMode)
 	t.Cleanup(func() { gin.SetMode(previousMode) })
