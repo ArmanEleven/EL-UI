@@ -14,7 +14,7 @@ const (
 	ResourceHosts           = "hosts"
 	ResourceTemplates       = "templates"
 	ResourceClientTemplates = "client_templates"
-	ResourceCores            = "cores"
+	ResourceCores           = "cores"
 	ResourceSettings         = "settings"
 	ResourceSystem           = "system"
 	ResourceHWIDs            = "hwids"
@@ -116,11 +116,13 @@ type RoleAccess struct {
 	AllowedGroupIDs    []int64 `json:"allowed_group_ids"`
 }
 
-func (a RoleAccess) AllowsGroup(id int64) bool { return containsAllowedID(a.AllowedGroupIDs, id) }
+func (a RoleAccess) AllowsGroup(id int64) bool    { return containsAllowedID(a.AllowedGroupIDs, id) }
 func (a RoleAccess) AllowsTemplate(id int64) bool { return containsAllowedID(a.AllowedTemplateIDs, id) }
 
 func containsAllowedID(allowed []int64, id int64) bool {
-	if allowed == nil { return true }
+	if allowed == nil {
+		return true
+	}
 	for _, candidate := range allowed {
 		if candidate == id { return true }
 	}
@@ -135,15 +137,25 @@ func (a RoleAccess) FilterTemplateIDs(requested []int64) []int64 {
 }
 
 func intersectIDs(requested, allowed []int64) []int64 {
-	if allowed == nil { return copyIDs(requested) }
-	if requested == nil { return copyIDs(allowed) }
+	if allowed == nil {
+		return copyIDs(requested)
+	}
+	if requested == nil {
+		return copyIDs(allowed)
+	}
 	allowedSet := make(map[int64]struct{}, len(allowed))
-	for _, id := range allowed { allowedSet[id] = struct{}{} }
+	for _, id := range allowed {
+		allowedSet[id] = struct{}{}
+	}
 	result := make([]int64, 0, len(requested))
 	seen := make(map[int64]struct{}, len(requested))
 	for _, id := range requested {
-		if _, ok := allowedSet[id]; !ok { continue }
-		if _, ok := seen[id]; ok { continue }
+		if _, ok := allowedSet[id]; !ok {
+			continue
+		}
+		if _, ok := seen[id]; ok {
+			continue
+		}
 		seen[id] = struct{}{}
 		result = append(result, id)
 	}
@@ -195,17 +207,29 @@ func NewRole(name string) Role {
 }
 
 func (r Role) Validate() error {
-	if strings.TrimSpace(r.Name) == "" { return fmt.Errorf("role name cannot be empty") }
-	if len([]rune(r.Name)) > 64 { return fmt.Errorf("role name cannot exceed 64 characters") }
-	if err := r.Limits.Validate(); err != nil { return err }
+	if strings.TrimSpace(r.Name) == "" {
+		return fmt.Errorf("role name cannot be empty")
+	}
+	if len([]rune(r.Name)) > 64 {
+		return fmt.Errorf("role name cannot exceed 64 characters")
+	}
+	if err := r.Limits.Validate(); err != nil {
+		return err
+	}
 	if r.HWID.Mode != "" && r.HWID.Mode != HWIDDisabled && r.HWID.Mode != HWIDUseGlobal && r.HWID.Mode != HWIDOverride {
 		return fmt.Errorf("unsupported HWID mode %q", r.HWID.Mode)
 	}
 	for resource, actions := range r.Permissions {
-		if strings.TrimSpace(resource) == "" { return fmt.Errorf("permission resource cannot be empty") }
+		if strings.TrimSpace(resource) == "" {
+			return fmt.Errorf("permission resource cannot be empty")
+		}
 		for action, grant := range actions {
-			if strings.TrimSpace(action) == "" { return fmt.Errorf("permission action for resource %q cannot be empty", resource) }
-			if !grant.Scope.Valid() { return fmt.Errorf("invalid permission scope %d for %s.%s", grant.Scope, resource, action) }
+			if strings.TrimSpace(action) == "" {
+				return fmt.Errorf("permission action for resource %q cannot be empty", resource)
+			}
+			if !grant.Scope.Valid() {
+				return fmt.Errorf("invalid permission scope %d for %s.%s", grant.Scope, resource, action)
+			}
 		}
 	}
 	return nil
@@ -230,12 +254,16 @@ type Admin struct {
 func (a *Admin) IsOwner() bool { return a != nil && a.Role != nil && a.Role.IsOwner }
 
 func (a *Admin) Validate() error {
-	if a == nil { return fmt.Errorf("admin is required") }
+	if a == nil {
+		return fmt.Errorf("admin is required")
+	}
 	switch a.Status {
 	case AdminActive, AdminDisabled, AdminLimited:
 	default:
 		return fmt.Errorf("unsupported admin status %q", a.Status)
 	}
-	if a.ID <= 0 && !a.IsOwner() { return fmt.Errorf("non-owner admin ID must be positive") }
+	if a.ID <= 0 && !a.IsOwner() {
+		return fmt.Errorf("non-owner admin ID must be positive")
+	}
 	return a.PermissionOverrides.Validate()
 }
