@@ -99,8 +99,6 @@ export default function AdminPortalPage() {
   const [form] = Form.useForm<CreateClientForm>();
 
   const load = useCallback(async () => {
-    setLoading(true);
-    setLoadError(null);
     try {
       const [meResp, inboundResp, clientResp] = await Promise.all([
         HttpUtil.get<ManagementMe>('/management-api/auth/me', undefined, { silent: true }),
@@ -118,6 +116,8 @@ export default function AdminPortalPage() {
       const canReadClients = !!meResp.obj.role.permissions?.clients?.read?.allowed;
       if ((!inboundResp.success && canReadInbounds) || (!clientResp.success && canReadClients)) {
         setLoadError(t('adminPortal.loadFailed'));
+      } else {
+        setLoadError(null);
       }
     } catch {
       setLoadError(t('adminPortal.loadFailed'));
@@ -125,6 +125,12 @@ export default function AdminPortalPage() {
       setLoading(false);
     }
   }, [navigate, t]);
+
+  const refresh = useCallback(() => {
+    setLoading(true);
+    setLoadError(null);
+    void load();
+  }, [load]);
 
   useEffect(() => {
     void load();
@@ -248,7 +254,7 @@ export default function AdminPortalPage() {
           </div>
           <Space wrap>
             <Tag color={me.status === 'active' ? 'success' : 'warning'}>{me.status}</Tag>
-            <Button onClick={() => void load()}>{t('adminPortal.refresh')}</Button>
+            <Button onClick={refresh}>{t('adminPortal.refresh')}</Button>
             <Button
               onClick={async () => {
                 await HttpUtil.post(
