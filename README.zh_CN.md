@@ -1,231 +1,153 @@
-[English](/README.md) | [فارسی](/README.fa_IR.md) | [العربية](/README.ar_EG.md) | [中文](/README.zh_CN.md) | [Español](/README.es_ES.md) | [Русский](/README.ru_RU.md) | [Türkçe](/README.tr_TR.md)
+<!--
+EL-UI
+项目负责人和维护者：ArmanEleven
+本项目基于 Sanaei 3X-UI 代码库开发。请参阅 LICENSE 及上游版权声明。
+-->
 
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./media/3x-ui-dark.png">
-    <img alt="3x-ui" src="./media/3x-ui-light.png">
-  </picture>
+  <strong>EL-UI</strong>
+</p>
+
+<h1 align="center">EL-UI — 面向 3X-UI 的角色权限管理层</h1>
+
+<p align="center">
+  <em>由 <a href="https://github.com/ArmanEleven">ArmanEleven</a> 创建并维护</em>
 </p>
 
 <p align="center">
-  <a href="https://github.com/MHSanaei/3x-ui/releases"><img src="https://img.shields.io/github/v/release/mhsanaei/3x-ui" alt="Release"></a>
-  <a href="https://github.com/MHSanaei/3x-ui/actions"><img src="https://img.shields.io/github/actions/workflow/status/mhsanaei/3x-ui/release.yml.svg" alt="Build"></a>
-  <a href="#"><img src="https://img.shields.io/github/go-mod/go-version/mhsanaei/3x-ui.svg" alt="GO Version"></a>
-  <a href="https://github.com/MHSanaei/3x-ui/releases/latest"><img src="https://img.shields.io/github/downloads/mhsanaei/3x-ui/total.svg" alt="Downloads"></a>
-  <a href="https://www.gnu.org/licenses/gpl-3.0.en.html"><img src="https://img.shields.io/badge/license-GPL%20V3-blue.svg?longCache=true" alt="License"></a>
-  <a href="https://pkg.go.dev/github.com/mhsanaei/3x-ui/v3"><img src="https://pkg.go.dev/badge/github.com/mhsanaei/3x-ui/v3.svg" alt="Go Reference"></a>
-  <a href="https://docs.sanaei.dev"><img src="https://img.shields.io/badge/docs-docs.sanaei.dev-22d3ee" alt="Documentation"></a>
+  <a href="README.md">English</a> ·
+  <a href="README.fa_IR.md">فارسی</a> ·
+  <a href="README.it_IT.md">Italiano</a> ·
+  <a href="README.zh_CN.md">简体中文</a> ·
+  <a href="README.ru_RU.md">Русский</a> ·
+  <a href="README.tr_TR.md">Türkçe</a>
 </p>
 
-**3X-UI** 是一个先进的开源 Web 控制面板，用于管理 [Xray-core](https://github.com/XTLS/Xray-core) 服务器。它提供简洁、多语言的界面，用于部署、配置和监控各种代理与 VPN 协议——从单台 VPS 到多节点部署。
+<p align="center">
+  <img alt="项目状态：实验阶段" src="https://img.shields.io/badge/status-experimental-orange">
+  <img alt="核心：3X-UI" src="https://img.shields.io/badge/core-3X--UI-blue">
+  <img alt="许可证：GPL-3.0" src="https://img.shields.io/badge/license-GPL--3.0-informational">
+</p>
 
-3X-UI 作为原始 X-UI 项目的增强分支（fork），增加了更广泛的协议支持、更好的稳定性、按客户端的流量统计以及许多提升使用体验的功能。
+**EL-UI** 是一个由 **ArmanEleven** 主导的开源项目，旨在基于 [Sanaei 3X-UI](https://github.com/MHSanaei/3x-ui) 代码库，打造更清晰、更完善的管理体验。项目并不打算替换 Xray 协议引擎，而是保留原生面板的核心能力，并逐步构建独立的管理层，用于管理员、角色、权限、配额和运行状态管理。
 
-> [!IMPORTANT]
-> 本项目仅供个人使用。请勿将其用于非法目的，也请勿在生产环境中使用。
+> [!WARNING]
+> **EL-UI 仍处于开发阶段，尚未发布可用于生产环境的版本。** 多管理员管理功能尚未完整接入身份验证、API 授权和用户界面。请勿使用当前开发分支管理生产服务器或重要数据。
 
-## 功能特性
+## 项目目标
 
-- **多协议入站** — VLESS、VMess、Trojan、Shadowsocks、WireGuard、AmneziaWG、TUIC v5、Hysteria2、MTProto、HTTP、SOCKS (Mixed)、Dokodemo-door / Tunnel 和 TUN。
-- **现代传输与安全** — TCP (Raw)、mKCP、WebSocket、gRPC、HTTPUpgrade 和 XHTTP，并通过 TLS、XTLS 和 REALITY 加密。
-- **内置 AmneziaWG** — 抗 DPI 的 WireGuard 直接在面板内的用户态网络栈上运行，无需内核模块、DKMS 或额外软件包。
-- **内置 TUIC v5** — 基于 QUIC 的高性能代理，支持原生 UDP 中继流量统计、0-RTT 握手和 BBR 拥塞控制。
-- **MTProto 代理** — 按客户端配置 FakeTLS 密钥、广告标签和配额，实时生效且不会断开已有连接。
-- **回落 (Fallback)** — 通过 Xray 的 fallback 功能在单个端口上提供多种协议（例如在 443 端口上同时使用 VLESS 和 Trojan）。
-- **按客户端管理** — 流量配额、到期日期、可豁免受信任地址的 IP 限制、HWID 设备数限制、定时续期周期、实时在线状态，以及一键分享链接、二维码和订阅。
-- **流量统计** — 按入站、按客户端、按出站统计，并支持重置控制。
-- **多节点支持** — 从单一面板管理并扩展到多台服务器，并可将入站克隆到其他节点。
-- **出站与路由** — WARP、NordVPN、PIA、自定义路由规则、支持均衡器间回退的负载均衡器，以及出站代理链。内置的 geosite 与 geoip 分类可直接在规则编辑器中浏览。
-- **内置订阅服务器** — 提供 raw、JSON 和 Clash 输出，可依据客户端 User-Agent 自动选择，并支持[自定义页面模板](docs/custom-subscription-templates.md)。
-- **Telegram 和 Discord 机器人**，用于远程监控和管理。
-- **RESTful API**，支持带作用域、可设置有效期的令牌，并提供面板内置的 API 参考文档。
-- **可安装面板 (PWA)** — 将 3X-UI 固定到桌面或手机主屏幕。
-- **灵活的存储** — SQLite（默认）或 PostgreSQL。
-- **13 种界面语言**，支持深色和浅色主题。
-- **Fail2ban 集成**，用于强制执行按客户端的 IP 限制。
+- **保留核心能力：** 继续支持 3X-UI 现有的 Xray、入站、客户端、订阅、流量和节点工作流。
+- **真正的多管理员：** 为每位管理员提供独立身份、角色、状态和可强制执行的访问范围。
+- **基于角色的权限控制：** 使用明确的 `NONE`、`OWN` 和 `ALL` 范围；未明确授权的操作默认拒绝。
+- **在服务端执行配额：** 在后端操作中落实用户数、流量、到期时间、HWID 等限制，而不仅是在表单中展示限制。
+- **隔离数据所有权：** 防止管理员读取或修改超出其角色授权范围的数据。
+- **可审计、可恢复的变更：** 引入安全迁移、备份与恢复检查、清晰的运行日志和回归测试。
+- **独立的现代界面：** 构建易用、响应式、多语言并支持从右向左布局的管理界面。
 
-## 截图
+## 当前开发状态
 
-<details>
-<summary>点击展开</summary>
+当前开发工作位于 `feature/rbac-foundation` 分支。
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./media/01-overview-dark.png">
-  <img alt="Overview" src="./media/01-overview-light.png">
-</picture>
+| 模块 | 状态 |
+|---|---|
+| 开发分支中的 3X-UI 核心源码 | 已存在；EL-UI 完整发布验证仍待完成 |
+| 初始 RBAC 领域模型和权限检查 | 已添加；已编写单元测试 |
+| 独立的管理角色和管理员数据库模型 | 已添加并注册到 schema 迁移 |
+| SQLite ↔ PostgreSQL 跨数据库迁移模型清单 | 已加入新的管理表 |
+| 管理员独立登录和会话身份 | 尚未实现 |
+| 在真实管理 API 中强制执行权限 | 尚未实现 |
+| 角色和管理员管理界面 | 尚未实现 |
+| 完整构建、集成测试和安全升级验证 | 待执行 |
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./media/02-add-inbound-dark.png">
-  <img alt="Inbounds" src="./media/02-add-inbound-light.png">
-</picture>
+仅有数据库模型或界面并不代表功能已经完成。每项功能都必须接入应用，并通过可重复执行的测试。当前分支的完整 CI 状态尚未得到验证。
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./media/03-add-client-dark.png">
-  <img alt="Add client" src="./media/03-add-client-light.png">
-</picture>
+## 计划中的功能
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./media/05-add-nodes-dark.png">
-  <img alt="Configs" src="./media/05-add-nodes-light.png">
-</picture>
+### 1. 管理员与角色
 
-</details>
+- 具有完整控制权的 Owner 账户。
+- 独立的次级管理员账户。
+- 创建、编辑、禁用和管理管理员账户。
+- 按资源和操作分别配置权限的角色管理。
+- 支持 `NONE`、`OWN` 和 `ALL` 访问范围。
+- 独立的管理员门户，与 Owner 专属操作隔离。
 
-## 快速开始
+### 2. 限额与访问策略
 
-```bash
-bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
-```
+- 为每位管理员设置可创建的用户/客户端数量上限。
+- 配置流量/数据限额、到期范围的最小值和最大值。
+- 在核心支持的范围内配置 HWID 策略和每用户设备限制。
+- 限制可使用的用户组和模板。
+- 明确定义受限或已禁用管理员的行为。
+- 在服务端执行所有限制，并测试边界值和并发请求。
 
-若要安装特定版本，请在命令后附加对应的标签（例如 `v3.7.0`）：
+### 3. 运维与可靠性
 
-```bash
-bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) v3.7.0
-```
+- 记录敏感的管理员操作事件。
+- 安全、带版本号的数据库迁移。
+- 发布前进行备份和恢复测试。
+- 覆盖 SQLite 与 PostgreSQL 之间的数据迁移。
+- 测试直接 API 调用、跨管理员数据隔离、禁用账户和配额执行。
+- 提供清晰的安装、升级、回滚和故障排查文档。
 
-若要安装滚动更新的 **dev** 版本（来自 `main` 的最新逐次提交预发布版本，而非稳定版本），请传入 `dev-latest`：
+以上是项目目标，并不表示所有功能都已经可用。
 
-```bash
-bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) dev-latest
-```
+## 架构
 
-安装过程中会生成随机的用户名、密码和访问路径。安装完成后，运行 `x-ui` 打开管理菜单，您可以在其中启动/停止服务、查看或重置登录凭据、管理 SSL 证书等。
+EL-UI 使用原生 3X-UI 代码作为协议和 Xray 核心。计划中的管理层会设置明确的边界，避免管理策略绕过核心客户端逻辑或运行时管理机制。
 
-每个发布资源都会在其旁边附带一个 `.sha256` 校验和。`install.sh` 和更新程序都会据此校验压缩包，不匹配时中止。
+- **核心面板：** [Sanaei 3X-UI](https://github.com/MHSanaei/3x-ui) — Xray 生命周期、入站、客户端、订阅和节点操作。
+- **协议引擎：** [Xray-core](https://github.com/XTLS/Xray-core)。
+- **后端：** Go、Gin 和 GORM。
+- **前端：** React、TypeScript、Vite 和 Ant Design。
+- **从核心继承的数据库选项：** SQLite 和 PostgreSQL。
+- **RBAC 行为参考：** [PasarGuard](https://github.com/PasarGuard/panel) 中公开文档化的设计概念。EL-UI 独立实现相关行为；这不表示复用 PasarGuard 的源代码。
 
-完整文档（安装、配置、运维以及完整的 API 参考）请访问 **[docs.sanaei.dev](https://docs.sanaei.dev/zh)**。
+更多信息请参阅[架构方案](docs/ELUI-ARCHITECTURE.md)、[源码审计](docs/SOURCE_AUDIT.md)和[功能兼容性矩阵](docs/FEATURE_MATRIX.md)。
 
-### 无人值守安装
+## 开发
 
-安装程序也可以**非交互式**运行，适用于 cloud-init。
-设置 `XUI_NONINTERACTIVE=1`（或在无 TTY 的情况下通过管道传入），它就会全程
-零提示地完成端到端安装，生成随机凭据并写入
-`/etc/x-ui/install-result.env`。请参阅 [`deploy/`](deploy/)：
+开发工具版本应与仓库中的 manifest 保持一致。当前分支声明使用 Go 1.27.2；前端要求 Node.js 26 或更高版本，以及 npm 11 或更高版本。
 
-- [Cloud-init user-data](deploy/cloud-init/) — 在任意云平台上无人值守安装（Hetzner/AWS/DO/Vultr/GCP/Azure/Oracle）
-- [Hetzner Cloud 说明](deploy/marketplace/hetzner/) — 在 Hetzner 上基于 cloud-init 的部署
-
-## 支持的平台
-
-**操作系统：** Ubuntu、Debian、Armbian、Fedora、CentOS、RHEL、AlmaLinux、Rocky Linux、Oracle Linux、Amazon Linux、Virtuozzo、Arch、Manjaro、Parch、openSUSE (Tumbleweed / Leap)、Alpine 和 Windows。
-
-**架构：** `amd64` · `386` · `arm64` (aarch64) · `armv7` · `armv6` · `armv5` · `s390x`。
-
-## 数据库选项
-
-3X-UI 支持两种后端，可在安装时选择：
-
-- **SQLite**（默认）— 位于 `/etc/x-ui/x-ui.db` 的单个文件。无需配置，适合中小型部署。
-- **PostgreSQL** — 推荐用于大量客户端或多节点设置。安装程序可以为您在本地安装 PostgreSQL，或接受指向现有服务器的 DSN。
-
-运行时通过环境变量选择后端（安装程序会为您写入 `/etc/default/x-ui`）：
-
-```
-XUI_DB_TYPE=postgres
-XUI_DB_DSN=postgres://xui:password@127.0.0.1:5432/xui?sslmode=disable
-```
-
-### 将现有的 SQLite 安装迁移到 PostgreSQL
+Go 测试命令：
 
 ```bash
-x-ui migrate-db --dsn "postgres://xui:password@127.0.0.1:5432/xui?sslmode=disable"
-# 然后在 /etc/default/x-ui 中设置 XUI_DB_TYPE 和 XUI_DB_DSN 并重启：
-systemctl restart x-ui
+go test ./...
 ```
 
-源 SQLite 文件保持不变；在确认新后端正常工作后，请手动删除它。
-
-### Docker
-
-默认的 `docker compose up -d` 仍使用 SQLite。若要使用捆绑的 PostgreSQL 服务运行，请取消注释 `docker-compose.yml` 中的两行 `XUI_DB_*` 环境变量，并使用该 profile 启动：
+在 `frontend/` 目录中执行前端检查：
 
 ```bash
-docker compose --profile postgres up -d
+npm ci
+npm run typecheck
+npm test
+npm run lint
+npm run build
 ```
 
-该镜像捆绑了 Fail2ban（默认启用），用于强制执行按客户端的 **IP 限制**。Fail2ban 使用 `iptables` 封禁违规者，这需要 `NET_ADMIN` 权限。`docker-compose.yml` 已通过 `cap_add` 授予该权限；如果您改用 `docker run` 启动容器，请自行添加这些权限，否则封禁只会被记录而永远不会生效：
+这些是建议的开发者检查命令，**不代表当前分支已经通过全部 CI 流程**。请在临时数据库和测试服务器上执行测试，不要在生产数据库上试验迁移。
 
-```bash
-docker run -d --cap-add=NET_ADMIN --cap-add=NET_RAW ... ghcr.io/mhsanaei/3x-ui
-```
+## 安全与数据完整性
 
-## 环境变量
+- 必须在后端执行权限检查；隐藏按钮不等于授权。
+- 必须在数据库查询中执行所有权过滤，而不仅是在界面中隐藏记录。
+- 不要将密码、API 令牌、订阅密钥或未脱敏的敏感信息写入日志。
+- 部署前应使用测试数据验证迁移和恢复流程。
+- 保留上游版权声明并遵守适用的许可证要求；请阅读 [LICENSE](LICENSE)。
+- 尽可能通过私密渠道报告疑似安全漏洞；参阅 [SECURITY.md](SECURITY.md)。
 
-| 变量 | 说明 | 默认值 |
-| --- | --- | --- |
-| `XUI_DB_TYPE` | 数据库后端：`sqlite` 或 `postgres` | `sqlite` |
-| `XUI_DB_DSN` | PostgreSQL 连接字符串（当 `XUI_DB_TYPE=postgres` 时） | — |
-| `XUI_DB_FOLDER` | SQLite 数据库文件所在目录 | `/etc/x-ui` |
-| `XUI_DB_MAX_OPEN_CONNS` | 最大打开连接数（PostgreSQL 连接池） | — |
-| `XUI_DB_MAX_IDLE_CONNS` | 最大空闲连接数（PostgreSQL 连接池） | — |
-| `XUI_INIT_WEB_BASE_PATH` | Web 面板的初始 URI 路径 | `/` |
-| `XUI_ENABLE_FAIL2BAN` | 启用基于 Fail2ban 的 IP 限制 | `true` |
-| `XUI_LOG_LEVEL` | 日志级别（`debug`、`info`、`warning`、`error`） | `info` |
-| `XUI_DEBUG` | 启用调试模式 | `false` |
-| `XUI_TUNNEL_HEALTH_MONITOR` | 启用隧道健康监控（探测某个 URL，在连续多次失败后重启 xray；重启会断开所有客户端） | `false` |
-| `XUI_TUNNEL_HEALTH_PROXY` | 探测请求所经过的代理；将其指向本地 xray 入站，使探测能够测试隧道（例如 `socks5://127.0.0.1:1080`）。留空表示探测仅检查主机连通性 | — |
-| `XUI_TUNNEL_HEALTH_URL` | 用于检测隧道健康状况的探测 URL | `https://www.cloudflare.com/cdn-cgi/trace` |
-| `XUI_TUNNEL_HEALTH_INTERVAL` | 两次探测之间的间隔 | `30s` |
-| `XUI_TUNNEL_HEALTH_TIMEOUT` | 单次探测的超时时间 | `10s` |
-| `XUI_TUNNEL_HEALTH_FAILURES` | 触发重启前的连续失败次数 | `3` |
-| `XUI_TUNNEL_HEALTH_COOLDOWN` | 两次连续重启之间的最小间隔 | `5m` |
-| `NODE_TOKEN_ENCRYPTION` | 节点 API 令牌的静态加密：`off`、`migration` 或 `required`（注意：无 `XUI_` 前缀） | `off` |
-| `XUI_NODE_TOKEN_KEY_FILE` | JSON 密钥环（权限 `0600`），包含活动密钥 ID 及其 base64 编码的 32 字节密钥 | `/etc/x-ui/node_token_key.json` |
-| `XUI_NODE_TOKEN_KEY` | 单个 base64 编码的 32 字节密钥，仅在无法加载密钥文件时使用 | — |
+## 项目负责人与致谢
 
-完整列表请参阅[环境变量参考](https://docs.sanaei.dev/zh/docs/reference/env-vars)。
+**项目负责人和维护者：** [ArmanEleven](https://github.com/ArmanEleven)。
 
-## 支持的语言
+EL-UI 建立在 [Sanaei 3X-UI](https://github.com/MHSanaei/3x-ui) 和 [Xray-core](https://github.com/XTLS/Xray-core) 项目的成果之上。我们重视对其维护者和贡献者的明确致谢。PasarGuard 公开记录的管理行为也作为功能设计参考进行研究。
 
-面板界面提供 13 种语言：
+## 许可证
 
-English · فارسی · العربية · 中文（简体） · 中文（繁體） · Español · Русский · Українська · Türkçe · Tiếng Việt · 日本語 · Bahasa Indonesia · Português (Brasil)
+分发 EL-UI 时必须保留上游许可证要求和版权声明。修改或重新分发本项目之前，请阅读仓库中的 [LICENSE](LICENSE)。
 
-## 贡献
-
-欢迎贡献。在提交 issue 或 pull request 之前，请阅读[贡献指南](/CONTRIBUTING.md)。
-
-## 特别感谢
-
-- [alireza0](https://github.com/alireza0/)
-
-## 致谢
-
-- [Iran v2ray rules](https://github.com/chocolate4u/Iran-v2ray-rules) (许可证: **GPL-3.0**): _增强的 v2ray/xray 和 v2ray/xray-clients 路由规则，内置伊朗域名，专注于安全性和广告拦截。_
-- [Russia v2ray rules](https://github.com/runetfreedom/russia-v2ray-rules-dat) (许可证: **GPL-3.0**): _此仓库包含基于俄罗斯被阻止域名和地址数据自动更新的 V2Ray 路由规则。_
-
-## 社区工具
-
-社区围绕 3x-ui 构建的工具和集成。
-
-- [terraform-provider-3x-ui](https://github.com/batonogov/terraform-provider-threexui) (许可证: **MIT**): _使用 Terraform / OpenTofu 通过代码管理入站、客户端、面板设置和 Xray 配置。_
-- [3X-UI Manager](https://github.com/yukh975/3X-UI-Manager) (许可证: **MIT**): _3x-ui 的原生 Android 客户端 — 仪表板、入站、带二维码分享的客户端、节点以及多面板管理。可在 F-Droid 获取。_
-
-## 支持项目
-
-**如果这个项目对您有帮助，您可以给它一个**:star2:
-
-<a href="https://www.buymeacoffee.com/MHSanaei" target="_blank">
-<img src="./media/default-yellow.png" alt="Buy Me A Coffee" style="height: 70px !important;width: 277px !important;" >
-</a>
-
-</br>
-<a href="https://nowpayments.io/donation/hsanaei" target="_blank" rel="noreferrer noopener">
-   <img src="./media/donation-button-black.svg" alt="Crypto donation button by NOWPayments">
-</a>
-
-## 星标历史
-
-<a href="https://www.star-history.com/?repos=mhsanaei%2F3x-ui&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=mhsanaei/3x-ui&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=mhsanaei/3x-ui&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=mhsanaei/3x-ui&type=date&legend=top-left" />
- </picture>
-</a>
+---
 
 <p align="center">
- <a href="https://www.star-history.com/mhsanaei/3x-ui">
-  <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/badge?repo=MHSanaei/3x-ui&type=rank&theme=dark" /><source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/badge?repo=MHSanaei/3x-ui&type=rank" /><img alt="Star History Rank" src="https://api.star-history.com/badge?repo=MHSanaei/3x-ui&type=rank" /></picture> <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/badge?repo=MHSanaei/3x-ui&type=trending&theme=dark" /><source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/badge?repo=MHSanaei/3x-ui&type=trending" /><img alt="GitHub Trending Repository of the Day" src="https://api.star-history.com/badge?repo=MHSanaei/3x-ui&type=trending" /></picture>
- </a>
+  <sub>由 <a href="https://github.com/ArmanEleven">ArmanEleven</a> 设计并维护 · 循序开发，以可验证的正确性为先。</sub>
 </p>
