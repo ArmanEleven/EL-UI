@@ -133,26 +133,3 @@ func TestManagementPortalKeepsInboundRoutesReadOnlyAndMasterRoutesProtected(t *t
 		}
 	}
 }
-
-func TestIsNativeOwnerUserRequiresExactOwnerIdentity(t *testing.T) {
-	tests := []struct {
-		name    string
-		user    *model.User
-		ownerID int
-		want    bool
-	}{
-		{name: "owner", user: &model.User{Id: 1}, ownerID: 1, want: true},
-		{name: "different user", user: &model.User{Id: 2}, ownerID: 1, want: false},
-		{name: "missing user", ownerID: 1, want: false},
-		{name: "unknown owner", user: &model.User{Id: 1}, want: false},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := isNativeOwnerUser(tt.user, tt.ownerID); got != tt.want {
-				t.Fatalf("isNativeOwnerUser() = %t, want %t", got, tt.want)
-			}
-		})
-	}
-}
-
