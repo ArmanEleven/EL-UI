@@ -124,7 +124,9 @@ func containsAllowedID(allowed []int64, id int64) bool {
 		return true
 	}
 	for _, candidate := range allowed {
-		if candidate == id { return true }
+		if candidate == id {
+			return true
+		}
 	}
 	return false
 }
@@ -163,7 +165,9 @@ func intersectIDs(requested, allowed []int64) []int64 {
 }
 
 func copyIDs(ids []int64) []int64 {
-	if ids == nil { return nil }
+	if ids == nil {
+		return nil
+	}
 	out := make([]int64, len(ids))
 	copy(out, ids)
 	return out
