@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Alert,
   Button,
@@ -56,6 +56,10 @@ type AdminForm = {
   roleId: number;
   permissionOverridesJSON: string;
 };
+
+const EMPTY_ROLES: RoleRow[] = [];
+const EMPTY_ADMINS: AdminRow[] = [];
+const EMPTY_INBOUNDS: InboundRow[] = [];
 
 const { Title, Text } = Typography;
 const DEFAULT_PERMISSIONS = JSON.stringify({
@@ -121,9 +125,9 @@ export default function AdminManagementPage() {
     queryFn: () => fetchManagementList<InboundRow>('/management-api/master/inbounds'),
   });
 
-  const roles = rolesQuery.data ?? [];
-  const admins = adminsQuery.data ?? [];
-  const inbounds = inboundsQuery.data ?? [];
+  const roles = rolesQuery.data ?? EMPTY_ROLES;
+  const admins = adminsQuery.data ?? EMPTY_ADMINS;
+  const inbounds = inboundsQuery.data ?? EMPTY_INBOUNDS;
   const loading = rolesQuery.isPending || adminsQuery.isPending || inboundsQuery.isPending;
   const queryError = rolesQuery.error || adminsQuery.error || inboundsQuery.error;
 
