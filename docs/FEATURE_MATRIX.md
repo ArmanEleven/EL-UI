@@ -8,20 +8,20 @@ Status meanings: - **Audit pending** — source-level behavior and dependencies 
 - **Design pending** — integration approach not yet approved. - **Not started** — no EL-UI
 implementation yet. - **Verified** — implemented and backed by a reproducible test.
 
-| Capability | 3X-UI baseline | HMPanel-described capability | Initial EL-UI status | Verification needed |
-| --- | --- | --- | --- | --- |
-| Protocols, inbounds, Xray config | Core functionality | Uses native 3X-UI | Audit pending | Confirm upstream version, APIs, database schema, and update behavior |
-| Clients and traffic limits | Per-client quota/expiry/IP controls | Client groups, reseller limits, multiple inbounds per client | Audit pending | Map client identities and limit semantics |
-| Multi-panel / nodes | Multi-node support exists | Central management of multiple 3X-UI panels | Design pending | Determine whether to reuse native node support or add a separate control-plane registry |
-| Reseller roles | Not equivalent to full reseller management | Multi-tier reseller permissions and limits | Design pending | Permission matrix, tenant isolation, authorization tests |
-| Traffic accounting | Per-client and per-inbound statistics | Real-time accounting, grace periods, usage/allocation modes | Audit pending | Reconcile reset windows, polling, stale data, and billing invariants |
-| Bulk operations | Some client/inbound workflows | Bulk edit/delete and migration workflows | Audit pending | Transaction boundaries, partial failures, dry-run and audit log |
-| Backup / restore | Core database options and operational tools | Web-based PostgreSQL backup and restore | Audit pending | Authentication, file validation, encryption, rollback and restore tests |
-| Migration | Existing panel migration docs/tools may apply | Legacy-panel migration engine | Audit pending | Supported source formats, idempotence, data validation |
-| Dashboard / monitoring | Existing panel status and traffic views | Super-admin and infrastructure dashboards | Design pending | Define source of truth and freshness indicators |
-| EL-UI rebrand and UI | Existing frontend | Separate management frontend | Not started | Preserve API contracts, responsive behavior, accessibility, RTL |
-| Authentication / audit | Existing panel authentication | Management roles and administrative workflows | Audit pending | Session security, CSRF, rate limits, audit trail, least privilege |
-| Installer / upgrades | Existing installer and service lifecycle | Separate installer/CLI/database stack | Design pending | Avoid conflicting services, ports, files, and destructive migrations |
+| Capability                       | 3X-UI baseline                                | HMPanel-described capability                                 | Initial EL-UI status | Verification needed                                                                     |
+| -------------------------------- | --------------------------------------------- | ------------------------------------------------------------ | -------------------- | --------------------------------------------------------------------------------------- |
+| Protocols, inbounds, Xray config | Core functionality                            | Uses native 3X-UI                                            | Audit pending        | Confirm upstream version, APIs, database schema, and update behavior                    |
+| Clients and traffic limits       | Per-client quota/expiry/IP controls           | Client groups, reseller limits, multiple inbounds per client | Audit pending        | Map client identities and limit semantics                                               |
+| Multi-panel / nodes              | Multi-node support exists                     | Central management of multiple 3X-UI panels                  | Design pending       | Determine whether to reuse native node support or add a separate control-plane registry |
+| Reseller roles                   | Not equivalent to full reseller management    | Multi-tier reseller permissions and limits                   | Design pending       | Permission matrix, tenant isolation, authorization tests                                |
+| Traffic accounting               | Per-client and per-inbound statistics         | Real-time accounting, grace periods, usage/allocation modes  | Audit pending        | Reconcile reset windows, polling, stale data, and billing invariants                    |
+| Bulk operations                  | Some client/inbound workflows                 | Bulk edit/delete and migration workflows                     | Audit pending        | Transaction boundaries, partial failures, dry-run and audit log                         |
+| Backup / restore                 | Core database options and operational tools   | Web-based PostgreSQL backup and restore                      | Audit pending        | Authentication, file validation, encryption, rollback and restore tests                 |
+| Migration                        | Existing panel migration docs/tools may apply | Legacy-panel migration engine                                | Audit pending        | Supported source formats, idempotence, data validation                                  |
+| Dashboard / monitoring           | Existing panel status and traffic views       | Super-admin and infrastructure dashboards                    | Design pending       | Define source of truth and freshness indicators                                         |
+| EL-UI rebrand and UI             | Existing frontend                             | Separate management frontend                                 | Not started          | Preserve API contracts, responsive behavior, accessibility, RTL                         |
+| Authentication / audit           | Existing panel authentication                 | Management roles and administrative workflows                | Audit pending        | Session security, CSRF, rate limits, audit trail, least privilege                       |
+| Installer / upgrades             | Existing installer and service lifecycle      | Separate installer/CLI/database stack                        | Design pending       | Avoid conflicting services, ports, files, and destructive migrations                    |
 
 ## Initial conclusion
 
