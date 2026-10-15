@@ -416,63 +416,150 @@
   margin-top: 20px;
 }
 
-
 /* EL-UI concept pass — graphite surfaces and botanical mint light. */
 .login-app {
-  --bg-page: #f3f6f0; --bg-card: rgba(255, 255, 255, 0.82); --bg-card-solid: #ffffff;
-  --color-text: #18241b; --color-text-subtle: #657269; --color-accent: #2f7752;
-  --color-border: rgba(47, 119, 82, 0.16); --shadow-card: 0 28px 90px rgba(24, 50, 32, 0.13);
-  --blob-1: rgba(75, 169, 110, 0.24); --blob-2: rgba(178, 224, 132, 0.32);
-  --blob-3: rgba(92, 173, 133, 0.20); --blob-4: rgba(206, 228, 155, 0.20);
-  --blob-5: rgba(68, 142, 95, 0.15); --grid-color: rgba(42, 96, 58, 0.055);
+  --bg-page: #f3f6f0;
+  --bg-card: rgba(255, 255, 255, 0.82);
+  --bg-card-solid: #ffffff;
+  --color-text: #18241b;
+  --color-text-subtle: #657269;
+  --color-accent: #2f7752;
+  --color-border: rgba(47, 119, 82, 0.16);
+  --shadow-card: 0 28px 90px rgba(24, 50, 32, 0.13);
+  --blob-1: rgba(75, 169, 110, 0.24);
+  --blob-2: rgba(178, 224, 132, 0.32);
+  --blob-3: rgba(92, 173, 133, 0.2);
+  --blob-4: rgba(206, 228, 155, 0.2);
+  --blob-5: rgba(68, 142, 95, 0.15);
+  --grid-color: rgba(42, 96, 58, 0.055);
   background: linear-gradient(145deg, #f4f7f1 0%, #eaf1e8 56%, #f8f8f0 100%);
 }
 .login-app.is-dark {
-  --bg-page: #0b110d; --bg-card: rgba(15, 23, 17, 0.78); --bg-card-solid: #101812;
-  --color-text: #edf7ed; --color-text-subtle: #a1b2a3; --color-accent: #a4e9b5;
-  --color-border: rgba(164, 233, 181, 0.16); --shadow-card: 0 30px 100px rgba(0, 0, 0, 0.42);
-  --blob-1: rgba(73, 158, 100, 0.24); --blob-2: rgba(148, 217, 119, 0.15);
-  --blob-3: rgba(59, 150, 110, 0.15); --blob-4: rgba(123, 184, 103, 0.12);
-  --blob-5: rgba(122, 201, 145, 0.12); --grid-color: rgba(203, 245, 211, 0.035);
+  --bg-page: #0b110d;
+  --bg-card: rgba(15, 23, 17, 0.78);
+  --bg-card-solid: #101812;
+  --color-text: #edf7ed;
+  --color-text-subtle: #a1b2a3;
+  --color-accent: #a4e9b5;
+  --color-border: rgba(164, 233, 181, 0.16);
+  --shadow-card: 0 30px 100px rgba(0, 0, 0, 0.42);
+  --blob-1: rgba(73, 158, 100, 0.24);
+  --blob-2: rgba(148, 217, 119, 0.15);
+  --blob-3: rgba(59, 150, 110, 0.15);
+  --blob-4: rgba(123, 184, 103, 0.12);
+  --blob-5: rgba(122, 201, 145, 0.12);
+  --grid-color: rgba(203, 245, 211, 0.035);
   background: radial-gradient(ellipse at 46% 0%, #17231a 0%, #0b110d 55%, #080c09 100%);
 }
 .login-app.is-dark.is-ultra {
-  --bg-page: #030604; --bg-card: rgba(9, 14, 10, 0.82); --bg-card-solid: #090e0a;
-  --color-border: rgba(164, 233, 181, 0.12); --shadow-card: 0 32px 100px rgba(0, 0, 0, 0.62);
+  --bg-page: #030604;
+  --bg-card: rgba(9, 14, 10, 0.82);
+  --bg-card-solid: #090e0a;
+  --color-border: rgba(164, 233, 181, 0.12);
+  --shadow-card: 0 32px 100px rgba(0, 0, 0, 0.62);
   --grid-color: rgba(203, 245, 211, 0.025);
   background: radial-gradient(ellipse at 46% 0%, #101b13 0%, #030604 61%);
 }
 .login-card {
-  max-width: 420px; border-radius: 26px; backdrop-filter: blur(26px) saturate(125%);
-  -webkit-backdrop-filter: blur(26px) saturate(125%); border-color: var(--color-border); box-shadow: var(--shadow-card);
+  max-width: 420px;
+  border-radius: 26px;
+  backdrop-filter: blur(26px) saturate(125%);
+  -webkit-backdrop-filter: blur(26px) saturate(125%);
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-card);
 }
-.login-card::before { background: linear-gradient(145deg, rgba(164, 233, 181, 0.28), transparent 44%, rgba(95, 190, 123, 0.24) 90%); }
-.login-app.is-dark .login-card::before { background: linear-gradient(145deg, rgba(164, 233, 181, 0.2), transparent 42%, rgba(64, 150, 91, 0.28) 90%); }
-.brand { gap: 5px; margin-bottom: 8px; }
+.login-card::before {
+  background: linear-gradient(
+    145deg,
+    rgba(164, 233, 181, 0.28),
+    transparent 44%,
+    rgba(95, 190, 123, 0.24) 90%
+  );
+}
+.login-app.is-dark .login-card::before {
+  background: linear-gradient(
+    145deg,
+    rgba(164, 233, 181, 0.2),
+    transparent 42%,
+    rgba(64, 150, 91, 0.28) 90%
+  );
+}
+.brand {
+  gap: 5px;
+  margin-bottom: 8px;
+}
 .brand-symbol {
-  display: inline-grid; place-items: center; width: 56px; height: 56px; margin-bottom: 5px;
-  border: 1px solid rgba(47, 119, 82, 0.28); border-radius: 17px;
+  display: inline-grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 5px;
+  border: 1px solid rgba(47, 119, 82, 0.28);
+  border-radius: 17px;
   background: linear-gradient(145deg, #c9f9d0 0%, #73d196 55%, #3b9e68 100%);
-  box-shadow: 0 12px 28px rgba(47, 119, 82, 0.21), inset 0 1px 0 rgba(255,255,255,0.72);
-  color: #0d2817; font-size: 18px; font-weight: 900; letter-spacing: -0.09em;
+  box-shadow:
+    0 12px 28px rgba(47, 119, 82, 0.21),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  color: #0d2817;
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: -0.09em;
 }
-.login-app.is-dark .brand-symbol { border-color: rgba(184, 246, 199, 0.38); box-shadow: 0 12px 32px rgba(72, 179, 110, 0.15), inset 0 1px 0 rgba(255,255,255,0.26); }
+.login-app.is-dark .brand-symbol {
+  border-color: rgba(184, 246, 199, 0.38);
+  box-shadow:
+    0 12px 32px rgba(72, 179, 110, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.26);
+}
 .brand-name {
-  margin-top: 2px; background: linear-gradient(110deg, #214b32 0%, #2f7752 54%, #78a847 100%);
-  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
-  font-size: 29px; font-weight: 850; letter-spacing: -0.07em;
+  margin-top: 2px;
+  background: linear-gradient(110deg, #214b32 0%, #2f7752 54%, #78a847 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 29px;
+  font-weight: 850;
+  letter-spacing: -0.07em;
 }
 .login-app.is-dark .brand-name {
   background: linear-gradient(110deg, #e7f9e9 0%, #a4e9b5 52%, #c2f38e 100%);
-  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
-.brand-caption { color: var(--color-text-subtle); font-size: 9px; font-weight: 800; letter-spacing: 0.24em; }
-.brand-accent { width: 34px; height: 3px; margin-top: 7px; background: linear-gradient(90deg, #2f7752, #a6d76e); }
-.login-app.is-dark .brand-accent { background: linear-gradient(90deg, #6fcf91, #c2f38e); }
-.login-form .ant-form-item-label > label { font-weight: 650; }
-.login-app .ant-btn-primary { border: 1px solid rgba(255, 255, 255, 0.14); background: linear-gradient(110deg, #286d49, #3d9861); box-shadow: 0 8px 20px rgba(47, 119, 82, 0.22); }
-.login-app .ant-btn-primary:hover { background: linear-gradient(110deg, #347e55, #4ea970) !important; }
+.brand-caption {
+  color: var(--color-text-subtle);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.24em;
+}
+.brand-accent {
+  width: 34px;
+  height: 3px;
+  margin-top: 7px;
+  background: linear-gradient(90deg, #2f7752, #a6d76e);
+}
+.login-app.is-dark .brand-accent {
+  background: linear-gradient(90deg, #6fcf91, #c2f38e);
+}
+.login-form .ant-form-item-label > label {
+  font-weight: 650;
+}
+.login-app .ant-btn-primary {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: linear-gradient(110deg, #286d49, #3d9861);
+  box-shadow: 0 8px 20px rgba(47, 119, 82, 0.22);
+}
+.login-app .ant-btn-primary:hover {
+  background: linear-gradient(110deg, #347e55, #4ea970) !important;
+}
 @media (max-width: 480px) {
-  .login-card { border-radius: 22px; }
-  .brand-symbol { width: 50px; height: 50px; border-radius: 15px; }
+  .login-card {
+    border-radius: 22px;
+  }
+  .brand-symbol {
+    width: 50px;
+    height: 50px;
+    border-radius: 15px;
+  }
 }
