@@ -69,6 +69,7 @@ func (a *ManagementController) initRouter(g *gin.RouterGroup) {
 	master.GET("/admins", a.listAdmins)
 	master.POST("/admins", a.createAdmin)
 	master.PATCH("/admins/:id/status", a.setAdminStatus)
+	master.POST("/admins/:id/status", a.setAdminStatus)
 }
 
 func managementJSON(c *gin.Context, status int, success bool, msg string, obj any) {
