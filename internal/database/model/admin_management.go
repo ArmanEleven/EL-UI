@@ -6,19 +6,19 @@ import "time"
 // native 3X-UI protocol/client records. JSON policy fields remain text so both
 // supported GORM dialects (SQLite and PostgreSQL) can persist the same format.
 type ManagementAdminRole struct {
-	ID                           int       `json:"id" gorm:"primaryKey;autoIncrement"`
-	Name                         string    `json:"name" gorm:"size:64;not null;uniqueIndex:ux_management_admin_roles_name"`
-	IsOwner                      bool      `json:"isOwner" gorm:"not null;default:false;index"`
-	PermissionsJSON              string    `json:"-" gorm:"type:text;not null"`
-	LimitsJSON                   string    `json:"-" gorm:"type:text;not null"`
-	FeaturesJSON                 string    `json:"-" gorm:"type:text;not null"`
-	AccessJSON                   string    `json:"-" gorm:"type:text;not null"`
-	HWIDJSON                     string    `json:"-" gorm:"type:text;not null"`
-	DisabledWhenLimited          bool      `json:"disabledWhenLimited" gorm:"not null;default:false"`
-	DisconnectUsersWhenLimited   bool      `json:"disconnectUsersWhenLimited" gorm:"not null;default:true"`
-	DisconnectUsersWhenDisabled  bool      `json:"disconnectUsersWhenDisabled" gorm:"not null;default:true"`
-	CreatedAt                    time.Time `json:"createdAt" gorm:"not null"`
-	UpdatedAt                    time.Time `json:"updatedAt" gorm:"not null"`
+	ID                          int       `json:"id" gorm:"primaryKey;autoIncrement"`
+	Name                        string    `json:"name" gorm:"size:64;not null;uniqueIndex:ux_management_admin_roles_name"`
+	IsOwner                     bool      `json:"isOwner" gorm:"not null;default:false;index"`
+	PermissionsJSON             string    `json:"-" gorm:"type:text;not null"`
+	LimitsJSON                  string    `json:"-" gorm:"type:text;not null"`
+	FeaturesJSON                string    `json:"-" gorm:"type:text;not null"`
+	AccessJSON                  string    `json:"-" gorm:"type:text;not null"`
+	HWIDJSON                    string    `json:"-" gorm:"type:text;not null"`
+	DisabledWhenLimited         bool      `json:"disabledWhenLimited" gorm:"not null;default:false"`
+	DisconnectUsersWhenLimited  bool      `json:"disconnectUsersWhenLimited" gorm:"not null;default:true"`
+	DisconnectUsersWhenDisabled bool      `json:"disconnectUsersWhenDisabled" gorm:"not null;default:true"`
+	CreatedAt                   time.Time `json:"createdAt" gorm:"not null"`
+	UpdatedAt                   time.Time `json:"updatedAt" gorm:"not null"`
 }
 
 func (ManagementAdminRole) TableName() string {
