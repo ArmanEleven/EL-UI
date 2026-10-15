@@ -15,11 +15,11 @@ const (
 	ResourceTemplates       = "templates"
 	ResourceClientTemplates = "client_templates"
 	ResourceCores           = "cores"
-	ResourceSettings         = "settings"
-	ResourceSystem           = "system"
+	ResourceSettings        = "settings"
+	ResourceSystem          = "system"
 	ResourceHWIDs            = "hwids"
-	ResourceAdminRoles       = "admin_roles"
-	ResourceAPIKeys          = "api_keys"
+	ResourceAdminRoles      = "admin_roles"
+	ResourceAPIKeys         = "api_keys"
 )
 
 const (
