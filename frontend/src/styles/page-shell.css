@@ -230,15 +230,28 @@ body.dark .ant-dropdown-menu-item-divider {
   }
 }
 
-
 /* EL-UI surface foundation, layered over inherited core page layouts. */
-.index-page, .clients-page, .inbounds-page, .xray-page, .settings-page,
-.nodes-page, .groups-page, .hosts-page, .api-docs-page, .sponsors-page {
+.index-page,
+.clients-page,
+.inbounds-page,
+.xray-page,
+.settings-page,
+.nodes-page,
+.groups-page,
+.hosts-page,
+.api-docs-page,
+.sponsors-page {
   background-color: #f3f6f0;
 }
-body.dark .index-page, body.dark .clients-page, body.dark .inbounds-page,
-body.dark .xray-page, body.dark .settings-page, body.dark .nodes-page,
-body.dark .groups-page, body.dark .hosts-page, body.dark .api-docs-page,
+body.dark .index-page,
+body.dark .clients-page,
+body.dark .inbounds-page,
+body.dark .xray-page,
+body.dark .settings-page,
+body.dark .nodes-page,
+body.dark .groups-page,
+body.dark .hosts-page,
+body.dark .api-docs-page,
 body.dark .sponsors-page {
   --bg-page: #0e1510;
   --bg-card: #151e17;
