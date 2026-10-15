@@ -21,7 +21,7 @@ Scope: EL-UI's real inbound editor and management flow. This is a coverage map, 
 - [x] The editor has separate Basic, Protocol, Stream, Security, Sniffing and Advanced navigation where the selected protocol supports those settings.
 - [x] Advanced editor exposes full-object JSON and focused `settings`, `streamSettings` and `sniffing` sections when applicable.
 - [x] Protocol-specific forms, transport forms, TLS and REALITY forms have dedicated source modules rather than decorative placeholder buttons.
-- [ ] Add a regression test for settings-tab navigation and advanced JSON section availability.
+- [x] Add a regression test for settings-tab navigation and advanced JSON section availability.
 - [ ] Verify full-object and focused JSON edits round-trip into the saved request; malformed JSON must not silently overwrite valid form state.
 - [ ] Exercise representative protocols (VLESS/REALITY, Trojan/WS/TLS, Shadowsocks, WireGuard, Hysteria and MASQUE) through form → wire payload → restored form.
 - [ ] Compare the capability list against the upstream `MHSanaei/3x-ui` version targeted by this branch, recording version-specific differences rather than blindly copying settings from another Xray version.
