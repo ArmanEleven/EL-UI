@@ -27,7 +27,7 @@
   --bg-card-solid: #111913;
   --color-text: rgba(255, 255, 255, 0.92);
   --color-text-subtle: rgba(255, 255, 255, 0.55);
-  --color-accent: #3b82f6;
+  --color-accent: #9ee8b6;
   --color-border: rgba(255, 255, 255, 0.1);
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4), 0 20px 60px rgba(0, 0, 0, 0.3);
   --blob-1: rgba(71, 143, 91, 0.22);
@@ -45,12 +45,12 @@
   --bg-card: rgba(15, 17, 28, 0.6);
   --bg-card-solid: #101013;
   --color-border: rgba(255, 255, 255, 0.06);
-  --blob-1: rgba(99, 102, 241, 0.3);
-  --blob-2: rgba(236, 72, 153, 0.22);
-  --blob-3: rgba(34, 211, 238, 0.2);
-  --blob-4: rgba(251, 146, 60, 0.15);
-  --blob-5: rgba(168, 85, 247, 0.25);
-  --grid-color: rgba(255, 255, 255, 0.025);
+  --blob-1: rgba(53, 121, 72, 0.16);
+  --blob-2: rgba(33, 91, 53, 0.15);
+  --blob-3: rgba(87, 150, 101, 0.1);
+  --blob-4: rgba(120, 151, 88, 0.07);
+  --blob-5: rgba(45, 102, 60, 0.1);
+  --grid-color: rgba(205, 240, 210, 0.02);
   --vignette: radial-gradient(ellipse at center, transparent 20%, rgba(0, 0, 0, 0.8) 100%);
   background: radial-gradient(ellipse at 25% 20%, #070d08 0%, #030604 62%);
 }
