@@ -9,7 +9,7 @@ commits.
 
 ## Before you start
 
--  Use a local working folder, not a production server.
+- Use a local working folder, not a production server.
 - Install Git for Windows if `git --version`
   is not recognized.
 - Make sure you have push access to
@@ -39,13 +39,14 @@ git merge elui/main --allow-unrelated-histories --no-commit
 
 Git may report conflicts in `README.md` and possibly `.gitignore`. Do not blindly choose one side: -
 Keep the upstream README's technical/build instructions and license attribution.
+
 - Preserve the
-EL-UI project direction, feature matrix, source audit, architecture and decision log. The project
-notes can be copied/merged into the upstream README after resolving the conflict.
+  EL-UI project direction, feature matrix, source audit, architecture and decision log. The project
+  notes can be copied/merged into the upstream README after resolving the conflict.
 - Keep both sets
-of ignore rules where they do not conflict.
+  of ignore rules where they do not conflict.
 - Never remove the upstream LICENSE or copyright
-notices.
+  notices.
 
 After resolving the conflicts, run:
 
@@ -63,10 +64,10 @@ the resulting tree has been reviewed.
 Before merging: 1. Check `git status` and inspect `git diff --stat`.
 
 2. Confirm upstream `LICENSE`,
-source notices, and build files remain present.
+   source notices, and build files remain present.
 
 3. Confirm all EL-UI docs remain present under
-`docs/`.
+   `docs/`.
 
 4. Confirm no secrets, production databases, private keys or local `.env` files were added.
 

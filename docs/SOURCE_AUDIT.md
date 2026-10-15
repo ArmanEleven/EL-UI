@@ -1,11 +1,11 @@
-﻿# Source Audit â€” Phase 1
+﻿# Source Audit — Phase 1
 
 Audit date: 2026-10-11 Status: **initial source review completed; full compatibility validation
 remains a later engineering task.**
 
 ## Repositories and evidence reviewed
 
--  [Sanaei 3X-UI](https://github.com/MHSanaei/3x-ui) - `go.mod`: Go module
+- [Sanaei 3X-UI](https://github.com/MHSanaei/3x-ui) - `go.mod`: Go module
   `github.com/mhsanaei/3x-ui/v3`, uses Gin, GORM, SQLite/PostgreSQL drivers, Xray libraries and
   other runtime dependencies.
 - `docs/architecture.md`: describes Go as the backend source of truth,
@@ -18,7 +18,7 @@ remains a later engineering task.**
   Router, TanStack Query, Zod, and Vitest scripts.
 - The repository identifies its license as
   GPL-3.0.
--  [HMPanel](https://github.com/neoauroraproject/hmpanel) - `README.md`: describes HMPanel as a
+- [HMPanel](https://github.com/neoauroraproject/hmpanel) - `README.md`: describes HMPanel as a
   management layer on top of native 3X-UI, with multi-panel/reseller management, advanced traffic
   accounting, bulk operations, migration, and backup/restore.
 - `prisma/schema.prisma`: defines a
@@ -37,7 +37,7 @@ remains a later engineering task.**
   README states MIT, but a root `LICENSE` file was not found by the connected repository file
   lookup. This conflicts with the backend package's `UNLICENSED` metadata; do not copy/re-distribute
   HMPanel backend source until its applicable license and provenance are clarified.
--  [ArmanEleven/ElevenPanel](https://github.com/ArmanEleven/ElevenPanel) - This is a separate
+- [ArmanEleven/ElevenPanel](https://github.com/ArmanEleven/ElevenPanel) - This is a separate
   repository, not the target EL-UI repository. Its README describes a similar management-layer
   direction and its `go.mod` declares a Go module.
 - It should be reviewed as a potentially relevant
@@ -71,7 +71,7 @@ Preserve upstream attribution and GPL obligations for any derivative 3X-UI distr
 
 ## Remaining checks before implementation
 
--  Pin exact upstream commits/releases instead of tracking moving `main` branches.
+- Pin exact upstream commits/releases instead of tracking moving `main` branches.
 - Map every
   HMPanel operation to exact 3X-UI API endpoints and request/response contracts.
 - Audit schema
@@ -80,8 +80,6 @@ Preserve upstream attribution and GPL obligations for any derivative 3X-UI distr
 - Review auth/session/CSRF and secret handling in both projects.
 - Inspect the
   existing ElevenPanel repository to determine whether it contains reusable project-specific work.
--
-  Decide and document the license/distribution strategy before bundling or redistributing source.
--
-  Implement a disposable-environment proof of concept; do not test migrations against production
+- Decide and document the license/distribution strategy before bundling or redistributing source.
+- Implement a disposable-environment proof of concept; do not test migrations against production
   data.

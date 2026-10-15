@@ -28,33 +28,33 @@ and must not be removed.
 ## Known gaps requiring follow-up
 
 1.  The installer and updater still use legacy storage/configuration identifiers. A safe migration
-   needs to detect existing paths, preserve user overrides, avoid overwriting data, and support
-   rollback.
+    needs to detect existing paths, preserve user overrides, avoid overwriting data, and support
+    rollback.
 
-2. The repository's install/update scripts still need a dedicated audit of release URL
-   construction, release asset names, checksum/signature validation, error text, and whether links
-   point to actual EL-UI artifacts or upstream artifacts.
+2.  The repository's install/update scripts still need a dedicated audit of release URL
+    construction, release asset names, checksum/signature validation, error text, and whether links
+    point to actual EL-UI artifacts or upstream artifacts.
 
-3. `x-ui.sh` is still the large legacy CLI
-   implementation. A complete CLI rename must preserve old invocation behavior, systemd integration,
-   scripts that call it, and existing installations.
+3.  `x-ui.sh` is still the large legacy CLI
+    implementation. A complete CLI rename must preserve old invocation behavior, systemd integration,
+    scripts that call it, and existing installations.
 
-4. Go source still imports the upstream module
-   path. This is internal build identity and should not be rewritten as a cosmetic string
-   replacement.
+4.  Go source still imports the upstream module
+    path. This is internal build identity and should not be rewritten as a cosmetic string
+    replacement.
 
-5. README files in other languages, translation catalogs, help text, and all UI
-   strings still need a repository-wide, language-by-language audit. This document does not claim
-   those surfaces are fully rebranded.
+5.  README files in other languages, translation catalogs, help text, and all UI
+    strings still need a repository-wide, language-by-language audit. This document does not claim
+    those surfaces are fully rebranded.
 
-6. Release ownership and update strategy need an explicit
-   decision before changing the updater from upstream release assets to EL-UI release assets. Until
-   EL-UI publishes compatible signed/versioned artifacts, an upstream dependency must remain clearly
-   disclosed.
+6.  Release ownership and update strategy need an explicit
+    decision before changing the updater from upstream release assets to EL-UI release assets. Until
+    EL-UI publishes compatible signed/versioned artifacts, an upstream dependency must remain clearly
+    disclosed.
 
 ## Safe migration rules
 
--  Do not rename storage paths, environment variables, service units, database files, or API routes
+- Do not rename storage paths, environment variables, service units, database files, or API routes
   by search-and-replace.
 - If adding EL-UI environment aliases, preserve old variables and define
   deterministic precedence; test both old-only and new-only configurations.

@@ -16,12 +16,6 @@
     // inside JSX components (Steps/Callout). Author MDX by hand.
     "content/**/*.mdx",
     // Generated API reference pages (fumadocs-openapi output).
-    "content/docs/**/reference/api",
-    // Hand-maintained engineering audit notes: keep list boundaries and tables stable.
-    "BRANDING_COMPATIBILITY_AUDIT.md",
-    "ELUI-ARCHITECTURE.md",
-    "FEATURE_MATRIX.md",
-    "IMPORT_UPSTREAM.md",
-    "SOURCE_AUDIT.md"
+    "content/docs/**/reference/api"
   ]
 }

@@ -4,7 +4,7 @@
 
 The upstream projects serve different roles:
 
--  **Sanaei 3X-UI** is the Go-based core panel and Xray integration. Its current frontend manifest
+- **Sanaei 3X-UI** is the Go-based core panel and Xray integration. Its current frontend manifest
   describes React 19, Ant Design 6, Vite 8, and TypeScript tooling.
 - **HMPanel** describes itself
   as a management layer built on native 3X-UI. Its repository has separate backend, frontend, Prisma
@@ -41,24 +41,24 @@ Do not choose a strategy until these are checked:
 
 1.  Pin exact upstream commits/releases and supported runtime versions.
 
-2. Inspect HMPanel's actual
-   3X-UI adapter/API calls and client identity model.
+2.  Inspect HMPanel's actual
+    3X-UI adapter/API calls and client identity model.
 
-3. Inspect its Prisma schema, migrations,
-   authentication, roles, and traffic-accounting implementation.
+3.  Inspect its Prisma schema, migrations,
+    authentication, roles, and traffic-accounting implementation.
 
-4. Inspect the 3X-UI API and
-   database contract for the same pinned version.
+4.  Inspect the 3X-UI API and
+    database contract for the same pinned version.
 
-5. Confirm licenses for source files and
-   dependencies; preserve notices and meet obligations.
+5.  Confirm licenses for source files and
+    dependencies; preserve notices and meet obligations.
 
-6. Build a capability-to-source map and a
-   minimal end-to-end proof of concept.
+6.  Build a capability-to-source map and a
+    minimal end-to-end proof of concept.
 
 ## Proposed logical boundaries
 
--  **Core adapter:** typed, versioned interface to the chosen 3X-UI API; timeouts, retries, explicit
+- **Core adapter:** typed, versioned interface to the chosen 3X-UI API; timeouts, retries, explicit
   error mapping, no broad database writes.
 - **Management domain:** panels/nodes, tenants/resellers,
   role assignments, quotas and policy configuration.
@@ -66,8 +66,7 @@ Do not choose a strategy until these are checked:
   reset windows, idempotent collection, reconciliation and auditable adjustments.
 - **Audit trail:**
   actor, action, target, timestamp, outcome, and redacted metadata for privileged operations.
--
-  **Web UI:** EL-UI branding, responsive layout, localization/RTL, role-aware navigation, and
+- **Web UI:** EL-UI branding, responsive layout, localization/RTL, role-aware navigation, and
   API-driven state.
 - **Operations:** installer, service supervision, migrations, health checks,
   backup/restore, upgrade/rollback.
@@ -76,7 +75,7 @@ These are target boundaries, not a claim that any of these components already ex
 
 ## Security and data integrity guardrails
 
--  Enforce authorization on the server; hiding a button is not authorization.
+- Enforce authorization on the server; hiding a button is not authorization.
 - Apply tenant scoping
   in every relevant query and mutation.
 - Treat upstream panel credentials and API tokens as
@@ -89,8 +88,7 @@ These are target boundaries, not a claim that any of these components already ex
   and define recovery behavior for partial multi-panel failures.
 - Never overwrite a production
   database during testing. Verify backup integrity and restore into a disposable environment.
--
-  Avoid a second source of truth for client traffic without documented reconciliation rules.
+- Avoid a second source of truth for client traffic without documented reconciliation rules.
 
 ## UI direction
 
