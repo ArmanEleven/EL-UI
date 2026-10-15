@@ -128,7 +128,14 @@ func TestManagementPortalKeepsInboundRoutesReadOnlyAndMasterRoutesProtected(t *t
 		}
 	}
 
+	// Both the delegated portal and owner-only API must reject requests
+	// without a session. This guards the server boundary independently of UI
+	// route hiding or client-side navigation.
 	for _, path := range []string{
+		"/panel/api/management-api/auth/me",
+		"/panel/api/management-api/inbounds",
+		"/panel/api/management-api/clients",
+		"/panel/api/management-api/master/inbounds",
 		"/panel/api/management-api/master/roles",
 		"/panel/api/management-api/master/admins",
 	} {
