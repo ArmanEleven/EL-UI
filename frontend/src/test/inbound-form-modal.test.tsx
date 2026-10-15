@@ -114,6 +114,24 @@ function renderCloneLikeEdit(dbInbound: DBInbound) {
 }
 
 describe('InboundFormModal', () => {
+  it('exposes the complete settings navigation and advanced JSON sections', async () => {
+    renderModal();
+
+    // VLESS is the default protocol and supports all standard inbound settings tabs.
+    for (const label of ['Basic', 'Protocol', 'Stream', 'Security', 'Sniffing', 'Advanced']) {
+      expect(screen.getByRole('tab', { name: label })).toBeTruthy();
+    }
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Advanced' }));
+
+    const advancedTabs = Array.from(
+      document.querySelectorAll('.advanced-inner-tabs [role="tab"]'),
+    ).map((tab) => tab.textContent?.trim());
+
+    expect(advancedTabs).toEqual(expect.arrayContaining(['All', 'Settings', 'Stream', 'Sniffing']));
+    expect(advancedTabs).toHaveLength(4);
+  });
+
   it('renders add mode without crashing', () => {
     renderModal();
     expect(document.querySelector('.ant-modal')).toBeTruthy();
