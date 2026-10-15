@@ -12,7 +12,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/mhsanaei/3x-ui/v3/internal/database"
 	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
 	"github.com/mhsanaei/3x-ui/v3/internal/logger"
@@ -21,15 +20,19 @@ import (
 	"github.com/mhsanaei/3x-ui/v3/internal/web/middleware"
 	"github.com/mhsanaei/3x-ui/v3/internal/web/service"
 	"github.com/mhsanaei/3x-ui/v3/internal/web/session"
+
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
-const managementAdminKey = "management_admin"
-const managementPolicyKey = "management_policy"
+const (
+	managementAdminKey  = "management_admin"
+	managementPolicyKey = "management_policy"
+)
 
 var (
-	managementUsernameRE = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9._-]{2,63}$`)
+	managementUsernameRE     = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9._-]{2,63}$`)
 	managementClientCreateMu sync.Mutex
 )
 
@@ -241,10 +244,10 @@ func managementAdminFromContext(c *gin.Context) (*model.ManagementAdmin, *rbac.A
 }
 
 type managementMeView struct {
-	ID       int           `json:"id"`
-	Username string        `json:"username"`
-	Status   string        `json:"status"`
-	Role     rbac.Role     `json:"role"`
+	ID       int             `json:"id"`
+	Username string          `json:"username"`
+	Status   string          `json:"status"`
+	Role     rbac.Role       `json:"role"`
 	Limits   rbac.RoleLimits `json:"effectiveLimits"`
 }
 
@@ -269,23 +272,25 @@ func (a *ManagementController) logout(c *gin.Context) {
 }
 
 type managementInboundView struct {
-	ID          int    `json:"id"`
-	Remark      string `json:"remark"`
-	Enabled     bool   `json:"enabled"`
-	Port        int    `json:"port"`
-	Protocol    string `json:"protocol"`
-	Tag         string `json:"tag,omitempty"`
-	NodeID      *int   `json:"nodeId,omitempty"`
-	ExpiryTime  int64  `json:"expiryTime"`
+	ID           int    `json:"id"`
+	Remark       string `json:"remark"`
+	Enabled      bool   `json:"enabled"`
+	Port         int    `json:"port"`
+	Protocol     string `json:"protocol"`
+	Tag          string `json:"tag,omitempty"`
+	NodeID       *int   `json:"nodeId,omitempty"`
+	ExpiryTime   int64  `json:"expiryTime"`
 	TrafficReset string `json:"trafficReset"`
-	Total       int64  `json:"total"`
-	Up          int64  `json:"up"`
-	Down        int64  `json:"down"`
-	ClientCount int    `json:"clientCount"`
+	Total        int64  `json:"total"`
+	Up           int64  `json:"up"`
+	Down         int64  `json:"down"`
+	ClientCount  int    `json:"clientCount"`
 }
 
 func projectManagementInbound(inbound model.Inbound) managementInboundView {
-	var settings struct { Clients []json.RawMessage `json:"clients"` }
+	var settings struct {
+		Clients []json.RawMessage `json:"clients"`
+	}
 	_ = json.Unmarshal([]byte(inbound.Settings), &settings)
 	return managementInboundView{
 		ID: inbound.Id, Remark: inbound.Remark, Enabled: inbound.Enable, Port: inbound.Port,
@@ -605,8 +610,8 @@ func (a *ManagementController) createClient(c *gin.Context) {
 		}
 		return tx.Create(&model.ManagementAdminClient{
 			ManagementAdminID: int(admin.ID),
-			Email: strings.TrimSpace(payload.Client.Email),
-			CreatedAt: time.Now().UTC(),
+			Email:             strings.TrimSpace(payload.Client.Email),
+			CreatedAt:         time.Now().UTC(),
 		}).Error
 	})
 	if errors.Is(err, errEmailTaken) {
@@ -645,15 +650,15 @@ func (a *ManagementController) createClient(c *gin.Context) {
 }
 
 type managementRoleInput struct {
-	Name                        string                 `json:"name"`
+	Name                        string                `json:"name"`
 	Permissions                 rbac.Permissions      `json:"permissions"`
 	Limits                      rbac.RoleLimits       `json:"limits"`
 	Features                    rbac.RoleFeatures     `json:"features"`
 	Access                      rbac.RoleAccess       `json:"access"`
 	HWID                        rbac.RoleHWIDSettings `json:"hwid"`
-	DisabledWhenLimited         bool                   `json:"disabledWhenLimited"`
-	DisconnectUsersWhenLimited  bool                   `json:"disconnectUsersWhenLimited"`
-	DisconnectUsersWhenDisabled bool                   `json:"disconnectUsersWhenDisabled"`
+	DisabledWhenLimited         bool                  `json:"disabledWhenLimited"`
+	DisconnectUsersWhenLimited  bool                  `json:"disconnectUsersWhenLimited"`
+	DisconnectUsersWhenDisabled bool                  `json:"disconnectUsersWhenDisabled"`
 }
 
 func (input managementRoleInput) toRole() rbac.Role {
@@ -674,15 +679,15 @@ func (input managementRoleInput) toRole() rbac.Role {
 
 func managementRoleRow(role rbac.Role) model.ManagementAdminRole {
 	return model.ManagementAdminRole{
-		Name: role.Name,
-		IsOwner: false,
-		PermissionsJSON: encodeStoredJSON(role.Permissions),
-		LimitsJSON: encodeStoredJSON(role.Limits),
-		FeaturesJSON: encodeStoredJSON(role.Features),
-		AccessJSON: encodeStoredJSON(role.Access),
-		HWIDJSON: encodeStoredJSON(role.HWID),
-		DisabledWhenLimited: role.DisabledWhenLimited,
-		DisconnectUsersWhenLimited: role.DisconnectUsersWhenLimited,
+		Name:                        role.Name,
+		IsOwner:                     false,
+		PermissionsJSON:             encodeStoredJSON(role.Permissions),
+		LimitsJSON:                  encodeStoredJSON(role.Limits),
+		FeaturesJSON:                encodeStoredJSON(role.Features),
+		AccessJSON:                  encodeStoredJSON(role.Access),
+		HWIDJSON:                    encodeStoredJSON(role.HWID),
+		DisabledWhenLimited:         role.DisabledWhenLimited,
+		DisconnectUsersWhenLimited:  role.DisconnectUsersWhenLimited,
 		DisconnectUsersWhenDisabled: role.DisconnectUsersWhenDisabled,
 	}
 }
@@ -774,15 +779,15 @@ func (a *ManagementController) updateRole(c *gin.Context) {
 	}
 	updates := map[string]any{
 		"name": role.Name, "is_owner": false,
-		"permissions_json": encodeStoredJSON(role.Permissions),
-		"limits_json": encodeStoredJSON(role.Limits),
-		"features_json": encodeStoredJSON(role.Features),
-		"access_json": encodeStoredJSON(role.Access),
-		"hwid_json": encodeStoredJSON(role.HWID),
-		"disabled_when_limited": role.DisabledWhenLimited,
-		"disconnect_users_when_limited": role.DisconnectUsersWhenLimited,
+		"permissions_json":               encodeStoredJSON(role.Permissions),
+		"limits_json":                    encodeStoredJSON(role.Limits),
+		"features_json":                  encodeStoredJSON(role.Features),
+		"access_json":                    encodeStoredJSON(role.Access),
+		"hwid_json":                      encodeStoredJSON(role.HWID),
+		"disabled_when_limited":          role.DisabledWhenLimited,
+		"disconnect_users_when_limited":  role.DisconnectUsersWhenLimited,
 		"disconnect_users_when_disabled": role.DisconnectUsersWhenDisabled,
-		"updated_at": time.Now().UTC(),
+		"updated_at":                     time.Now().UTC(),
 	}
 	if err := database.GetDB().Model(&model.ManagementAdminRole{}).Where("id = ?", id).Updates(updates).Error; err != nil {
 		managementJSON(c, http.StatusConflict, false, "role could not be updated", nil)
@@ -792,18 +797,18 @@ func (a *ManagementController) updateRole(c *gin.Context) {
 }
 
 type managementAdminInput struct {
-	Username                string          `json:"username"`
-	Password                string          `json:"password"`
-	RoleID                  int             `json:"roleId"`
-	PermissionOverrides     rbac.RoleLimits `json:"permissionOverrides"`
+	Username            string          `json:"username"`
+	Password            string          `json:"password"`
+	RoleID              int             `json:"roleId"`
+	PermissionOverrides rbac.RoleLimits `json:"permissionOverrides"`
 }
 
 type managementAdminView struct {
-	ID         int       `json:"id"`
-	Username   string    `json:"username"`
-	RoleID     int       `json:"roleId"`
-	Status     string    `json:"status"`
-	CreatedAt  time.Time `json:"createdAt"`
+	ID          int        `json:"id"`
+	Username    string     `json:"username"`
+	RoleID      int        `json:"roleId"`
+	Status      string     `json:"status"`
+	CreatedAt   time.Time  `json:"createdAt"`
 	LastLoginAt *time.Time `json:"lastLoginAt,omitempty"`
 }
 
@@ -877,7 +882,7 @@ func (a *ManagementController) createAdmin(c *gin.Context) {
 	}
 	row := model.ManagementAdmin{
 		Username: input.Username, PasswordHash: hash, RoleID: input.RoleID,
-		Status: string(rbac.AdminActive),
+		Status:                  string(rbac.AdminActive),
 		PermissionOverridesJSON: encodeStoredJSON(input.PermissionOverrides),
 	}
 	if err := db.Create(&row).Error; err != nil {
@@ -897,7 +902,9 @@ func (a *ManagementController) setAdminStatus(c *gin.Context) {
 		managementJSON(c, http.StatusBadRequest, false, "invalid administrator ID", nil)
 		return
 	}
-	var body struct { Status string `json:"status"` }
+	var body struct {
+		Status string `json:"status"`
+	}
 	if err := c.ShouldBindJSON(&body); err != nil {
 		managementJSON(c, http.StatusBadRequest, false, "invalid status payload", nil)
 		return
