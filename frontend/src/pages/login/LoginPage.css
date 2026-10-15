@@ -37,7 +37,7 @@
   --blob-5: color-mix(in srgb, var(--elui-accent-strong) 10%, transparent);
   --grid-color: rgba(205, 240, 210, 0.035);
   --vignette: radial-gradient(ellipse at center, transparent 25%, rgba(0, 0, 0, 0.5) 100%);
-  background: radial-gradient(ellipse at 25% 20%, color-mix(in srgb, var(--elui-accent) 9%, #10141c) 0%, #0a0d12 60%);
+  background: radial-gradient(ellipse at 25% 20%, var(--elui-surface) 0%, var(--elui-bg) 60%);
 }
 
 .login-app.is-dark.is-ultra {

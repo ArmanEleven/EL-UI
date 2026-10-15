@@ -204,7 +204,16 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     [isDark, isUltra, themeId],
   );
   const value = useMemo<ThemeContextValue>(
-    () => ({ isDark, isUltra, themeId, setTheme, cycleTheme, toggleTheme, toggleUltra, antdThemeConfig }),
+    () => ({
+      isDark,
+      isUltra,
+      themeId,
+      setTheme,
+      cycleTheme,
+      toggleTheme,
+      toggleUltra,
+      antdThemeConfig,
+    }),
     [isDark, isUltra, themeId, setTheme, cycleTheme, toggleTheme, toggleUltra, antdThemeConfig],
   );
 
