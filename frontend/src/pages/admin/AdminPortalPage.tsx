@@ -133,9 +133,7 @@ export default function AdminPortalPage() {
   }, [load]);
 
   useEffect(() => {
-    const timeoutId = window.setTimeout(() => {
-      void load();
-    }, 0);
+    const timeoutId = window.setTimeout(() => void load(), 0);
     return () => window.clearTimeout(timeoutId);
   }, [load]);
 
