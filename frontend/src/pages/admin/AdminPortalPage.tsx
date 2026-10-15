@@ -168,6 +168,8 @@ export default function AdminPortalPage() {
         messageApi.success(t('adminPortal.createSuccess'));
         form.resetFields();
         await load();
+      } catch {
+        messageApi.error(t('adminPortal.createFailed'));
       } finally {
         setCreating(false);
       }
@@ -227,7 +229,7 @@ export default function AdminPortalPage() {
         dataIndex: 'enabled',
         width: 105,
         render: (v: boolean) => (
-          <Tag color={v ? 'success' : 'default'}>{v ? 'Enabled' : 'Disabled'}</Tag>
+          <Tag color={v ? 'success' : 'default'}>{v ? t('enabled') : t('disabled')}</Tag>
         ),
       },
     ],
