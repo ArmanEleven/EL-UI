@@ -1760,18 +1760,18 @@ install_x-ui() {
         fi
         verify_release_checksum "${url}" "${xui_folder}-linux-$(arch).tar.gz"
     fi
-    # x-ui.sh, x-ui.rc and the unit files must come from the same release as
-    # the binary; only the rolling dev build tracks main.
+    # The base runtime and its service assets follow the compatible 3X-UI release.
+    # The EL-UI command script is maintained on this repository's main branch
+    # until EL-UI publishes version-matched release tags.
     local script_ref="${tag_version}"
     if [[ "${tag_version}" == "dev-latest" ]]; then
         script_ref="main"
     fi
-    # The unit files are only fetched when the release tarball lacks them, so
-    # they are checked at that point instead of here.
-    local required_files=("x-ui.sh")
+    # The only non-archive service asset fetched directly on Alpine is x-ui.rc.
+    local required_files=()
     [[ $release == "alpine" ]] && required_files+=("x-ui.rc")
     require_repo_files "${script_ref}" "${required_files[@]}"
-    local xui_script_temp="/usr/bin/x-ui-temp.$$"
+    local xui_script_temp="/usr/bin/x-ui-temp.$"
     rm -f "${xui_script_temp}"
     curl -fLRo "${xui_script_temp}" "https://raw.githubusercontent.com/ArmanEleven/EL-UI/main/x-ui.sh"
     if [[ $? -ne 0 ]]; then
