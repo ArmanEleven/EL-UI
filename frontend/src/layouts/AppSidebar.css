@@ -373,3 +373,33 @@ body.dark .ant-drawer-body .drawer-menu .ant-menu-item-group-list {
   background-color: color-mix(in srgb, var(--ant-color-primary) 10%, transparent) !important;
   color: var(--ant-color-primary) !important;
 }
+
+
+/* EL-UI concept mark; replace this typographic badge when the final logo is ready. */
+.sider-brand { height: 68px; padding-inline: 14px; border-bottom-color: rgba(47, 138, 91, 0.12); }
+.brand-block { gap: 10px; }
+.brand-mark {
+  width: 30px; height: 30px; display: inline-grid; place-items: center; flex: 0 0 30px;
+  border: 1px solid rgba(158, 232, 182, 0.45); border-radius: 9px;
+  background: linear-gradient(145deg, #b8f6c7, #58be81); color: #0c1b11;
+  box-shadow: 0 5px 14px rgba(47, 138, 91, 0.20), inset 0 1px 0 rgba(255,255,255,0.6);
+  font-size: 11px; font-weight: 900; letter-spacing: -0.07em;
+}
+.brand-text, .drawer-brand { font-weight: 800; letter-spacing: -0.055em; font-size: 17px; }
+.ant-sidebar > .ant-layout-sider {
+  border-inline-end: 1px solid rgba(47, 138, 91, 0.10);
+  background: linear-gradient(180deg, #fbfdf9 0%, #f4f8f1 100%);
+}
+body.dark .ant-sidebar > .ant-layout-sider {
+  border-inline-end-color: rgba(158, 232, 182, 0.10);
+  background: linear-gradient(180deg, #101711 0%, #0c120e 100%);
+}
+html[data-theme='ultra-dark'] body.dark .ant-sidebar > .ant-layout-sider {
+  background: linear-gradient(180deg, #080c09 0%, #030604 100%);
+}
+.sider-nav { padding: 9px 8px; }
+.sider-nav .ant-menu-item, .sider-nav .ant-menu-submenu-title, .sider-utility .ant-menu-item { border-radius: 10px; }
+.sider-nav .ant-menu-item-selected, .sider-utility .ant-menu-item-selected, .drawer-menu .ant-menu-item-selected { font-weight: 700; }
+body.dark .sider-brand, body.dark .drawer-header { border-bottom-color: rgba(158, 232, 182, 0.10); }
+body.dark .brand-text, body.dark .drawer-brand { color: #edf7ed; }
+.drawer-brand { color: var(--ant-color-text); }
