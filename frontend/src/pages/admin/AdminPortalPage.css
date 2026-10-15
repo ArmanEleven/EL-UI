@@ -129,3 +129,67 @@ html[data-theme='ultra-dark'] body.dark .management-portal {
     border-radius: 16px;
   }
 }
+
+/* Responsive finishing pass: preserve the console hierarchy on narrow screens
+   and keep focus/hover states visible in both color schemes. */
+.management-portal .ant-btn {
+  min-height: 36px;
+  border-radius: 10px;
+  font-weight: 600;
+  transition:
+    transform 140ms ease,
+    box-shadow 140ms ease,
+    border-color 140ms ease;
+}
+.management-portal .ant-btn:focus-visible,
+.management-portal a:focus-visible,
+.management-portal .ant-select-focused .ant-select-selector {
+  outline: 2px solid var(--ant-color-primary);
+  outline-offset: 2px;
+}
+.management-portal .ant-table-wrapper {
+  max-width: 100%;
+  overflow-x: auto;
+}
+.management-portal .ant-table-tbody > tr > td {
+  transition: background-color 120ms ease;
+}
+.management-portal .ant-table-tbody > tr:hover > td {
+  background: color-mix(in srgb, var(--ant-color-primary) 5%, var(--ant-color-bg-container));
+}
+.management-portal .ant-input,
+.management-portal .ant-input-number,
+.management-portal .ant-select-selector {
+  border-radius: 10px !important;
+}
+.management-portal .ant-card-body {
+  min-width: 0;
+}
+.management-portal .management-footnote {
+  color: var(--ant-color-text-secondary);
+  line-height: 1.65;
+}
+@media (max-width: 640px) {
+  .management-content {
+    padding: 12px;
+  }
+  .management-topbar {
+    gap: 12px;
+    padding: 16px;
+  }
+  .management-topbar > div:last-child {
+    width: 100%;
+  }
+  .management-topbar .ant-space {
+    max-width: 100%;
+  }
+  .management-portal .ant-card {
+    border-radius: 14px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .management-portal .ant-btn,
+  .management-portal .ant-table-tbody > tr > td {
+    transition: none;
+  }
+}
