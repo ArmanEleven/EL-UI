@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import {
   Alert,
   Button,
@@ -73,29 +74,33 @@ type CreateClientForm = {
 
 const { Title, Text } = Typography;
 
-function bytesLabel(bytes: number): string {
-  if (!bytes) return 'Unlimited';
+function bytesLabel(bytes: number, unlimitedLabel = 'Unlimited'): string {
+  if (!bytes) return unlimitedLabel;
   if (bytes < 1024 ** 3) return `${(bytes / 1024 ** 2).toFixed(0)} MB`;
   return `${(bytes / 1024 ** 3).toFixed(1)} GB`;
 }
 
-function expiryLabel(value: number): string {
-  if (!value) return 'Unlimited';
+function expiryLabel(value: number, unlimitedLabel = 'Unlimited'): string {
+  if (!value) return unlimitedLabel;
   const date = new Date(value);
   return Number.isNaN(date.valueOf()) ? '—' : date.toLocaleString();
 }
 
 export default function AdminPortalPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [messageApi, messageContextHolder] = message.useMessage();
   const [me, setMe] = useState<ManagementMe | null>(null);
   const [inbounds, setInbounds] = useState<SafeInbound[]>([]);
   const [clients, setClients] = useState<SafeClient[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const [form] = Form.useForm<CreateClientForm>();
 
   const load = useCallback(async () => {
+    setLoading(true);
+    setLoadError(null);
     try {
       const [meResp, inboundResp, clientResp] = await Promise.all([
         HttpUtil.get<ManagementMe>('/management-api/auth/me', undefined, { silent: true }),
@@ -109,10 +114,17 @@ export default function AdminPortalPage() {
       setMe(meResp.obj);
       setInbounds(inboundResp.success && inboundResp.obj ? inboundResp.obj : []);
       setClients(clientResp.success && clientResp.obj ? clientResp.obj : []);
+      const canReadInbounds = !!meResp.obj.role.permissions?.inbounds?.read?.allowed;
+      const canReadClients = !!meResp.obj.role.permissions?.clients?.read?.allowed;
+      if ((!inboundResp.success && canReadInbounds) || (!clientResp.success && canReadClients)) {
+        setLoadError(t('adminPortal.loadFailed'));
+      }
+    } catch {
+      setLoadError(t('adminPortal.loadFailed'));
     } finally {
       setLoading(false);
     }
-  }, [navigate]);
+  }, [navigate, t]);
 
   useEffect(() => {
     void load();
@@ -142,45 +154,45 @@ export default function AdminPortalPage() {
           { headers: { 'Content-Type': 'application/json' }, silent: true },
         );
         if (!response.success) {
-          messageApi.error(response.msg || 'Client creation failed');
+          messageApi.error(response.msg || t('adminPortal.createFailed'));
           return;
         }
-        messageApi.success('Client created');
+        messageApi.success(t('adminPortal.createSuccess'));
         form.resetFields();
         await load();
       } finally {
         setCreating(false);
       }
     },
-    [form, load, messageApi],
+    [form, load, messageApi, t],
   );
 
   const inboundColumns = useMemo<ColumnsType<SafeInbound>>(
     () => [
       { title: 'ID', dataIndex: 'id', width: 72 },
-      { title: 'Remark', dataIndex: 'remark', ellipsis: true },
+      { title: t('remark'), dataIndex: 'remark', ellipsis: true },
       {
         title: 'Protocol',
         dataIndex: 'protocol',
         width: 125,
         render: (v: string) => <Tag>{v}</Tag>,
       },
-      { title: 'Port', dataIndex: 'port', width: 95 },
-      { title: 'Clients', dataIndex: 'clientCount', width: 100 },
+      { title: t('adminPortal.port'), dataIndex: 'port', width: 95 },
+      { title: t('clients'), dataIndex: 'clientCount', width: 100 },
       {
         title: 'Status',
         dataIndex: 'enabled',
         width: 110,
         render: (v: boolean) => (
-          <Tag color={v ? 'success' : 'default'}>{v ? 'Enabled' : 'Disabled'}</Tag>
+          <Tag color={v ? 'success' : 'default'}>{v ? t('enabled') : t('disabled')}</Tag>
         ),
       },
       {
-        title: 'Traffic used',
+        title: t('adminPortal.trafficUsed'),
         key: 'traffic',
         width: 150,
         render: (_: unknown, row: SafeInbound) =>
-          `${bytesLabel(row.up + row.down)} / ${bytesLabel(row.total)}`,
+          `${bytesLabel(row.up + row.down, t('unlimited'))} / ${bytesLabel(row.total, t('unlimited'))}`,
       },
     ],
     [],
@@ -188,19 +200,19 @@ export default function AdminPortalPage() {
 
   const clientColumns = useMemo<ColumnsType<SafeClient>>(
     () => [
-      { title: 'Email / Name', dataIndex: 'email', ellipsis: true },
-      { title: 'Group', dataIndex: 'group', render: (v: string) => v || '—' },
+      { title: t('adminPortal.emailColumn'), dataIndex: 'email', ellipsis: true },
+      { title: t('adminPortal.group'), dataIndex: 'group', render: (v: string) => v || '—' },
       {
-        title: 'Volume (GB)',
+        title: t('adminPortal.volume'),
         dataIndex: 'totalGB',
         width: 125,
         render: (v: number) => v || 'Unlimited',
       },
       {
-        title: 'Expires',
+        title: t('adminPortal.expires'),
         dataIndex: 'expiryTime',
         width: 180,
-        render: (v: number) => expiryLabel(v),
+        render: (v: number) => expiryLabel(v, t('unlimited')), 
       },
       {
         title: 'Status',
@@ -231,12 +243,12 @@ export default function AdminPortalPage() {
       <Layout.Content className="management-content">
         <div className="management-topbar">
           <div>
-            <Text type="secondary">EL-UI · Management</Text>
-            <Title level={2}>Admin Portal</Title>
+            <Text type="secondary">{t('adminPortal.brand')}</Text>
+            <Title level={2}>{t('adminPortal.title')}</Title>
           </div>
           <Space wrap>
             <Tag color={me.status === 'active' ? 'success' : 'warning'}>{me.status}</Tag>
-            <Button onClick={() => void load()}>Refresh</Button>
+            <Button onClick={() => void load()}>{t('adminPortal.refresh')}</Button>
             <Button
               onClick={async () => {
                 await HttpUtil.post(
@@ -255,21 +267,30 @@ export default function AdminPortalPage() {
           </Space>
         </div>
 
+        {loadError && (
+          <Alert
+            type="warning"
+            showIcon
+            message={loadError}
+            action={<Button size="small" onClick={() => void load()}>{t('adminPortal.refresh')}</Button>}
+          />
+        )}
+
         <Row gutter={[16, 16]}>
           <Col xs={24} xl={8}>
             <Card>
               <Descriptions column={1} size="small">
-                <Descriptions.Item label="Administrator">{me.username}</Descriptions.Item>
-                <Descriptions.Item label="Role">{me.role.name}</Descriptions.Item>
-                <Descriptions.Item label="Allowed inbounds">{inbounds.length}</Descriptions.Item>
-                <Descriptions.Item label="Client limit">
+                <Descriptions.Item label={t('adminPortal.administrator')}>{me.username}</Descriptions.Item>
+                <Descriptions.Item label={t('adminPortal.role')}>{me.role.name}</Descriptions.Item>
+                <Descriptions.Item label={t('adminPortal.allowedInbounds')}>{inbounds.length}</Descriptions.Item>
+                <Descriptions.Item label={t('adminPortal.clientLimit')}>
                   {me.effectiveLimits.max_users ?? 'Unlimited'}
                 </Descriptions.Item>
               </Descriptions>
             </Card>
           </Col>
           <Col xs={24} xl={16}>
-            <Card title="Allowed inbounds">
+            <Card title={t('adminPortal.allowedInbounds')}>
               <Table<SafeInbound>
                 rowKey="id"
                 size="small"
@@ -277,7 +298,7 @@ export default function AdminPortalPage() {
                 columns={inboundColumns}
                 dataSource={inbounds}
                 pagination={{ pageSize: 8, showSizeChanger: false }}
-                locale={{ emptyText: 'No inbounds are available for this role.' }}
+                locale={{ emptyText: t('adminPortal.noInbounds') }}
               />
             </Card>
           </Col>
@@ -285,21 +306,21 @@ export default function AdminPortalPage() {
 
         <Row gutter={[16, 16]} className="management-lower">
           <Col xs={24} xl={canCreate ? 10 : 24}>
-            <Card title="Create client">
+            <Card title={t('adminPortal.createClient')}>
               {!canCreate ? (
-                <Alert type="info" showIcon message="Your role does not allow client creation." />
+                <Alert type="info" showIcon message={t('adminPortal.noCreatePermission')} />
               ) : (
                 <Form<CreateClientForm> form={form} layout="vertical" onFinish={createClient}>
                   <Form.Item
                     name="email"
-                    label="Client email / name"
+                    label={t('adminPortal.clientEmail')}
                     rules={[{ required: true, whitespace: true }, { max: 128 }]}
                   >
-                    <Input autoComplete="off" placeholder="client@example.com" />
+                    <Input autoComplete="off" placeholder={t('adminPortal.clientPlaceholder')} />
                   </Form.Item>
                   <Form.Item
                     name="inboundIds"
-                    label="Allowed inbounds"
+                    label={t('adminPortal.allowedInbounds')}
                     rules={[{ required: true, type: 'array', min: 1 }]}
                   >
                     <Select
@@ -308,13 +329,13 @@ export default function AdminPortalPage() {
                         value: ib.id,
                         label: `#${ib.id} · ${ib.remark || ib.protocol} : ${ib.port}`,
                       }))}
-                      placeholder="Select one or more inbounds"
+                      placeholder={t('adminPortal.selectInbounds')}
                     />
                   </Form.Item>
-                  <Form.Item name="totalGB" label="Traffic limit (GB, 0 = unlimited)">
+                  <Form.Item name="totalGB" label={t('adminPortal.trafficLimit')}>
                     <InputNumber min={0} precision={0} style={{ width: '100%' }} placeholder="0" />
                   </Form.Item>
-                  <Form.Item name="expiryHours" label="Expiry in hours (0 = unlimited)">
+                  <Form.Item name="expiryHours" label={t('adminPortal.expiryHours')}>
                     <InputNumber min={0} precision={0} style={{ width: '100%' }} placeholder="0" />
                   </Form.Item>
                   <Button type="primary" htmlType="submit" block loading={creating}>
@@ -325,12 +346,12 @@ export default function AdminPortalPage() {
             </Card>
           </Col>
           <Col xs={24} xl={canCreate ? 14 : 24}>
-            <Card title="Managed clients">
+            <Card title={t('adminPortal.managedClients')}>
               {!canReadClients ? (
                 <Alert
                   type="info"
                   showIcon
-                  message="Your role does not allow viewing managed clients."
+                  message={t('adminPortal.noViewClientsPermission')}
                 />
               ) : (
                 <Table<SafeClient>
@@ -339,7 +360,7 @@ export default function AdminPortalPage() {
                   columns={clientColumns}
                   dataSource={clients}
                   pagination={{ pageSize: 8, showSizeChanger: false }}
-                  locale={{ emptyText: 'No managed clients yet.' }}
+                  locale={{ emptyText: t('adminPortal.noClients') }}
                   scroll={{ x: 600 }}
                 />
               )}
@@ -347,8 +368,7 @@ export default function AdminPortalPage() {
           </Col>
         </Row>
         <Text className="management-footnote" type="secondary">
-          This portal has no inbound edit/delete controls. Authorization is enforced by the server
-          for every request.
+          {t('adminPortal.footnote')}
         </Text>
       </Layout.Content>
     </Layout>
