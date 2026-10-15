@@ -1,44 +1,47 @@
+
+
+/* EL-UI management console surfaces. */
 .management-portal {
-  min-height: 100vh;
-  background: var(--ant-color-bg-layout, #f5f7fa);
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 88% -10%, rgba(151, 218, 126, 0.13), transparent 36%),
+    linear-gradient(145deg, #f4f7f1 0%, #edf3ea 100%);
 }
-
-.management-content {
-  width: min(1440px, 100%);
-  margin: 0 auto;
-  padding: clamp(16px, 3vw, 36px);
-}
-
+.management-content { position: relative; z-index: 1; width: min(1500px, 100%); padding: clamp(18px, 3vw, 42px); }
 .management-topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 24px;
+  padding: 22px 24px; margin-bottom: 22px; border: 1px solid rgba(47, 119, 82, 0.12);
+  border-radius: 20px; background: rgba(255, 255, 255, 0.76);
+  box-shadow: 0 12px 36px rgba(35, 71, 43, 0.055); backdrop-filter: blur(18px);
 }
-
-.management-topbar h2 {
-  margin: 4px 0 0;
+.management-topbar h2 { font-weight: 800; letter-spacing: -0.045em; }
+.management-portal .ant-card {
+  border: 1px solid rgba(47, 119, 82, 0.12); border-radius: 17px;
+  box-shadow: 0 12px 30px rgba(24, 54, 32, 0.055);
 }
-
-.management-lower {
-  margin-top: 16px;
+.management-portal .ant-card-head { min-height: 54px; border-bottom-color: rgba(47, 119, 82, 0.10); }
+.management-portal .ant-card-head-title { font-weight: 750; letter-spacing: -0.02em; }
+.management-portal .ant-descriptions .ant-descriptions-item-label { color: #6c7a70; }
+.management-portal .ant-table-thead > tr > th { background: #f0f5ee; }
+.management-portal .management-footnote { padding: 12px 2px; border-top: 1px solid rgba(47, 119, 82, 0.12); }
+body.dark .management-portal {
+  background: radial-gradient(ellipse at 88% -10%, rgba(116, 193, 133, 0.10), transparent 34%),
+    linear-gradient(145deg, #0e1510 0%, #0b110d 100%);
 }
-
-.management-loading {
-  display: grid;
-  min-height: 100vh;
-  place-items: center;
+body.dark .management-topbar {
+  border-color: rgba(158, 232, 182, 0.12); background: rgba(17, 25, 19, 0.72);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.17);
 }
-
-.management-footnote {
-  display: block;
-  margin-top: 20px;
+body.dark .management-portal .ant-card {
+  border-color: rgba(158, 232, 182, 0.10);
+  background: linear-gradient(145deg, rgba(22, 32, 24, 0.98), rgba(14, 21, 16, 0.98));
 }
-
+body.dark .management-portal .ant-card-head { border-bottom-color: rgba(158, 232, 182, 0.10); }
+body.dark .management-portal .ant-table-thead > tr > th { background: rgba(158, 232, 182, 0.055); }
+body.dark .management-portal .management-footnote { border-top-color: rgba(158, 232, 182, 0.12); }
+html[data-theme='ultra-dark'] body.dark .management-portal {
+  background: radial-gradient(ellipse at 88% -10%, rgba(116, 193, 133, 0.08), transparent 34%), #030604;
+}
 @media (max-width: 640px) {
-  .management-topbar {
-    align-items: flex-start;
-    flex-direction: column;
-  }
+  .management-content { padding: 14px; }
+  .management-topbar { padding: 18px; border-radius: 16px; }
 }
