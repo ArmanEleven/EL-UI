@@ -264,3 +264,10 @@
     transition: none;
   }
 }
+
+[dir='rtl'] .inbounds-page .ant-card-head-title {
+  text-align: start;
+}
+[dir='rtl'] .inbound-card .tag-name {
+  text-align: start;
+}
