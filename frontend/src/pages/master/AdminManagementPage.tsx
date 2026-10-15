@@ -25,6 +25,7 @@ import './AdminManagementPage.css';
 type PermissionGrant = { allowed: boolean; scope: number };
 type Role = {
   name: string;
+  is_owner?: boolean;
   permissions: Record<string, Record<string, PermissionGrant>>;
   limits: Record<string, number | undefined>;
   access: { allowed_inbound_ids?: number[] | null };
@@ -278,12 +279,14 @@ export default function AdminManagementPage() {
         render: (_: unknown, row: RoleRow) => (
           <Button
             size="small"
+            disabled={!!row.role.is_owner}
+            title={row.role.is_owner ? 'The Owner role is protected' : undefined}
             onClick={() => {
               setSelectedRole(row);
               roleForm.setFieldsValue(roleToForm(row.role));
             }}
           >
-            Edit
+            {row.role.is_owner ? 'Protected' : 'Edit'}
           </Button>
         ),
       },
