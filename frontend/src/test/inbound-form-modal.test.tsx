@@ -118,7 +118,7 @@ describe('InboundFormModal', () => {
     renderModal();
 
     // VLESS is the default protocol and supports all standard inbound settings tabs.
-    for (const label of ['Basics', 'Protocol', 'Stream', 'Security', 'Sniffing', 'Advanced']) {
+    for (const label of ['Basic', 'Protocol', 'Stream', 'Security', 'Sniffing', 'Advanced']) {
       expect(screen.getByRole('tab', { name: label })).toBeTruthy();
     }
 
