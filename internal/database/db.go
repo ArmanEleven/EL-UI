@@ -68,6 +68,7 @@ func allModels() []any {
 		&model.User{},
 		&model.ManagementAdminRole{},
 		&model.ManagementAdmin{},
+		&model.ManagementAdminClient{},
 		&model.Inbound{},
 		&model.OutboundTraffics{},
 		&model.Setting{},

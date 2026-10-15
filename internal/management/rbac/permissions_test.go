@@ -164,3 +164,62 @@ func TestNewRoleHasReferenceDefaults(t *testing.T) {
 		t.Fatal("disconnect defaults should be enabled")
 	}
 }
+
+
+func TestOwnScopeFailsClosedForUnsupportedResources(t *testing.T) {
+	admin := adminWith(AdminActive, Permissions{
+		ResourceHosts: {ActionRead: AllowOwn()},
+	})
+	targetOwner := int64(admin.ID)
+	if err := CheckTargetPermission(admin, ResourceHosts, ActionRead, &targetOwner); err == nil {
+		t.Fatal("OWN scope on a resource without ownership enforcement must be denied")
+	}
+	if _, err := ListOwnerScope(admin, ResourceHosts, ActionRead); err == nil {
+		t.Fatal("list OWN scope on an unsupported resource must be denied")
+	}
+}
+
+func TestOwnScopeRestrictsClientOwnership(t *testing.T) {
+	admin := adminWith(AdminActive, Permissions{ResourceClients: {ActionRead: AllowOwn()}})
+	ownID, otherID := int64(admin.ID), int64(admin.ID + 1)
+	if err := CheckTargetPermission(admin, ResourceClients, ActionRead, &ownID); err != nil {
+		t.Fatalf("own client should be allowed: %v", err)
+	}
+	if err := CheckTargetPermission(admin, ResourceClients, ActionRead, &otherID); err == nil {
+		t.Fatal("another admin's client must be denied")
+	}
+}
+
+func TestValidateLimitOverridesCannotExpandRole(t *testing.T) {
+	role := RoleLimits{MaxUsers: ptr(20), DataLimitMin: ptr(10), DataLimitMax: ptr(1000)}
+	if err := ValidateLimitOverrides(role, RoleLimits{MaxUsers: ptr(21)}); err == nil {
+		t.Fatal("max-users override cannot expand role maximum")
+	}
+	if err := ValidateLimitOverrides(role, RoleLimits{DataLimitMin: ptr(9)}); err == nil {
+		t.Fatal("data minimum override cannot relax role minimum")
+	}
+	if err := ValidateLimitOverrides(role, RoleLimits{DataLimitMax: ptr(1001)}); err == nil {
+		t.Fatal("data maximum override cannot expand role maximum")
+	}
+	if err := ValidateLimitOverrides(role, RoleLimits{MaxUsers: ptr(5), DataLimitMin: ptr(20), DataLimitMax: ptr(500)}); err != nil {
+		t.Fatalf("tighter overrides should pass: %v", err)
+	}
+}
+
+func TestOwnerRoleCannotBeAssignedThroughNormalRolePath(t *testing.T) {
+	role := NewRole("owner")
+	role.IsOwner = true
+	if err := role.ValidateAssignable(); err == nil {
+		t.Fatal("owner role must be protected from normal assignment")
+	}
+}
+
+func TestInboundAllowListRequiresExplicitID(t *testing.T) {
+	if (RoleAccess{}).AllowsInbound(1) {
+		t.Fatal("empty inbound allow-list must deny")
+	}
+	access := RoleAccess{AllowedInboundIDs: []int64{2, 4}}
+	if !access.AllowsInbound(2) || access.AllowsInbound(3) || access.AllowsInbound(0) {
+		t.Fatal("inbound allow-list did not enforce explicit positive IDs")
+	}
+}

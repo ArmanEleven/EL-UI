@@ -15,8 +15,9 @@ import (
 
 const (
 	loginUserKey      = "LOGIN_USER"
-	loginEpochKey     = "LOGIN_EPOCH"
-	apiAuthUserKey    = "api_auth_user"
+	loginEpochKey         = "LOGIN_EPOCH"
+	managementAdminIDKey  = "MANAGEMENT_ADMIN_ID"
+	apiAuthUserKey        = "api_auth_user"
 	sessionCookieName = "3x-ui"
 )
 
@@ -29,9 +30,45 @@ func SetLoginUser(c *gin.Context, user *model.User) error {
 		return nil
 	}
 	s := sessions.Default(c)
+	s.Delete(managementAdminIDKey)
 	s.Set(loginUserKey, user.Id)
 	s.Set(loginEpochKey, user.LoginEpoch)
 	return s.Save()
+}
+
+// SetManagementLogin switches the shared cookie into the management identity
+// namespace and removes the native panel identity. A management account must
+// never inherit or retain access to the Master Panel through the same cookie.
+func SetManagementLogin(c *gin.Context, adminID int) error {
+	if adminID <= 0 {
+		return http.ErrNoCookie
+	}
+	s := sessions.Default(c)
+	s.Delete(loginUserKey)
+	s.Delete(loginEpochKey)
+	s.Delete(apiAuthUserKey)
+	s.Set(managementAdminIDKey, adminID)
+	return s.Save()
+}
+
+// ManagementAdminID returns the validated positive ID held by a management
+// session, or zero when this cookie does not represent that identity.
+func ManagementAdminID(c *gin.Context) int {
+	s := sessions.Default(c)
+	switch v := s.Get(managementAdminIDKey).(type) {
+	case int:
+		if v > 0 { return v }
+	case int64:
+		if v > 0 && int64(int(v)) == v { return int(v) }
+	case float64:
+		id := int(v)
+		if v == float64(id) && id > 0 { return id }
+	}
+	return 0
+}
+
+func IsManagementLogin(c *gin.Context) bool {
+	return ManagementAdminID(c) > 0
 }
 
 func SetAPIAuthUser(c *gin.Context, user *model.User) {
@@ -42,6 +79,9 @@ func SetAPIAuthUser(c *gin.Context, user *model.User) {
 }
 
 func GetLoginUser(c *gin.Context) *model.User {
+	if IsManagementLogin(c) {
+		return nil
+	}
 	if v, ok := c.Get(apiAuthUserKey); ok {
 		if u, ok2 := v.(*model.User); ok2 {
 			return u

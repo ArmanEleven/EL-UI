@@ -42,9 +42,8 @@ func CheckPermission(admin *Admin, resource, action string) error {
 	if admin.Status != AdminActive && admin.Status != AdminLimited {
 		return denied(resource, action, "invalid administrator status")
 	}
-	if admin.IsOwner() {
-		return nil
-	}
+	// Limited status is enforced even if a caller accidentally attaches an
+	// Owner role. Disabled accounts were already rejected above.
 	if admin.Status == AdminLimited {
 		if admin.Role != nil && admin.Role.DisabledWhenLimited {
 			return denied(resource, action, "all access blocked while limited")
@@ -52,6 +51,9 @@ func CheckPermission(admin *Admin, resource, action string) error {
 		if !isReadAction(action) {
 			return denied(resource, action, "write actions blocked while limited")
 		}
+	}
+	if admin.IsOwner() {
+		return nil
 	}
 	if admin.Role == nil {
 		return denied(resource, action, "missing role")
@@ -79,10 +81,20 @@ func CheckTargetPermission(admin *Admin, resource, action string, targetOwnerID 
 		return nil
 	}
 	grant := admin.Role.Permissions[resource][action]
-	if resource == ResourceUsers && grant.Scope == ScopeOwn && (targetOwnerID == nil || *targetOwnerID != admin.ID) {
-		return denied(resource, action, "outside administrator ownership")
+	if grant.Scope != ScopeOwn {
+		return nil
 	}
-	return nil
+	switch resource {
+	case ResourceUsers, ResourceClients:
+		if targetOwnerID == nil || *targetOwnerID != admin.ID {
+			return denied(resource, action, "outside administrator ownership")
+		}
+		return nil
+	default:
+		// A grant must never become global just because a resource's ownership
+		// resolver has not been implemented yet.
+		return denied(resource, action, "OWN scope unsupported for this resource")
+	}
 }
 
 // OwnerScope is a mandatory query constraint for list endpoints. When Restricted
@@ -100,10 +112,52 @@ func ListOwnerScope(admin *Admin, resource, action string) (OwnerScope, error) {
 		return OwnerScope{}, nil
 	}
 	grant := admin.Role.Permissions[resource][action]
-	if resource == ResourceUsers && grant.Scope == ScopeOwn {
-		return OwnerScope{Restricted: true, AdminID: admin.ID}, nil
+	if grant.Scope != ScopeOwn {
+		return OwnerScope{}, nil
 	}
-	return OwnerScope{}, nil
+	switch resource {
+	case ResourceUsers, ResourceClients:
+		return OwnerScope{Restricted: true, AdminID: admin.ID}, nil
+	default:
+		return OwnerScope{}, denied(resource, action, "OWN scope unsupported for this resource")
+	}
+}
+
+// ValidateLimitOverrides prevents per-admin settings from widening a role's
+// policy. Non-nil overrides may tighten a policy or add a limit where the role
+// leaves a value unlimited, but must not weaken an inherited bound.
+func ValidateLimitOverrides(roleLimits, overrides RoleLimits) error {
+	checks := []struct {
+		name string
+		base, override *int64
+		limit string
+	}{
+		{"max_users", roleLimits.MaxUsers, overrides.MaxUsers, "max"},
+		{"data_limit_min", roleLimits.DataLimitMin, overrides.DataLimitMin, "min"},
+		{"data_limit_max", roleLimits.DataLimitMax, overrides.DataLimitMax, "max"},
+		{"expire_min", roleLimits.ExpireMin, overrides.ExpireMin, "min"},
+		{"expire_max", roleLimits.ExpireMax, overrides.ExpireMax, "max"},
+		{"min_hwid_per_user", roleLimits.MinHWIDPerUser, overrides.MinHWIDPerUser, "min"},
+		{"max_hwid_per_user", roleLimits.MaxHWIDPerUser, overrides.MaxHWIDPerUser, "max"},
+		{"on_hold_timeout_min", roleLimits.OnHoldTimeoutMin, overrides.OnHoldTimeoutMin, "min"},
+		{"on_hold_timeout_max", roleLimits.OnHoldTimeoutMax, overrides.OnHoldTimeoutMax, "max"},
+	}
+	for _, item := range checks {
+		if item.base == nil || item.override == nil {
+			continue
+		}
+		if item.limit == "max" && *item.override > *item.base {
+			return fmt.Errorf("%s override cannot exceed the role maximum", item.name)
+		}
+		if item.limit == "min" && *item.override < *item.base {
+			return fmt.Errorf("%s override cannot be below the role minimum", item.name)
+		}
+	}
+	effective := EffectiveLimits(roleLimits, overrides)
+	if err := effective.Validate(); err != nil {
+		return fmt.Errorf("invalid effective limits: %w", err)
+	}
+	return nil
 }
 
 // EffectiveLimits overlays non-nil per-admin values on role defaults and does

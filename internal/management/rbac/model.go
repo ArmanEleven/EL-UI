@@ -8,6 +8,8 @@ import (
 
 const (
 	ResourceUsers           = "users"
+	ResourceClients         = "clients"
+	ResourceInbounds        = "inbounds"
 	ResourceAdmins          = "admins"
 	ResourceNodes           = "nodes"
 	ResourceGroups          = "groups"
@@ -118,6 +120,10 @@ type RoleAccess struct {
 	RequireTemplate    bool    `json:"require_template"`
 	AllowedTemplateIDs []int64 `json:"allowed_template_ids"`
 	AllowedGroupIDs    []int64 `json:"allowed_group_ids"`
+	// AllowedInboundIDs constrains the inbounds available to a management
+	// administrator. A nil or empty list grants no inbound when the permission
+	// uses OWN scope; with ALL scope, nil means no extra restriction.
+	AllowedInboundIDs []int64 `json:"allowed_inbound_ids,omitempty"`
 }
 
 func (a RoleAccess) AllowsGroup(id int64) bool {
@@ -126,6 +132,12 @@ func (a RoleAccess) AllowsGroup(id int64) bool {
 
 func (a RoleAccess) AllowsTemplate(id int64) bool {
 	return containsAllowedID(a.AllowedTemplateIDs, id)
+}
+
+// AllowsInbound is intentionally fail-closed: an inbound ID must be explicitly
+// included. Callers may treat a nil list as unrestricted only for ALL scope.
+func (a RoleAccess) AllowsInbound(id int64) bool {
+	return id > 0 && containsAllowedID(a.AllowedInboundIDs, id) && len(a.AllowedInboundIDs) > 0
 }
 
 func containsAllowedID(allowed []int64, id int64) bool {
@@ -220,6 +232,16 @@ func NewRole(name string) Role {
 	}
 }
 
+// ValidateAssignable rejects the protected Owner role from normal role
+// creation and assignment paths. The native panel owner remains outside the
+// management-admin role table.
+func (r Role) ValidateAssignable() error {
+	if r.IsOwner {
+		return fmt.Errorf("the owner role is protected and cannot be assigned")
+	}
+	return r.Validate()
+}
+
 func (r Role) Validate() error {
 	if strings.TrimSpace(r.Name) == "" {
 		return fmt.Errorf("role name cannot be empty")
@@ -229,6 +251,25 @@ func (r Role) Validate() error {
 	}
 	if err := r.Limits.Validate(); err != nil {
 		return err
+	}
+	for _, list := range []struct {
+		name string
+		ids  []int64
+	}{
+		{"allowed_group_ids", r.Access.AllowedGroupIDs},
+		{"allowed_template_ids", r.Access.AllowedTemplateIDs},
+		{"allowed_inbound_ids", r.Access.AllowedInboundIDs},
+	} {
+		seen := make(map[int64]struct{}, len(list.ids))
+		for _, id := range list.ids {
+			if id <= 0 {
+				return fmt.Errorf("%s must contain only positive IDs", list.name)
+			}
+			if _, exists := seen[id]; exists {
+				return fmt.Errorf("%s must not contain duplicate IDs", list.name)
+			}
+			seen[id] = struct{}{}
+		}
 	}
 	if r.HWID.Mode != "" && r.HWID.Mode != HWIDDisabled && r.HWID.Mode != HWIDUseGlobal && r.HWID.Mode != HWIDOverride {
 		return fmt.Errorf("unsupported HWID mode %q", r.HWID.Mode)
