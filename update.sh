@@ -786,7 +786,7 @@ update_x-ui() {
     echo -e "┌───────────────────────────────────────────────────────┐
 │  ${blue}EL-UI control menu usages (subcommands):${plain}              │
 │                                                       │
-│  ${blue}el-ui${plain}              - Admin Management Script          │
+│  ${blue}el-ui${plain}              - Panel Management CLI          │
 │  ${blue}el-ui start${plain}        - Start                            │
 │  ${blue}el-ui stop${plain}         - Stop                             │
 │  ${blue}el-ui restart${plain}      - Restart                          │
