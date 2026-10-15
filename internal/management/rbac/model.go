@@ -62,15 +62,15 @@ func Deny() ActionPermission     { return ActionPermission{Allowed: false, Scope
 type Permissions map[string]map[string]ActionPermission
 
 type RoleLimits struct {
-	MaxUsers          *int64 `json:"max_users,omitempty"`
-	DataLimitMin      *int64 `json:"data_limit_min,omitempty"`
-	DataLimitMax      *int64 `json:"data_limit_max,omitempty"`
-	ExpireMin         *int64 `json:"expire_min,omitempty"`
-	ExpireMax         *int64 `json:"expire_max,omitempty"`
-	MinHWIDPerUser    *int64 `json:"min_hwid_per_user,omitempty"`
-	MaxHWIDPerUser    *int64 `json:"max_hwid_per_user,omitempty"`
-	OnHoldTimeoutMin  *int64 `json:"on_hold_timeout_min,omitempty"`
-	OnHoldTimeoutMax  *int64 `json:"on_hold_timeout_max,omitempty"`
+	MaxUsers         *int64 `json:"max_users,omitempty"`
+	DataLimitMin     *int64 `json:"data_limit_min,omitempty"`
+	DataLimitMax     *int64 `json:"data_limit_max,omitempty"`
+	ExpireMin        *int64 `json:"expire_min,omitempty"`
+	ExpireMax        *int64 `json:"expire_max,omitempty"`
+	MinHWIDPerUser   *int64 `json:"min_hwid_per_user,omitempty"`
+	MaxHWIDPerUser   *int64 `json:"max_hwid_per_user,omitempty"`
+	OnHoldTimeoutMin *int64 `json:"on_hold_timeout_min,omitempty"`
+	OnHoldTimeoutMax *int64 `json:"on_hold_timeout_max,omitempty"`
 }
 
 func (l RoleLimits) Validate() error {
