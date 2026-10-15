@@ -133,3 +133,22 @@ func TestManagementPortalKeepsInboundRoutesReadOnlyAndMasterRoutesProtected(t *t
 		}
 	}
 }
+
+func TestIsNativeOwnerUserRequiresExactOwnerIdentity(t *testing.T) {
+	owner := &model.User{Id: 1}
+	otherAdmin := &model.User{Id: 2}
+
+	if !isNativeOwnerUser(owner, 1) {
+		t.Fatal("native owner should be allowed")
+	}
+	if isNativeOwnerUser(otherAdmin, 1) {
+		t.Fatal("authenticated non-owner must not access master management routes")
+	}
+	if isNativeOwnerUser(nil, 1) {
+		t.Fatal("missing identity must be denied")
+	}
+	if isNativeOwnerUser(owner, 0) {
+		t.Fatal("unknown owner ID must be denied")
+	}
+}
+
