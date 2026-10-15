@@ -172,7 +172,7 @@ export default function AdminPortalPage() {
       { title: 'ID', dataIndex: 'id', width: 72 },
       { title: t('remark'), dataIndex: 'remark', ellipsis: true },
       {
-        title: 'Protocol',
+        title: t('protocol'),
         dataIndex: 'protocol',
         width: 125,
         render: (v: string) => <Tag>{v}</Tag>,
@@ -180,7 +180,7 @@ export default function AdminPortalPage() {
       { title: t('adminPortal.port'), dataIndex: 'port', width: 95 },
       { title: t('clients'), dataIndex: 'clientCount', width: 100 },
       {
-        title: 'Status',
+        title: t('status'),
         dataIndex: 'enabled',
         width: 110,
         render: (v: boolean) => (
@@ -195,7 +195,7 @@ export default function AdminPortalPage() {
           `${bytesLabel(row.up + row.down, t('unlimited'))} / ${bytesLabel(row.total, t('unlimited'))}`,
       },
     ],
-    [],
+    [t],
   );
 
   const clientColumns = useMemo<ColumnsType<SafeClient>>(
@@ -206,13 +206,13 @@ export default function AdminPortalPage() {
         title: t('adminPortal.volume'),
         dataIndex: 'totalGB',
         width: 125,
-        render: (v: number) => v || 'Unlimited',
+        render: (v: number) => v || t('unlimited'),
       },
       {
         title: t('adminPortal.expires'),
         dataIndex: 'expiryTime',
         width: 180,
-        render: (v: number) => expiryLabel(v, t('unlimited')), 
+        render: (v: number) => expiryLabel(v, t('unlimited')),
       },
       {
         title: 'Status',
@@ -223,7 +223,7 @@ export default function AdminPortalPage() {
         ),
       },
     ],
-    [],
+    [t],
   );
 
   const canCreate = !!me?.role.permissions?.clients?.create?.allowed;
@@ -262,7 +262,7 @@ export default function AdminPortalPage() {
                 window.location.href = window.X_UI_BASE_PATH || '/';
               }}
             >
-              Log out
+              {t('adminPortal.logout')}
             </Button>
           </Space>
         </div>
@@ -272,7 +272,11 @@ export default function AdminPortalPage() {
             type="warning"
             showIcon
             message={loadError}
-            action={<Button size="small" onClick={() => void load()}>{t('adminPortal.refresh')}</Button>}
+            action={
+              <Button size="small" onClick={() => void load()}>
+                {t('adminPortal.refresh')}
+              </Button>
+            }
           />
         )}
 
@@ -280,9 +284,15 @@ export default function AdminPortalPage() {
           <Col xs={24} xl={8}>
             <Card>
               <Descriptions column={1} size="small">
-                <Descriptions.Item label={t('adminPortal.administrator')}>{me.username}</Descriptions.Item>
-                <Descriptions.Item label={t('adminPortal.role')}>{me.role.name}</Descriptions.Item>
-                <Descriptions.Item label={t('adminPortal.allowedInbounds')}>{inbounds.length}</Descriptions.Item>
+                <Descriptions.Item label={t('adminPortal.administrator')}>
+                  {me.username}
+                </Descriptions.Item>
+                <Descriptions.Item label={t('adminPortal.role')}>
+                  {me.role.name}
+                </Descriptions.Item>
+                <Descriptions.Item label={t('adminPortal.allowedInbounds')}>
+                  {inbounds.length}
+                </Descriptions.Item>
                 <Descriptions.Item label={t('adminPortal.clientLimit')}>
                   {me.effectiveLimits.max_users ?? 'Unlimited'}
                 </Descriptions.Item>
@@ -339,7 +349,7 @@ export default function AdminPortalPage() {
                     <InputNumber min={0} precision={0} style={{ width: '100%' }} placeholder="0" />
                   </Form.Item>
                   <Button type="primary" htmlType="submit" block loading={creating}>
-                    Create client
+                    {t('adminPortal.createClient')}
                   </Button>
                 </Form>
               )}
