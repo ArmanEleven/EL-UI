@@ -1,18 +1,18 @@
 .login-app {
-  --bg-page: #f3f6f0;
+  --bg-page: #f4f6fa;
   --bg-card: rgba(255, 255, 255, 0.72);
   --bg-card-solid: #ffffff;
   --color-text: rgba(0, 0, 0, 0.88);
   --color-text-subtle: rgba(0, 0, 0, 0.55);
   --color-accent: var(--elui-accent-strong, #3478f6);
   --color-border: rgba(255, 255, 255, 0.6);
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 18px 50px rgba(35, 71, 43, 0.12);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 18px 50px rgba(25, 42, 75, 0.12);
   --blob-1: color-mix(in srgb, var(--elui-accent) 22%, transparent);
   --blob-2: color-mix(in srgb, var(--elui-accent-strong) 20%, transparent);
   --blob-3: color-mix(in srgb, var(--elui-accent) 18%, transparent);
   --blob-4: color-mix(in srgb, var(--elui-accent) 12%, transparent);
   --blob-5: color-mix(in srgb, var(--elui-accent-strong) 15%, transparent);
-  --grid-color: rgba(47, 119, 82, 0.055);
+  --grid-color: rgba(31, 67, 110, 0.055);
   --vignette: radial-gradient(ellipse at center, transparent 30%, rgba(0, 0, 0, 0.05) 100%);
 
   position: relative;
@@ -22,9 +22,9 @@
 }
 
 .login-app.is-dark {
-  --bg-page: #0e1510;
-  --bg-card: rgba(17, 25, 19, 0.78);
-  --bg-card-solid: #111913;
+  --bg-page: #0a0d12;
+  --bg-card: rgba(17, 23, 32, 0.78);
+  --bg-card-solid: #111720;
   --color-text: rgba(255, 255, 255, 0.92);
   --color-text-subtle: rgba(255, 255, 255, 0.55);
   --color-accent: var(--elui-accent, #61d5ff);
@@ -35,7 +35,7 @@
   --blob-3: color-mix(in srgb, var(--elui-accent) 11%, transparent);
   --blob-4: color-mix(in srgb, var(--elui-accent) 8%, transparent);
   --blob-5: color-mix(in srgb, var(--elui-accent-strong) 10%, transparent);
-  --grid-color: rgba(205, 240, 210, 0.035);
+  --grid-color: rgba(200, 220, 255, 0.035);
   --vignette: radial-gradient(ellipse at center, transparent 25%, rgba(0, 0, 0, 0.5) 100%);
   background: radial-gradient(ellipse at 25% 20%, var(--elui-surface) 0%, var(--elui-bg) 60%);
 }
@@ -45,12 +45,12 @@
   --bg-card: rgba(15, 17, 28, 0.6);
   --bg-card-solid: #101013;
   --color-border: rgba(255, 255, 255, 0.06);
-  --blob-1: rgba(53, 121, 72, 0.16);
-  --blob-2: rgba(33, 91, 53, 0.15);
-  --blob-3: rgba(87, 150, 101, 0.1);
-  --blob-4: rgba(120, 151, 88, 0.07);
-  --blob-5: rgba(45, 102, 60, 0.1);
-  --grid-color: rgba(205, 240, 210, 0.02);
+  --blob-1: color-mix(in srgb, var(--elui-accent) 12%, transparent);
+  --blob-2: color-mix(in srgb, var(--elui-accent-strong) 11%, transparent);
+  --blob-3: color-mix(in srgb, var(--elui-accent) 8%, transparent);
+  --blob-4: color-mix(in srgb, var(--elui-accent) 6%, transparent);
+  --blob-5: color-mix(in srgb, var(--elui-accent-strong) 7%, transparent);
+  --grid-color: rgba(200, 220, 255, 0.02);
   --vignette: radial-gradient(ellipse at center, transparent 20%, rgba(0, 0, 0, 0.8) 100%);
   background: radial-gradient(ellipse at 25% 20%, #070b10 0%, #030405 62%);
 }
@@ -418,7 +418,7 @@
 
 /* EL-UI concept pass — graphite surfaces and botanical mint light. */
 .login-app {
-  --bg-page: #f3f6f0;
+  --bg-page: #f4f6fa;
   --bg-card: rgba(255, 255, 255, 0.82);
   --bg-card-solid: #ffffff;
   --color-text: #18241b;

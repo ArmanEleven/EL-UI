@@ -28,12 +28,12 @@ body.dark {
   color: var(--elui-text, #eaf2fb);
 }
 html[data-theme='ultra-dark'] body.dark {
-  background: #030604;
+  background: #030405;
 }
 .ant-card {
   border-radius: var(--elui-radius);
   border-color: var(--elui-border-light);
-  box-shadow: 0 8px 24px rgba(30, 64, 39, 0.035);
+  box-shadow: 0 8px 24px rgba(18, 31, 51, 0.035);
   overflow: hidden;
   transition:
     border-color 180ms ease,
@@ -105,7 +105,7 @@ body.dark .ant-table-wrapper .ant-table-tbody > tr > td {
   border-color: var(--elui-border);
 }
 body.dark .ant-table-wrapper .ant-table-tbody > tr:hover > td {
-  background: rgba(95, 182, 124, 0.07);
+  background: color-mix(in srgb, var(--elui-accent) 7%, transparent);
 }
 .ant-tag {
   border-radius: 999px;
@@ -127,7 +127,7 @@ body.dark .ant-popover .ant-popover-inner {
   transition: color 160ms ease;
 }
 ::selection {
-  background: rgba(47, 138, 91, 0.24);
+  background: color-mix(in srgb, var(--elui-accent) 24%, transparent);
 }
 @media (prefers-reduced-motion: reduce) {
   *,
