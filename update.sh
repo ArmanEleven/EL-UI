@@ -523,16 +523,16 @@ update_x-ui() {
             _fail "ERROR: Failed to fetch the EL-UI release version, it may be due to GitHub API restrictions, please try it later"
         fi
     fi
-    echo -e "Got EL-UI release version: ${tag_version}, beginning the installation..."
-    # x-ui.sh, x-ui.rc and the unit files must come from the same release as
-    # the binary; only the rolling dev build tracks main.
+    echo -e "Got compatible runtime version: ${tag_version}, preparing EL-UI..."
+    # The base runtime and its service assets follow the compatible 3X-UI release.
+    # The EL-UI command script is maintained on this repository's main branch
+    # until EL-UI publishes version-matched release tags.
     script_ref="${tag_version}"
     if [[ "${tag_version}" == "dev-latest" ]]; then
         script_ref="main"
     fi
-    # The unit files are only fetched when the release tarball lacks them, so
-    # they are checked at that point instead of here.
-    local required_files=("x-ui.sh")
+    # The only non-archive service asset fetched directly on Alpine is x-ui.rc.
+    local required_files=()
     [[ $release == "alpine" ]] && required_files+=("x-ui.rc")
     require_repo_files "${script_ref}" "${required_files[@]}"
     ${curl_bin} -fLRo ${xui_folder}-linux-$(arch).tar.gz https://github.com/MHSanaei/3x-ui/releases/download/${tag_version}/x-ui-linux-$(arch).tar.gz 2> /dev/null
