@@ -213,11 +213,11 @@ replace_xui_script() {
 installed_script_url() {
     local ver
     ver=$("${xui_folder}/x-ui" -v 2> /dev/null | tr -d '[:space:]')
-    if [[ "$ver" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] && curl -fsIL -o /dev/null "https://raw.githubusercontent.com/MHSanaei/3x-ui/v${ver}/x-ui.sh"; then
-        echo "https://raw.githubusercontent.com/MHSanaei/3x-ui/v${ver}/x-ui.sh"
+    if [[ "$ver" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] && curl -fsIL -o /dev/null "https://raw.githubusercontent.com/ArmanEleven/EL-UI/v${ver}/x-ui.sh"; then
+        echo "https://raw.githubusercontent.com/ArmanEleven/EL-UI/v${ver}/x-ui.sh"
     else
-        echo -e "${yellow}No x-ui.sh published for the installed version (${ver:-unknown}), using main${plain}" >&2
-        echo "https://raw.githubusercontent.com/MHSanaei/3x-ui/main/x-ui.sh"
+        echo -e "${yellow}No EL-UI command script published for the installed version (${ver:-unknown}), using main${plain}" >&2
+        echo "https://raw.githubusercontent.com/ArmanEleven/EL-UI/main/x-ui.sh"
     fi
 }
 
@@ -353,7 +353,7 @@ reset_user() {
 
     echo -e "Panel login username has been reset to: ${green} ${config_account} ${plain}"
     echo -e "Panel login password has been reset to: ${green} ${config_password} ${plain}"
-    echo -e "${green} Please use the new login username and password to access the X-UI panel. Also remember them! ${plain}"
+    echo -e "${green} Please use the new login username and password to access the EL-UI panel. Also remember them! ${plain}"
     confirm_restart
 }
 
@@ -2913,7 +2913,7 @@ pg_ensure_hba_password_auth() {
     local tmp
     tmp=$(mktemp) || return 1
     {
-        echo "# Added by 3x-ui: allow password logins for the panel database."
+        echo "# Added by EL-UI: allow password logins for the panel database."
         echo "host    ${pg_db}    all    127.0.0.1/32    md5"
         echo "host    ${pg_db}    all    ::1/128         md5"
         cat "${hba_file}"
@@ -3394,7 +3394,7 @@ migrate_db() {
     [[ -z "$input" ]] && input="$default_db"
 
     if [[ ! -x "$bin" ]]; then
-        LOGE "x-ui binary not found at ${bin}. Is the panel installed?"
+        LOGE "EL-UI runtime binary not found at ${bin}. Is EL-UI installed?"
         return 1
     fi
 
@@ -3443,7 +3443,7 @@ migrate_db() {
     else
         [[ -z "$output" ]] && output="${input%.*}.db"
         if [[ "$output" == "$default_db" ]] && check_status > /dev/null 2>&1; then
-            LOGE "Refusing to restore into the live database (${default_db}) while x-ui is running."
+            LOGE "Refusing to restore into the live database (${default_db}) while EL-UI is running."
             LOGE "Stop the panel first (el-ui stop) or choose a different output path."
             return 1
         fi
