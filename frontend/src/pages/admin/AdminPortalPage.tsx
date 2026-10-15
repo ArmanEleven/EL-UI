@@ -118,61 +118,111 @@ export default function AdminPortalPage() {
     void load();
   }, [load]);
 
-  const createClient = useCallback(async (values: CreateClientForm) => {
-    setCreating(true);
-    try {
-      const expiryTime = values.expiryHours && values.expiryHours > 0
-        ? Date.now() + values.expiryHours * 60 * 60 * 1000
-        : 0;
-      const response = await HttpUtil.post<{ email: string }>(
-        '/management-api/clients',
-        {
-          client: {
-            email: values.email.trim(),
-            enable: true,
-            totalGB: values.totalGB || 0,
-            expiryTime,
-            trafficReset: 'never',
-            trafficResetDay: 1,
+  const createClient = useCallback(
+    async (values: CreateClientForm) => {
+      setCreating(true);
+      try {
+        const expiryTime =
+          values.expiryHours && values.expiryHours > 0
+            ? Date.now() + values.expiryHours * 60 * 60 * 1000
+            : 0;
+        const response = await HttpUtil.post<{ email: string }>(
+          '/management-api/clients',
+          {
+            client: {
+              email: values.email.trim(),
+              enable: true,
+              totalGB: values.totalGB || 0,
+              expiryTime,
+              trafficReset: 'never',
+              trafficResetDay: 1,
+            },
+            inboundIds: values.inboundIds,
           },
-          inboundIds: values.inboundIds,
-        },
-        { headers: { 'Content-Type': 'application/json' }, silent: true },
-      );
-      if (!response.success) {
-        messageApi.error(response.msg || 'Client creation failed');
-        return;
+          { headers: { 'Content-Type': 'application/json' }, silent: true },
+        );
+        if (!response.success) {
+          messageApi.error(response.msg || 'Client creation failed');
+          return;
+        }
+        messageApi.success('Client created');
+        form.resetFields();
+        await load();
+      } finally {
+        setCreating(false);
       }
-      messageApi.success('Client created');
-      form.resetFields();
-      await load();
-    } finally {
-      setCreating(false);
-    }
-  }, [form, load, messageApi]);
+    },
+    [form, load, messageApi],
+  );
 
-  const inboundColumns = useMemo<ColumnsType<SafeInbound>>(() => [
-    { title: 'ID', dataIndex: 'id', width: 72 },
-    { title: 'Remark', dataIndex: 'remark', ellipsis: true },
-    { title: 'Protocol', dataIndex: 'protocol', width: 125, render: (v: string) => <Tag>{v}</Tag> },
-    { title: 'Port', dataIndex: 'port', width: 95 },
-    { title: 'Clients', dataIndex: 'clientCount', width: 100 },
-    { title: 'Status', dataIndex: 'enabled', width: 110, render: (v: boolean) => <Tag color={v ? 'success' : 'default'}>{v ? 'Enabled' : 'Disabled'}</Tag> },
-    { title: 'Traffic used', key: 'traffic', width: 150, render: (_: unknown, row: SafeInbound) => `${bytesLabel(row.up + row.down)} / ${bytesLabel(row.total)}` },
-  ], []);
+  const inboundColumns = useMemo<ColumnsType<SafeInbound>>(
+    () => [
+      { title: 'ID', dataIndex: 'id', width: 72 },
+      { title: 'Remark', dataIndex: 'remark', ellipsis: true },
+      {
+        title: 'Protocol',
+        dataIndex: 'protocol',
+        width: 125,
+        render: (v: string) => <Tag>{v}</Tag>,
+      },
+      { title: 'Port', dataIndex: 'port', width: 95 },
+      { title: 'Clients', dataIndex: 'clientCount', width: 100 },
+      {
+        title: 'Status',
+        dataIndex: 'enabled',
+        width: 110,
+        render: (v: boolean) => (
+          <Tag color={v ? 'success' : 'default'}>{v ? 'Enabled' : 'Disabled'}</Tag>
+        ),
+      },
+      {
+        title: 'Traffic used',
+        key: 'traffic',
+        width: 150,
+        render: (_: unknown, row: SafeInbound) =>
+          `${bytesLabel(row.up + row.down)} / ${bytesLabel(row.total)}`,
+      },
+    ],
+    [],
+  );
 
-  const clientColumns = useMemo<ColumnsType<SafeClient>>(() => [
-    { title: 'Email / Name', dataIndex: 'email', ellipsis: true },
-    { title: 'Group', dataIndex: 'group', render: (v: string) => v || '—' },
-    { title: 'Volume (GB)', dataIndex: 'totalGB', width: 125, render: (v: number) => v || 'Unlimited' },
-    { title: 'Expires', dataIndex: 'expiryTime', width: 180, render: (v: number) => expiryLabel(v) },
-    { title: 'Status', dataIndex: 'enabled', width: 105, render: (v: boolean) => <Tag color={v ? 'success' : 'default'}>{v ? 'Enabled' : 'Disabled'}</Tag> },
-  ], []);
+  const clientColumns = useMemo<ColumnsType<SafeClient>>(
+    () => [
+      { title: 'Email / Name', dataIndex: 'email', ellipsis: true },
+      { title: 'Group', dataIndex: 'group', render: (v: string) => v || '—' },
+      {
+        title: 'Volume (GB)',
+        dataIndex: 'totalGB',
+        width: 125,
+        render: (v: number) => v || 'Unlimited',
+      },
+      {
+        title: 'Expires',
+        dataIndex: 'expiryTime',
+        width: 180,
+        render: (v: number) => expiryLabel(v),
+      },
+      {
+        title: 'Status',
+        dataIndex: 'enabled',
+        width: 105,
+        render: (v: boolean) => (
+          <Tag color={v ? 'success' : 'default'}>{v ? 'Enabled' : 'Disabled'}</Tag>
+        ),
+      },
+    ],
+    [],
+  );
 
   const canCreate = !!me?.role.permissions?.clients?.create?.allowed;
   const canReadClients = !!me?.role.permissions?.clients?.read?.allowed;
 
-  if (loading) return <div className="management-loading"><Spin size="large" /></div>;
+  if (loading)
+    return (
+      <div className="management-loading">
+        <Spin size="large" />
+      </div>
+    );
   if (!me) return null;
 
   return (
@@ -187,12 +237,21 @@ export default function AdminPortalPage() {
           <Space wrap>
             <Tag color={me.status === 'active' ? 'success' : 'warning'}>{me.status}</Tag>
             <Button onClick={() => void load()}>Refresh</Button>
-            <Button onClick={async () => {
-              await HttpUtil.post('/management-api/auth/logout', {}, {
-                headers: { 'Content-Type': 'application/json' }, silent: true,
-              });
-              window.location.href = window.X_UI_BASE_PATH || '/';
-            }}>Log out</Button>
+            <Button
+              onClick={async () => {
+                await HttpUtil.post(
+                  '/management-api/auth/logout',
+                  {},
+                  {
+                    headers: { 'Content-Type': 'application/json' },
+                    silent: true,
+                  },
+                );
+                window.location.href = window.X_UI_BASE_PATH || '/';
+              }}
+            >
+              Log out
+            </Button>
           </Space>
         </div>
 
@@ -203,7 +262,9 @@ export default function AdminPortalPage() {
                 <Descriptions.Item label="Administrator">{me.username}</Descriptions.Item>
                 <Descriptions.Item label="Role">{me.role.name}</Descriptions.Item>
                 <Descriptions.Item label="Allowed inbounds">{inbounds.length}</Descriptions.Item>
-                <Descriptions.Item label="Client limit">{me.effectiveLimits.max_users ?? 'Unlimited'}</Descriptions.Item>
+                <Descriptions.Item label="Client limit">
+                  {me.effectiveLimits.max_users ?? 'Unlimited'}
+                </Descriptions.Item>
               </Descriptions>
             </Card>
           </Col>
@@ -229,13 +290,24 @@ export default function AdminPortalPage() {
                 <Alert type="info" showIcon message="Your role does not allow client creation." />
               ) : (
                 <Form<CreateClientForm> form={form} layout="vertical" onFinish={createClient}>
-                  <Form.Item name="email" label="Client email / name" rules={[{ required: true, whitespace: true }, { max: 128 }]}>
+                  <Form.Item
+                    name="email"
+                    label="Client email / name"
+                    rules={[{ required: true, whitespace: true }, { max: 128 }]}
+                  >
                     <Input autoComplete="off" placeholder="client@example.com" />
                   </Form.Item>
-                  <Form.Item name="inboundIds" label="Allowed inbounds" rules={[{ required: true, type: 'array', min: 1 }]}>
+                  <Form.Item
+                    name="inboundIds"
+                    label="Allowed inbounds"
+                    rules={[{ required: true, type: 'array', min: 1 }]}
+                  >
                     <Select
                       mode="multiple"
-                      options={inbounds.map((ib) => ({ value: ib.id, label: `#${ib.id} · ${ib.remark || ib.protocol} : ${ib.port}` }))}
+                      options={inbounds.map((ib) => ({
+                        value: ib.id,
+                        label: `#${ib.id} · ${ib.remark || ib.protocol} : ${ib.port}`,
+                      }))}
                       placeholder="Select one or more inbounds"
                     />
                   </Form.Item>
@@ -245,7 +317,9 @@ export default function AdminPortalPage() {
                   <Form.Item name="expiryHours" label="Expiry in hours (0 = unlimited)">
                     <InputNumber min={0} precision={0} style={{ width: '100%' }} placeholder="0" />
                   </Form.Item>
-                  <Button type="primary" htmlType="submit" block loading={creating}>Create client</Button>
+                  <Button type="primary" htmlType="submit" block loading={creating}>
+                    Create client
+                  </Button>
                 </Form>
               )}
             </Card>
@@ -253,7 +327,11 @@ export default function AdminPortalPage() {
           <Col xs={24} xl={canCreate ? 14 : 24}>
             <Card title="Managed clients">
               {!canReadClients ? (
-                <Alert type="info" showIcon message="Your role does not allow viewing managed clients." />
+                <Alert
+                  type="info"
+                  showIcon
+                  message="Your role does not allow viewing managed clients."
+                />
               ) : (
                 <Table<SafeClient>
                   rowKey="email"
@@ -269,7 +347,8 @@ export default function AdminPortalPage() {
           </Col>
         </Row>
         <Text className="management-footnote" type="secondary">
-          This portal has no inbound edit/delete controls. Authorization is enforced by the server for every request.
+          This portal has no inbound edit/delete controls. Authorization is enforced by the server
+          for every request.
         </Text>
       </Layout.Content>
     </Layout>
