@@ -82,6 +82,17 @@ describe('i18n keys', () => {
     );
   });
 
+
+  it('every non-English locale translates the admin portal title', () => {
+    const englishTitle = enUS.adminPortal.title;
+    for (const file of readdirSync(translationDir)) {
+      if (!file.endsWith('.json') || file === 'en-US.json') continue;
+      const locale = JSON.parse(readFileSync(join(translationDir, file), 'utf8'));
+      expect(locale.adminPortal?.title, `${file} should translate adminPortal.title`).toBeTruthy();
+      expect(locale.adminPortal.title, `${file} should not reuse the English admin portal title`).not.toBe(englishTitle);
+    }
+  });
+
   it('every locale carries exactly the en-US key set', () => {
     const enSet = new Set(enKeys);
     for (const file of readdirSync(translationDir)) {
