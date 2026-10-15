@@ -450,7 +450,10 @@ body.dark .drawer-menu .ant-menu-item-selected .anticon {
 
 .sider-version {
   border-radius: 9px;
-  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease;
 }
 
 .sider-version:hover {
