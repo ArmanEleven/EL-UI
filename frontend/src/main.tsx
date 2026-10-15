@@ -5,6 +5,7 @@ import 'antd/dist/reset.css';
 import '@/styles/utils.css';
 import '@/styles/page-shell.css';
 import '@/styles/page-cards.css';
+import '@/styles/elui-identity.css';
 
 import { setupHttp } from '@/api/http-init';
 import { readyI18n } from '@/i18n/react';
@@ -14,7 +15,7 @@ import { router } from '@/routes';
 
 // A stale tab keeps this entry's old chunk URLs after a deploy. Reload once per
 // panel base path and entry URL; the same bundle must not loop on a real outage.
-const chunkRecoveryKey = `xui:chunk-recovery:${window.X_UI_BASE_PATH || '/'}:${import.meta.url}`;
+const chunkRecoveryKey = `elui:chunk-recovery:${window.X_UI_BASE_PATH || '/'}:${import.meta.url}`;
 let chunkRecoveryCommitted = false;
 
 window.addEventListener('vite:preloadError', (event) => {
