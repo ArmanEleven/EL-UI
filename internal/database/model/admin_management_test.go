@@ -8,8 +8,12 @@ import (
 
 func TestManagementAdminNeverSerializesCredentialsOrOverrides(t *testing.T) {
 	admin := ManagementAdmin{
-		ID: 3, Username: "operator", PasswordHash: "secret-hash-that-must-not-leak",
-		RoleID: 2, Status: "active", PermissionOverridesJSON: `{"max_users":10}`,
+		ID:                      3,
+		Username:                "operator",
+		PasswordHash:            "secret-hash-that-must-not-leak",
+		RoleID:                  2,
+		Status:                  "active",
+		PermissionOverridesJSON: `{"max_users":10}`,
 	}
 	data, err := json.Marshal(admin)
 	if err != nil {
@@ -31,11 +35,12 @@ func TestManagementAdminNeverSerializesCredentialsOrOverrides(t *testing.T) {
 
 func TestManagementRoleNeverSerializesPolicyBlobs(t *testing.T) {
 	role := ManagementAdminRole{
-		ID: 2, Name: "reseller",
+		ID:              2,
+		Name:            "reseller",
 		PermissionsJSON: `{"users":{"create":true}}`,
-		LimitsJSON: `{"max_users":10}`,
-		AccessJSON: `{"allowed_group_ids":[4]}`,
-		HWIDJSON: `{"mode":"override"}`,
+		LimitsJSON:      `{"max_users":10}`,
+		AccessJSON:      `{"allowed_group_ids":[4]}`,
+		HWIDJSON:        `{"mode":"override"}`,
 	}
 	data, err := json.Marshal(role)
 	if err != nil {
