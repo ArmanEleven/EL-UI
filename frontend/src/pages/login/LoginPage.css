@@ -563,3 +563,89 @@
     border-radius: 15px;
   }
 }
+
+
+/* EL-UI identity alignment: keep login on the same forest/graphite/mint system as the panel. */
+.login-app {
+  --bg-page: #f3f6f0;
+  --bg-card: rgba(255, 255, 255, 0.78);
+  --bg-card-solid: #ffffff;
+  --color-text: #17221a;
+  --color-text-subtle: #5d6b60;
+  --color-accent: #2f8a5b;
+  --color-border: rgba(47, 119, 82, 0.16);
+  --shadow-card: 0 1px 3px rgba(20, 42, 25, 0.04), 0 22px 60px rgba(35, 71, 43, 0.12);
+  --blob-1: rgba(151, 218, 126, 0.36);
+  --blob-2: rgba(82, 166, 111, 0.28);
+  --blob-3: rgba(158, 232, 182, 0.34);
+  --blob-4: rgba(199, 224, 158, 0.22);
+  --blob-5: rgba(81, 151, 104, 0.2);
+  --grid-color: rgba(47, 119, 82, 0.055);
+  --vignette: radial-gradient(ellipse at center, transparent 30%, rgba(16, 23, 17, 0.06) 100%);
+  background: linear-gradient(145deg, #f4f7f1 0%, #edf3ea 100%);
+}
+
+.login-app.is-dark {
+  --bg-page: #0e1510;
+  --bg-card: rgba(17, 25, 19, 0.78);
+  --bg-card-solid: #111913;
+  --color-text: #eaf4eb;
+  --color-text-subtle: #a6b5a8;
+  --color-accent: #9ee8b6;
+  --color-border: rgba(158, 232, 182, 0.13);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.35), 0 24px 64px rgba(0, 0, 0, 0.3);
+  --blob-1: rgba(71, 143, 91, 0.22);
+  --blob-2: rgba(50, 117, 75, 0.22);
+  --blob-3: rgba(112, 185, 129, 0.15);
+  --blob-4: rgba(163, 194, 127, 0.1);
+  --blob-5: rgba(64, 129, 83, 0.16);
+  --grid-color: rgba(205, 240, 210, 0.035);
+  --vignette: radial-gradient(ellipse at center, transparent 25%, rgba(0, 0, 0, 0.55) 100%);
+  background: radial-gradient(ellipse at 25% 20%, #17251a 0%, #0e1510 62%);
+}
+
+.login-app.is-dark.is-ultra {
+  --bg-page: #030604;
+  --bg-card: rgba(8, 13, 9, 0.84);
+  --bg-card-solid: #080d09;
+  --color-border: rgba(158, 232, 182, 0.08);
+  --blob-1: rgba(53, 121, 72, 0.16);
+  --blob-2: rgba(33, 91, 53, 0.15);
+  --blob-3: rgba(87, 150, 101, 0.1);
+  --blob-4: rgba(120, 151, 88, 0.07);
+  --blob-5: rgba(45, 102, 60, 0.1);
+  --grid-color: rgba(205, 240, 210, 0.02);
+  --vignette: radial-gradient(ellipse at center, transparent 20%, rgba(0, 0, 0, 0.82) 100%);
+  background: radial-gradient(ellipse at 25% 20%, #070d08 0%, #030604 62%);
+}
+
+.login-app .brand-symbol {
+  background: linear-gradient(145deg, #9ee8b6, #2f8a5b);
+  color: #101711;
+  box-shadow: 0 8px 22px rgba(47, 138, 91, 0.22);
+}
+
+.login-app .ant-btn-primary {
+  background: #2f8a5b;
+  border-color: #2f8a5b;
+}
+
+.login-app .ant-btn-primary:hover {
+  background: #256f49 !important;
+  border-color: #256f49 !important;
+}
+
+.login-app.is-dark .ant-btn-primary,
+.login-app.is-dark .ant-btn-primary:hover {
+  color: #07110a;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-app::before,
+  .login-app::after,
+  .login-content::before,
+  .login-content::after,
+  .login-wrapper::before {
+    animation: none;
+  }
+}
