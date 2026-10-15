@@ -106,7 +106,6 @@ func TestSetNativeLoginClearsManagementIdentity(t *testing.T) {
 	}
 }
 
-
 func TestGetLoginUserWithoutSessionMiddlewareReturnsAnonymous(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
