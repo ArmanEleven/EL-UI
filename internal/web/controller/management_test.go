@@ -135,20 +135,24 @@ func TestManagementPortalKeepsInboundRoutesReadOnlyAndMasterRoutesProtected(t *t
 }
 
 func TestIsNativeOwnerUserRequiresExactOwnerIdentity(t *testing.T) {
-	owner := &model.User{Id: 1}
-	otherAdmin := &model.User{Id: 2}
+	tests := []struct {
+		name    string
+		user    *model.User
+		ownerID int
+		want    bool
+	}{
+		{name: "owner", user: &model.User{Id: 1}, ownerID: 1, want: true},
+		{name: "different user", user: &model.User{Id: 2}, ownerID: 1, want: false},
+		{name: "missing user", ownerID: 1, want: false},
+		{name: "unknown owner", user: &model.User{Id: 1}, want: false},
+	}
 
-	if !isNativeOwnerUser(owner, 1) {
-		t.Fatal("native owner should be allowed")
-	}
-	if isNativeOwnerUser(otherAdmin, 1) {
-		t.Fatal("authenticated non-owner must not access master management routes")
-	}
-	if isNativeOwnerUser(nil, 1) {
-		t.Fatal("missing identity must be denied")
-	}
-	if isNativeOwnerUser(owner, 0) {
-		t.Fatal("unknown owner ID must be denied")
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := isNativeOwnerUser(tt.user, tt.ownerID); got != tt.want {
+				t.Fatalf("isNativeOwnerUser() = %t, want %t", got, tt.want)
+			}
+		})
 	}
 }
 
