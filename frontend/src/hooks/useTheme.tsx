@@ -35,50 +35,56 @@ const initialUltra = readBool(STORAGE_ULTRA, false);
 applyDom(initialDark, initialUltra);
 
 const DARK_TOKENS = {
-  colorBgBase: '#1a1b1f',
-  colorBgLayout: '#1a1b1f',
-  colorBgContainer: '#23252b',
-  colorBgElevated: '#2d2f37',
+  colorBgBase: '#0e1510',
+  colorBgLayout: '#0e1510',
+  colorBgContainer: '#151e17',
+  colorBgElevated: '#1e2a21',
+  colorPrimary: '#2f8a5b',
+  colorPrimaryHover: '#399b68',
+  colorPrimaryActive: '#26734c',
 };
 const ULTRA_DARK_TOKENS = {
-  colorBgBase: '#000',
-  colorBgLayout: '#000',
-  colorBgContainer: '#101013',
-  colorBgElevated: '#1a1a1e',
+  colorBgBase: '#030604',
+  colorBgLayout: '#030604',
+  colorBgContainer: '#0b100c',
+  colorBgElevated: '#141c16',
+  colorPrimary: '#328b5c',
+  colorPrimaryHover: '#3aa76b',
+  colorPrimaryActive: '#26744d',
 };
 const DARK_LAYOUT_TOKENS = {
-  bodyBg: '#1a1b1f',
-  headerBg: '#15161a',
-  headerColor: '#ffffff',
-  footerBg: '#1a1b1f',
-  siderBg: '#15161a',
-  triggerBg: '#23252b',
-  triggerColor: '#ffffff',
+  bodyBg: '#0e1510',
+  headerBg: '#101711',
+  headerColor: '#edf7ed',
+  footerBg: '#0e1510',
+  siderBg: '#101711',
+  triggerBg: '#1e2a21',
+  triggerColor: '#edf7ed',
 };
 const ULTRA_DARK_LAYOUT_TOKENS = {
-  bodyBg: '#000',
-  headerBg: '#050507',
-  headerColor: '#ffffff',
-  footerBg: '#000',
-  siderBg: '#050507',
-  triggerBg: '#1a1a1e',
-  triggerColor: '#ffffff',
+  bodyBg: '#030604',
+  headerBg: '#070b08',
+  headerColor: '#edf7ed',
+  footerBg: '#030604',
+  siderBg: '#070b08',
+  triggerBg: '#141c16',
+  triggerColor: '#edf7ed',
 };
 const DARK_MENU_TOKENS = {
-  darkItemBg: '#15161a',
-  darkSubMenuItemBg: '#1a1b1f',
-  darkPopupBg: '#23252b',
+  darkItemBg: '#101711',
+  darkSubMenuItemBg: '#0e1510',
+  darkPopupBg: '#1e2a21',
 };
 const ULTRA_DARK_MENU_TOKENS = {
-  darkItemBg: '#050507',
-  darkSubMenuItemBg: '#000',
-  darkPopupBg: '#101013',
+  darkItemBg: '#070b08',
+  darkSubMenuItemBg: '#030604',
+  darkPopupBg: '#141c16',
 };
 const DARK_CARD_TOKENS = {
-  colorBorderSecondary: 'rgba(255, 255, 255, 0.06)',
+  colorBorderSecondary: 'rgba(158, 232, 182, 0.10)',
 };
 const ULTRA_DARK_CARD_TOKENS = {
-  colorBorderSecondary: 'rgba(255, 255, 255, 0.04)',
+  colorBorderSecondary: 'rgba(158, 232, 182, 0.08)',
 };
 const STATISTIC_TOKENS = {
   contentFontSize: 17,
@@ -93,9 +99,9 @@ const LIGHT_CONTRAST_TOKENS = {
   colorSuccessText: '#237804',
 };
 const LIGHT_BUTTON_TOKENS = {
-  colorPrimary: '#0958d9',
-  colorPrimaryHover: '#2468e5',
-  colorPrimaryActive: '#073ea8',
+  colorPrimary: '#2f7752',
+  colorPrimaryHover: '#256642',
+  colorPrimaryActive: '#1f5438',
 };
 
 // hashed:false drops the `:where(.css-<hash>)` wrapper antd puts around every
@@ -109,7 +115,7 @@ const LIGHT_BUTTON_TOKENS = {
 // token block under a new class instead of reusing the one already in the head.
 const SHARED_STYLE_CONFIG = {
   hashed: false,
-  cssVar: { key: 'xui' },
+  cssVar: { key: 'elui' },
 } as const;
 
 export function buildAntdThemeConfig(isDark: boolean, isUltra: boolean): ThemeConfig {
@@ -117,7 +123,12 @@ export function buildAntdThemeConfig(isDark: boolean, isUltra: boolean): ThemeCo
     return {
       ...SHARED_STYLE_CONFIG,
       algorithm: antdTheme.defaultAlgorithm,
-      token: LIGHT_CONTRAST_TOKENS,
+      token: {
+        ...LIGHT_CONTRAST_TOKENS,
+        colorPrimary: '#2f7752',
+        colorPrimaryHover: '#256642',
+        colorPrimaryActive: '#1f5438',
+      },
       components: {
         Statistic: STATISTIC_TOKENS,
         Button: LIGHT_BUTTON_TOKENS,
