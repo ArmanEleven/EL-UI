@@ -27,8 +27,8 @@ import {
   HysteriaClientSchema,
   HysteriaInboundSettingsSchema,
 } from '@/schemas/protocols/inbound/hysteria';
-import { TlsStreamSettingsSchema } from '@/schemas/protocols/security/tls';
 import { MixedInboundSettingsSchema } from '@/schemas/protocols/inbound/mixed';
+import { TlsStreamSettingsSchema } from '@/schemas/protocols/security/tls';
 import {
   ShadowsocksClientSchema,
   ShadowsocksInboundSettingsSchema,
