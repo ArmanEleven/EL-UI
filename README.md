@@ -151,3 +151,16 @@ EL-UI's distribution must preserve the upstream license requirements and notices
 <p align="center">
   <sub>Designed and maintained by <a href="https://github.com/ArmanEleven">ArmanEleven</a> · Built incrementally, with correctness before claims.</sub>
 </p>
+
+
+## Command-line entry point
+
+Use `el-ui` for panel operations on new installations:
+
+```bash
+el-ui status
+el-ui restart
+el-ui settings
+```
+
+The previous launcher remains an internal compatibility target during the migration. Service and storage identifiers will be migrated separately with an upgrade path that protects existing installations.
