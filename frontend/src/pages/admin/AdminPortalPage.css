@@ -206,70 +206,86 @@ html[data-theme='ultra-dark'] body.dark .management-portal {
   text-align: start;
 }
 
-
 /* Stage 5: RTL and small-screen ergonomics. Use logical properties so the
    same layout works in Persian/Arabic and LTR languages without duplication. */
 .management-portal .ant-space {
   flex-wrap: wrap;
 }
+
 .management-portal .ant-form-item-control,
 .management-portal .ant-form-item-label {
   min-width: 0;
 }
+
 .management-portal .ant-table-cell {
   overflow-wrap: anywhere;
 }
+
 .management-portal .ant-table-cell .ant-tag {
   white-space: normal;
 }
+
 [dir='rtl'] .management-portal .ant-card-head-title,
 [dir='rtl'] .management-portal .ant-descriptions-item-label,
 [dir='rtl'] .management-portal .ant-form-item-label {
   text-align: right;
 }
+
 [dir='rtl'] .management-portal .ant-input-number-input {
   direction: ltr;
   text-align: right;
 }
+
 [dir='rtl'] .management-portal .ant-table-cell {
   text-align: start;
 }
+
 [dir='rtl'] .management-portal .ant-table-cell .ant-space {
   justify-content: flex-start;
 }
+
 @media (max-width: 768px) {
   .management-content {
     padding: 12px;
   }
+
   .management-topbar {
     align-items: stretch;
     flex-direction: column;
   }
+
   .management-topbar > div:last-child,
   .management-topbar .ant-space,
   .management-topbar .ant-btn {
     max-width: 100%;
   }
+
   .management-topbar .ant-space {
     display: flex;
   }
+
   .management-portal .ant-card-head {
     padding-inline: 14px;
   }
+
   .management-portal .ant-card-body {
     padding: 14px;
   }
+
   .management-portal .ant-descriptions .ant-descriptions-item {
     padding-bottom: 8px;
   }
 }
+
 @media (max-width: 420px) {
   .management-content {
     padding: 8px;
   }
+
   .management-topbar {
     padding: 14px;
   }
+
   .management-portal .ant-btn {
     white-space: normal;
   }
