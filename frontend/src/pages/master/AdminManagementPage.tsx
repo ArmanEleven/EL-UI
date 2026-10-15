@@ -62,13 +62,17 @@ const EMPTY_ADMINS: AdminRow[] = [];
 const EMPTY_INBOUNDS: InboundRow[] = [];
 
 const { Title, Text } = Typography;
-const DEFAULT_PERMISSIONS = JSON.stringify({
-  clients: {
-    read: { allowed: true, scope: 1 },
-    create: { allowed: true, scope: 1 },
+const DEFAULT_PERMISSIONS = JSON.stringify(
+  {
+    clients: {
+      read: { allowed: true, scope: 1 },
+      create: { allowed: true, scope: 1 },
+    },
+    inbounds: { read: { allowed: true, scope: 1 } },
   },
-  inbounds: { read: { allowed: true, scope: 1 } },
-}, null, 2);
+  null,
+  2,
+);
 
 async function fetchManagementList<T>(path: string): Promise<T[]> {
   const response = await HttpUtil.get<T[]>(path, undefined, { silent: true });
@@ -132,171 +136,225 @@ export default function AdminManagementPage() {
   const queryError = rolesQuery.error || adminsQuery.error || inboundsQuery.error;
 
   const refresh = useCallback(async () => {
-    await Promise.all([
-      rolesQuery.refetch(),
-      adminsQuery.refetch(),
-      inboundsQuery.refetch(),
-    ]);
+    await Promise.all([rolesQuery.refetch(), adminsQuery.refetch(), inboundsQuery.refetch()]);
   }, [adminsQuery, inboundsQuery, rolesQuery]);
 
-  const saveRole = useCallback(async (values: RoleForm) => {
-    setSavingRole(true);
-    try {
-      const permissions = parseJSON<Role['permissions']>(values.permissionsJSON, 'Permissions');
-      const limits = {
-        max_users: values.maxUsers || undefined,
-        data_limit_min: values.dataLimitMinGB
-          ? Math.round(values.dataLimitMinGB * 1024 ** 3)
-          : undefined,
-        data_limit_max: values.dataLimitMaxGB
-          ? Math.round(values.dataLimitMaxGB * 1024 ** 3)
-          : undefined,
-        expire_min: values.expiryMinHours ? Math.round(values.expiryMinHours * 3600) : undefined,
-        expire_max: values.expiryMaxHours ? Math.round(values.expiryMaxHours * 3600) : undefined,
-      };
-      const response = await HttpUtil.post(
-        selectedRole
-          ? '/management-api/master/roles/' + selectedRole.id
-          : '/management-api/master/roles',
-        {
-          name: values.name.trim(),
-          permissions,
-          limits,
-          features: { can_use_reset_strategy: true, can_use_next_plan: true },
-          access: { allowed_inbound_ids: values.allInbounds ? null : values.allowedInboundIds || [] },
-          hwid: { mode: 'use_global' },
-          disabledWhenLimited: false,
-          disconnectUsersWhenLimited: true,
-          disconnectUsersWhenDisabled: true,
-        },
-        { headers: { 'Content-Type': 'application/json' }, silent: true },
-      );
-      if (!response.success) {
-        messageApi.error(response.msg || 'Role could not be saved');
-        return;
+  const saveRole = useCallback(
+    async (values: RoleForm) => {
+      setSavingRole(true);
+      try {
+        const permissions = parseJSON<Role['permissions']>(values.permissionsJSON, 'Permissions');
+        const limits = {
+          max_users: values.maxUsers || undefined,
+          data_limit_min: values.dataLimitMinGB
+            ? Math.round(values.dataLimitMinGB * 1024 ** 3)
+            : undefined,
+          data_limit_max: values.dataLimitMaxGB
+            ? Math.round(values.dataLimitMaxGB * 1024 ** 3)
+            : undefined,
+          expire_min: values.expiryMinHours ? Math.round(values.expiryMinHours * 3600) : undefined,
+          expire_max: values.expiryMaxHours ? Math.round(values.expiryMaxHours * 3600) : undefined,
+        };
+        const response = await HttpUtil.post(
+          selectedRole
+            ? '/management-api/master/roles/' + selectedRole.id
+            : '/management-api/master/roles',
+          {
+            name: values.name.trim(),
+            permissions,
+            limits,
+            features: { can_use_reset_strategy: true, can_use_next_plan: true },
+            access: {
+              allowed_inbound_ids: values.allInbounds ? null : values.allowedInboundIds || [],
+            },
+            hwid: { mode: 'use_global' },
+            disabledWhenLimited: false,
+            disconnectUsersWhenLimited: true,
+            disconnectUsersWhenDisabled: true,
+          },
+          { headers: { 'Content-Type': 'application/json' }, silent: true },
+        );
+        if (!response.success) {
+          messageApi.error(response.msg || 'Role could not be saved');
+          return;
+        }
+        messageApi.success(selectedRole ? 'Role updated' : 'Role created');
+        setSelectedRole(null);
+        roleForm.resetFields();
+        await queryClient.invalidateQueries({ queryKey: ['management', 'roles'] });
+      } catch (error) {
+        messageApi.error(error instanceof Error ? error.message : 'Invalid role settings');
+      } finally {
+        setSavingRole(false);
       }
-      messageApi.success(selectedRole ? 'Role updated' : 'Role created');
-      setSelectedRole(null);
-      roleForm.resetFields();
-      await queryClient.invalidateQueries({ queryKey: ['management', 'roles'] });
-    } catch (error) {
-      messageApi.error(error instanceof Error ? error.message : 'Invalid role settings');
-    } finally {
-      setSavingRole(false);
-    }
-  }, [messageApi, queryClient, roleForm, selectedRole]);
+    },
+    [messageApi, queryClient, roleForm, selectedRole],
+  );
 
-  const createAdmin = useCallback(async (values: AdminForm) => {
-    setSavingAdmin(true);
-    try {
-      const permissionOverrides = parseJSON<Record<string, number>>(
-        values.permissionOverridesJSON || '{}',
-        'Limit overrides',
-      );
-      const response = await HttpUtil.post('/management-api/master/admins', {
-        username: values.username.trim(),
-        password: values.password,
-        roleId: values.roleId,
-        permissionOverrides,
-      }, {
-        headers: { 'Content-Type': 'application/json' },
-        silent: true,
-      });
-      if (!response.success) {
-        messageApi.error(response.msg || 'Administrator could not be created');
-        return;
+  const createAdmin = useCallback(
+    async (values: AdminForm) => {
+      setSavingAdmin(true);
+      try {
+        const permissionOverrides = parseJSON<Record<string, number>>(
+          values.permissionOverridesJSON || '{}',
+          'Limit overrides',
+        );
+        const response = await HttpUtil.post(
+          '/management-api/master/admins',
+          {
+            username: values.username.trim(),
+            password: values.password,
+            roleId: values.roleId,
+            permissionOverrides,
+          },
+          {
+            headers: { 'Content-Type': 'application/json' },
+            silent: true,
+          },
+        );
+        if (!response.success) {
+          messageApi.error(response.msg || 'Administrator could not be created');
+          return;
+        }
+        messageApi.success('Administrator created');
+        adminForm.resetFields();
+        await queryClient.invalidateQueries({ queryKey: ['management', 'admins'] });
+      } catch (error) {
+        messageApi.error(error instanceof Error ? error.message : 'Invalid override JSON');
+      } finally {
+        setSavingAdmin(false);
       }
-      messageApi.success('Administrator created');
-      adminForm.resetFields();
-      await queryClient.invalidateQueries({ queryKey: ['management', 'admins'] });
-    } catch (error) {
-      messageApi.error(error instanceof Error ? error.message : 'Invalid override JSON');
-    } finally {
-      setSavingAdmin(false);
-    }
-  }, [adminForm, messageApi, queryClient]);
+    },
+    [adminForm, messageApi, queryClient],
+  );
 
-  const setAdminStatus = useCallback(async (admin: AdminRow, status: AdminRow['status']) => {
-    try {
-      const response = await HttpUtil.post(
-        '/management-api/master/admins/' + admin.id + '/status',
-        { status },
-        { headers: { 'Content-Type': 'application/json' }, silent: true },
-      );
-      if (!response.success) {
-        messageApi.error(response.msg || 'Status update failed');
-        return;
+  const setAdminStatus = useCallback(
+    async (admin: AdminRow, status: AdminRow['status']) => {
+      try {
+        const response = await HttpUtil.post(
+          '/management-api/master/admins/' + admin.id + '/status',
+          { status },
+          { headers: { 'Content-Type': 'application/json' }, silent: true },
+        );
+        if (!response.success) {
+          messageApi.error(response.msg || 'Status update failed');
+          return;
+        }
+        messageApi.success(admin.username + ': ' + status);
+        await queryClient.invalidateQueries({ queryKey: ['management', 'admins'] });
+      } catch (error) {
+        messageApi.error(error instanceof Error ? error.message : 'Status update failed');
       }
-      messageApi.success(admin.username + ': ' + status);
-      await queryClient.invalidateQueries({ queryKey: ['management', 'admins'] });
-    } catch (error) {
-      messageApi.error(error instanceof Error ? error.message : 'Status update failed');
-    }
-  }, [messageApi, queryClient]);
+    },
+    [messageApi, queryClient],
+  );
 
-  const roleColumns = useMemo<ColumnsType<RoleRow>>(() => [
-    { title: 'Role', dataIndex: ['role', 'name'] },
-    {
-      title: 'Client creation',
-      key: 'create',
-      render: (_: unknown, row: RoleRow) => row.role.permissions?.clients?.create?.allowed
-        ? <Tag color="success">Allowed</Tag>
-        : <Tag>Denied</Tag>,
-    },
-    {
-      title: 'Inbound read',
-      key: 'inbounds',
-      render: (_: unknown, row: RoleRow) => row.role.permissions?.inbounds?.read?.allowed
-        ? <Tag color="success">Allowed</Tag>
-        : <Tag>Denied</Tag>,
-    },
-    {
-      title: 'Edit',
-      key: 'edit',
-      render: (_: unknown, row: RoleRow) => (
-        <Button size="small" onClick={() => {
-          setSelectedRole(row);
-          roleForm.setFieldsValue(roleToForm(row.role));
-        }}>Edit</Button>
-      ),
-    },
-  ], [roleForm]);
+  const roleColumns = useMemo<ColumnsType<RoleRow>>(
+    () => [
+      { title: 'Role', dataIndex: ['role', 'name'] },
+      {
+        title: 'Client creation',
+        key: 'create',
+        render: (_: unknown, row: RoleRow) =>
+          row.role.permissions?.clients?.create?.allowed ? (
+            <Tag color="success">Allowed</Tag>
+          ) : (
+            <Tag>Denied</Tag>
+          ),
+      },
+      {
+        title: 'Inbound read',
+        key: 'inbounds',
+        render: (_: unknown, row: RoleRow) =>
+          row.role.permissions?.inbounds?.read?.allowed ? (
+            <Tag color="success">Allowed</Tag>
+          ) : (
+            <Tag>Denied</Tag>
+          ),
+      },
+      {
+        title: 'Edit',
+        key: 'edit',
+        render: (_: unknown, row: RoleRow) => (
+          <Button
+            size="small"
+            onClick={() => {
+              setSelectedRole(row);
+              roleForm.setFieldsValue(roleToForm(row.role));
+            }}
+          >
+            Edit
+          </Button>
+        ),
+      },
+    ],
+    [roleForm],
+  );
 
-  const adminColumns = useMemo<ColumnsType<AdminRow>>(() => [
-    { title: 'Username', dataIndex: 'username' },
-    {
-      title: 'Role',
-      dataIndex: 'roleId',
-      render: (id: number) => roles.find((r) => r.id === id)?.role.name || '#' + id,
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      render: (status: string) => (
-        <Tag color={status === 'active' ? 'success' : status === 'limited' ? 'warning' : 'default'}>
-          {status}
-        </Tag>
-      ),
-    },
-    {
-      title: 'Last login',
-      dataIndex: 'lastLoginAt',
-      render: (value?: string) => value ? new Date(value).toLocaleString() : 'Never',
-    },
-    {
-      title: 'Change status',
-      key: 'statusActions',
-      render: (_: unknown, row: AdminRow) => (
-        <Space wrap>
-          <Button size="small" disabled={row.status === 'active'} onClick={() => void setAdminStatus(row, 'active')}>Activate</Button>
-          <Button size="small" disabled={row.status === 'limited'} onClick={() => void setAdminStatus(row, 'limited')}>Limit</Button>
-          <Button size="small" danger disabled={row.status === 'disabled'} onClick={() => void setAdminStatus(row, 'disabled')}>Disable</Button>
-        </Space>
-      ),
-    },
-  ], [roles, setAdminStatus]);
+  const adminColumns = useMemo<ColumnsType<AdminRow>>(
+    () => [
+      { title: 'Username', dataIndex: 'username' },
+      {
+        title: 'Role',
+        dataIndex: 'roleId',
+        render: (id: number) => roles.find((r) => r.id === id)?.role.name || '#' + id,
+      },
+      {
+        title: 'Status',
+        dataIndex: 'status',
+        render: (status: string) => (
+          <Tag
+            color={status === 'active' ? 'success' : status === 'limited' ? 'warning' : 'default'}
+          >
+            {status}
+          </Tag>
+        ),
+      },
+      {
+        title: 'Last login',
+        dataIndex: 'lastLoginAt',
+        render: (value?: string) => (value ? new Date(value).toLocaleString() : 'Never'),
+      },
+      {
+        title: 'Change status',
+        key: 'statusActions',
+        render: (_: unknown, row: AdminRow) => (
+          <Space wrap>
+            <Button
+              size="small"
+              disabled={row.status === 'active'}
+              onClick={() => void setAdminStatus(row, 'active')}
+            >
+              Activate
+            </Button>
+            <Button
+              size="small"
+              disabled={row.status === 'limited'}
+              onClick={() => void setAdminStatus(row, 'limited')}
+            >
+              Limit
+            </Button>
+            <Button
+              size="small"
+              danger
+              disabled={row.status === 'disabled'}
+              onClick={() => void setAdminStatus(row, 'disabled')}
+            >
+              Disable
+            </Button>
+          </Space>
+        ),
+      },
+    ],
+    [roles, setAdminStatus],
+  );
 
-  if (loading) return <div className="admin-management-loading"><Spin size="large" /></div>;
+  if (loading)
+    return (
+      <div className="admin-management-loading">
+        <Spin size="large" />
+      </div>
+    );
 
   return (
     <div className="admin-management-page">
@@ -305,7 +363,10 @@ export default function AdminManagementPage() {
         <div>
           <Text type="secondary">EL-UI · Master controls</Text>
           <Title level={2}>Admin Management</Title>
-          <Text type="secondary">Create scoped roles and delegated accounts. Server-side authorization remains authoritative.</Text>
+          <Text type="secondary">
+            Create scoped roles and delegated accounts. Server-side authorization remains
+            authoritative.
+          </Text>
         </div>
         <Button onClick={() => void refresh()}>Refresh</Button>
       </div>
@@ -313,7 +374,9 @@ export default function AdminManagementPage() {
         <Alert
           showIcon
           type="error"
-          message={queryError instanceof Error ? queryError.message : 'Could not load management data'}
+          message={
+            queryError instanceof Error ? queryError.message : 'Could not load management data'
+          }
           description="Confirm that you are signed in to the Master Panel, then refresh the page."
           className="admin-management-error"
         />
@@ -337,10 +400,18 @@ export default function AdminManagementPage() {
               }}
               onFinish={saveRole}
             >
-              <Form.Item name="name" label="Role name" rules={[{ required: true, whitespace: true }, { max: 64 }]}>
+              <Form.Item
+                name="name"
+                label="Role name"
+                rules={[{ required: true, whitespace: true }, { max: 64 }]}
+              >
                 <Input placeholder="reseller-readonly" />
               </Form.Item>
-              <Form.Item name="permissionsJSON" label="Permissions JSON" rules={[{ required: true }]}>
+              <Form.Item
+                name="permissionsJSON"
+                label="Permissions JSON"
+                rules={[{ required: true }]}
+              >
                 <Input.TextArea rows={8} spellCheck={false} />
               </Form.Item>
               <Form.Item name="allInbounds" valuePropName="checked">
@@ -353,7 +424,13 @@ export default function AdminManagementPage() {
                   disabled={!!allInbounds}
                   options={inbounds.map((inbound) => ({
                     value: inbound.id,
-                    label: '#' + inbound.id + ' · ' + (inbound.remark || inbound.protocol) + ' : ' + inbound.port,
+                    label:
+                      '#' +
+                      inbound.id +
+                      ' · ' +
+                      (inbound.remark || inbound.protocol) +
+                      ' : ' +
+                      inbound.port,
                   }))}
                   placeholder="Select specific inbound IDs"
                 />
@@ -389,10 +466,16 @@ export default function AdminManagementPage() {
                 <Button type="primary" htmlType="submit" loading={savingRole}>
                   {selectedRole ? 'Save role' : 'Create role'}
                 </Button>
-                {selectedRole && <Button onClick={() => {
-                  setSelectedRole(null);
-                  roleForm.resetFields();
-                }}>Cancel edit</Button>}
+                {selectedRole && (
+                  <Button
+                    onClick={() => {
+                      setSelectedRole(null);
+                      roleForm.resetFields();
+                    }}
+                  >
+                    Cancel edit
+                  </Button>
+                )}
               </Space>
             </Form>
           </Card>
@@ -403,14 +486,26 @@ export default function AdminManagementPage() {
               initialValues={{ permissionOverridesJSON: '{}' }}
               onFinish={createAdmin}
             >
-              <Form.Item name="username" label="Username" rules={[{ required: true, min: 3, max: 64, pattern: /^[a-zA-Z0-9][a-zA-Z0-9._-]*$/ }]}>
+              <Form.Item
+                name="username"
+                label="Username"
+                rules={[
+                  { required: true, min: 3, max: 64, pattern: /^[a-zA-Z0-9][a-zA-Z0-9._-]*$/ },
+                ]}
+              >
                 <Input autoComplete="off" />
               </Form.Item>
-              <Form.Item name="password" label="Initial password (12–72 bytes)" rules={[{ required: true, min: 12, max: 72 }]}>
+              <Form.Item
+                name="password"
+                label="Initial password (12–72 bytes)"
+                rules={[{ required: true, min: 12, max: 72 }]}
+              >
                 <Input.Password autoComplete="new-password" />
               </Form.Item>
               <Form.Item name="roleId" label="Role" rules={[{ required: true }]}>
-                <Select options={roles.map((role) => ({ value: role.id, label: role.role.name }))} />
+                <Select
+                  options={roles.map((role) => ({ value: role.id, label: role.role.name }))}
+                />
               </Form.Item>
               <Form.Item name="permissionOverridesJSON" label="Per-admin limit overrides (JSON)">
                 <Input.TextArea rows={3} spellCheck={false} />
@@ -423,7 +518,13 @@ export default function AdminManagementPage() {
         </Col>
         <Col xs={24} xl={12}>
           <Card title="Roles">
-            <Table<RoleRow> rowKey="id" size="small" columns={roleColumns} dataSource={roles} pagination={{ pageSize: 6 }} />
+            <Table<RoleRow>
+              rowKey="id"
+              size="small"
+              columns={roleColumns}
+              dataSource={roles}
+              pagination={{ pageSize: 6 }}
+            />
           </Card>
           <Card title="Delegated administrators" className="admin-management-card">
             <Table<AdminRow>
