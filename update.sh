@@ -781,7 +781,7 @@ update_x-ui() {
     # Never fatal.
     setup_fail2ban
 
-    echo -e "${green}x-ui ${tag_version}${plain} updating finished, it is running now..."
+    echo -e "${green}EL-UI ${tag_version}${plain} update finished, it is running now..."
     echo -e ""
     echo -e "┌───────────────────────────────────────────────────────┐
 │  ${blue}EL-UI control menu usages (subcommands):${plain}              │
