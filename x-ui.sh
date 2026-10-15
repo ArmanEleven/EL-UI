@@ -1680,7 +1680,7 @@ ssl_cert_issue_for_ip() {
     done
 
     # Reload command - restarts panel after renewal
-    local reloadCmd="systemctl restart x-ui 2>/dev/null || rc-service x-ui restart 2>/dev/null"
+    local reloadCmd="el-ui restart"
 
     # issue the certificate for IP with shortlived profile
     ~/.acme.sh/acme.sh --set-default-ca --server letsencrypt --force
@@ -3479,7 +3479,7 @@ show_usage() {
     echo -e "┌────────────────────────────────────────────────────────────────┐
 │  ${blue}EL-UI control menu usages (subcommands):${plain}                       │
 │                                                                │
-│  ${blue}el-ui${plain}                       - Admin Management Script          │
+│  ${blue}el-ui${plain}                       - Panel Management CLI          │
 │  ${blue}el-ui start${plain}                 - Start                            │
 │  ${blue}el-ui stop${plain}                  - Stop                             │
 │  ${blue}el-ui restart${plain}               - Restart                          │
