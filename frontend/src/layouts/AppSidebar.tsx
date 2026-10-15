@@ -368,7 +368,7 @@ export default function AppSidebar() {
         collapsedWidth={RAIL_WIDTH}
         collapsed={railCollapsed}
       >
-        <div className="sider-brand">
+        <div className={`sider-brand${railCollapsed ? ' is-collapsed' : ''}`}>
           <div className="brand-block">
             <span className="brand-mark" aria-hidden="true">EL</span>
             <span className="brand-text">{railCollapsed ? 'EL' : 'EL-UI'}</span>
