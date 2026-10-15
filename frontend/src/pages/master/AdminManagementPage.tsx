@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Alert,
   Button,
@@ -11,6 +12,7 @@ import {
   Row,
   Select,
   Space,
+  Spin,
   Table,
   Tag,
   Typography,
@@ -64,6 +66,14 @@ const DEFAULT_PERMISSIONS = JSON.stringify({
   inbounds: { read: { allowed: true, scope: 1 } },
 }, null, 2);
 
+async function fetchManagementList<T>(path: string): Promise<T[]> {
+  const response = await HttpUtil.get<T[]>(path, undefined, { silent: true });
+  if (!response?.success) {
+    throw new Error(response?.msg || 'Could not load management data');
+  }
+  return response.obj ?? [];
+}
+
 function parseJSON<T>(raw: string, label: string): T {
   try {
     return JSON.parse(raw) as T;
@@ -90,9 +100,7 @@ function roleToForm(role: Role): Partial<RoleForm> {
 
 export default function AdminManagementPage() {
   const [messageApi, contextHolder] = message.useMessage();
-  const [roles, setRoles] = useState<RoleRow[]>([]);
-  const [admins, setAdmins] = useState<AdminRow[]>([]);
-  const [inbounds, setInbounds] = useState<InboundRow[]>([]);
+  const queryClient = useQueryClient();
   const [savingRole, setSavingRole] = useState(false);
   const [savingAdmin, setSavingAdmin] = useState(false);
   const [selectedRole, setSelectedRole] = useState<RoleRow | null>(null);
@@ -100,29 +108,32 @@ export default function AdminManagementPage() {
   const [adminForm] = Form.useForm<AdminForm>();
   const allInbounds = Form.useWatch('allInbounds', roleForm);
 
-  const load = useCallback(async () => {
-    try {
-      const [roleResponse, adminResponse, inboundResponse] = await Promise.all([
-        HttpUtil.get<RoleRow[]>('/management-api/master/roles', undefined, { silent: true }),
-        HttpUtil.get<AdminRow[]>('/management-api/master/admins', undefined, { silent: true }),
-        HttpUtil.get<InboundRow[]>('/management-api/master/inbounds', undefined, { silent: true }),
-      ]);
-      if (!roleResponse.success || !adminResponse.success || !inboundResponse.success) {
-        messageApi.error(
-          roleResponse.msg || adminResponse.msg || inboundResponse.msg || 'Master access required',
-        );
-      }
-      setRoles(roleResponse.success && roleResponse.obj ? roleResponse.obj : []);
-      setAdmins(adminResponse.success && adminResponse.obj ? adminResponse.obj : []);
-      setInbounds(inboundResponse.success && inboundResponse.obj ? inboundResponse.obj : []);
-    } catch (error) {
-      messageApi.error(error instanceof Error ? error.message : 'Could not load admin settings');
-    }
-  }, [messageApi]);
+  const rolesQuery = useQuery({
+    queryKey: ['management', 'roles'],
+    queryFn: () => fetchManagementList<RoleRow>('/management-api/master/roles'),
+  });
+  const adminsQuery = useQuery({
+    queryKey: ['management', 'admins'],
+    queryFn: () => fetchManagementList<AdminRow>('/management-api/master/admins'),
+  });
+  const inboundsQuery = useQuery({
+    queryKey: ['management', 'inbounds'],
+    queryFn: () => fetchManagementList<InboundRow>('/management-api/master/inbounds'),
+  });
 
-  useEffect(() => {
-    void load();
-  }, [load]);
+  const roles = rolesQuery.data ?? [];
+  const admins = adminsQuery.data ?? [];
+  const inbounds = inboundsQuery.data ?? [];
+  const loading = rolesQuery.isPending || adminsQuery.isPending || inboundsQuery.isPending;
+  const queryError = rolesQuery.error || adminsQuery.error || inboundsQuery.error;
+
+  const refresh = useCallback(async () => {
+    await Promise.all([
+      rolesQuery.refetch(),
+      adminsQuery.refetch(),
+      inboundsQuery.refetch(),
+    ]);
+  }, [adminsQuery, inboundsQuery, rolesQuery]);
 
   const saveRole = useCallback(async (values: RoleForm) => {
     setSavingRole(true);
@@ -163,13 +174,13 @@ export default function AdminManagementPage() {
       messageApi.success(selectedRole ? 'Role updated' : 'Role created');
       setSelectedRole(null);
       roleForm.resetFields();
-      await load();
+      await queryClient.invalidateQueries({ queryKey: ['management', 'roles'] });
     } catch (error) {
       messageApi.error(error instanceof Error ? error.message : 'Invalid role settings');
     } finally {
       setSavingRole(false);
     }
-  }, [load, messageApi, roleForm, selectedRole]);
+  }, [messageApi, queryClient, roleForm, selectedRole]);
 
   const createAdmin = useCallback(async (values: AdminForm) => {
     setSavingAdmin(true);
@@ -193,27 +204,31 @@ export default function AdminManagementPage() {
       }
       messageApi.success('Administrator created');
       adminForm.resetFields();
-      await load();
+      await queryClient.invalidateQueries({ queryKey: ['management', 'admins'] });
     } catch (error) {
       messageApi.error(error instanceof Error ? error.message : 'Invalid override JSON');
     } finally {
       setSavingAdmin(false);
     }
-  }, [adminForm, load, messageApi]);
+  }, [adminForm, messageApi, queryClient]);
 
   const setAdminStatus = useCallback(async (admin: AdminRow, status: AdminRow['status']) => {
-    const response = await HttpUtil.post(
-      '/management-api/master/admins/' + admin.id + '/status',
-      { status },
-      { headers: { 'Content-Type': 'application/json' }, silent: true },
-    );
-    if (!response.success) {
-      messageApi.error(response.msg || 'Status update failed');
-      return;
+    try {
+      const response = await HttpUtil.post(
+        '/management-api/master/admins/' + admin.id + '/status',
+        { status },
+        { headers: { 'Content-Type': 'application/json' }, silent: true },
+      );
+      if (!response.success) {
+        messageApi.error(response.msg || 'Status update failed');
+        return;
+      }
+      messageApi.success(admin.username + ': ' + status);
+      await queryClient.invalidateQueries({ queryKey: ['management', 'admins'] });
+    } catch (error) {
+      messageApi.error(error instanceof Error ? error.message : 'Status update failed');
     }
-    messageApi.success(admin.username + ': ' + status);
-    await load();
-  }, [load, messageApi]);
+  }, [messageApi, queryClient]);
 
   const roleColumns = useMemo<ColumnsType<RoleRow>>(() => [
     { title: 'Role', dataIndex: ['role', 'name'] },
@@ -277,6 +292,8 @@ export default function AdminManagementPage() {
     },
   ], [roles, setAdminStatus]);
 
+  if (loading) return <div className="admin-management-loading"><Spin size="large" /></div>;
+
   return (
     <div className="admin-management-page">
       {contextHolder}
@@ -286,8 +303,17 @@ export default function AdminManagementPage() {
           <Title level={2}>Admin Management</Title>
           <Text type="secondary">Create scoped roles and delegated accounts. Server-side authorization remains authoritative.</Text>
         </div>
-        <Button onClick={() => void load()}>Refresh</Button>
+        <Button onClick={() => void refresh()}>Refresh</Button>
       </div>
+      {queryError && (
+        <Alert
+          showIcon
+          type="error"
+          message={queryError instanceof Error ? queryError.message : 'Could not load management data'}
+          description="Confirm that you are signed in to the Master Panel, then refresh the page."
+          className="admin-management-error"
+        />
+      )}
       <Alert
         showIcon
         type="warning"
