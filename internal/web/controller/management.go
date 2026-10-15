@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math"
 	"net/http"
@@ -60,9 +61,11 @@ func (a *ManagementController) initRouter(g *gin.RouterGroup) {
 
 	master := api.Group("/master")
 	master.Use(a.requireNativeOwner)
+	master.GET("/inbounds", a.listMasterInbounds)
 	master.GET("/roles", a.listRoles)
 	master.POST("/roles", a.createRole)
 	master.PUT("/roles/:id", a.updateRole)
+	master.POST("/roles/:id", a.updateRole)
 	master.GET("/admins", a.listAdmins)
 	master.POST("/admins", a.createAdmin)
 	master.PATCH("/admins/:id/status", a.setAdminStatus)
@@ -315,6 +318,26 @@ func canManagementAccessInbound(admin *rbac.Admin, inboundID int64) bool {
 	}
 }
 
+func canUseOwnedManagementInbound(admin *rbac.Admin, inboundID int64) bool {
+	if !canManagementAccessInbound(admin, inboundID) {
+		return false
+	}
+	ownerID, err := nativeOwnerID()
+	if err != nil {
+		return false
+	}
+	db := database.GetDB()
+	if db == nil {
+		return false
+	}
+	var count int64
+	if err := db.Model(&model.Inbound{}).
+		Where("id = ? AND user_id = ?", inboundID, ownerID).Count(&count).Error; err != nil {
+		return false
+	}
+	return count == 1
+}
+
 func nativeOwnerID() (int, error) {
 	db := database.GetDB()
 	if db == nil {
@@ -325,6 +348,26 @@ func nativeOwnerID() (int, error) {
 		return 0, err
 	}
 	return owner.Id, nil
+}
+
+func (a *ManagementController) listMasterInbounds(c *gin.Context) {
+	ownerID, err := nativeOwnerID()
+	if err != nil {
+		managementJSON(c, http.StatusInternalServerError, false, "could not load panel owner", nil)
+		return
+	}
+	var inbounds []model.Inbound
+	if err := database.GetDB().Model(&model.Inbound{}).
+		Select("id, user_id, up, down, total, remark, enable, expiry_time, traffic_reset, port, protocol, tag, node_id, settings").
+		Where("user_id = ?", ownerID).Order("id ASC").Find(&inbounds).Error; err != nil {
+		managementJSON(c, http.StatusInternalServerError, false, "could not list master inbounds", nil)
+		return
+	}
+	out := make([]managementInboundView, 0, len(inbounds))
+	for _, inbound := range inbounds {
+		out = append(out, projectManagementInbound(inbound))
+	}
+	managementJSON(c, http.StatusOK, true, "", out)
 }
 
 func (a *ManagementController) listInbounds(c *gin.Context) {
@@ -436,6 +479,9 @@ func validateManagementClientPayload(admin *rbac.Admin, payload *service.ClientC
 	if len(payload.InboundIds) == 0 {
 		return fmt.Errorf("at least one permitted inbound is required")
 	}
+	if payload.Client.ExpiryTime < 0 {
+		return fmt.Errorf("client expiry must be non-negative")
+	}
 	seen := make(map[int]struct{}, len(payload.InboundIds))
 	for _, id := range payload.InboundIds {
 		if id <= 0 {
@@ -445,7 +491,7 @@ func validateManagementClientPayload(admin *rbac.Admin, payload *service.ClientC
 			return fmt.Errorf("inbound IDs must not contain duplicates")
 		}
 		seen[id] = struct{}{}
-		if !canManagementAccessInbound(admin, int64(id)) {
+		if !canUseOwnedManagementInbound(admin, int64(id)) {
 			return fmt.Errorf("one or more selected inbounds are not permitted")
 		}
 	}
@@ -529,38 +575,48 @@ func (a *ManagementController) createClient(c *gin.Context) {
 	managementClientCreateMu.Lock()
 	defer managementClientCreateMu.Unlock()
 
-	var existing model.ClientRecord
-	err := db.Where("LOWER(email) = LOWER(?)", strings.TrimSpace(payload.Client.Email)).First(&existing).Error
-	if err == nil {
-		managementJSON(c, http.StatusConflict, false, "client email is already in use", nil)
-		return
-	}
-	if err != gorm.ErrRecordNotFound {
-		managementJSON(c, http.StatusInternalServerError, false, "could not verify client email", nil)
-		return
-	}
-	var owned int64
-	if err := db.Model(&model.ManagementAdminClient{}).Where("management_admin_id = ?", admin.ID).Count(&owned).Error; err != nil {
-		managementJSON(c, http.StatusInternalServerError, false, "could not verify client limit", nil)
-		return
-	}
-	limits := rbac.EffectiveLimits(admin.Role.Limits, admin.PermissionOverrides)
-	if limits.MaxUsers != nil && owned >= *limits.MaxUsers {
-		managementJSON(c, http.StatusForbidden, false, "client count limit reached", nil)
-		return
-	}
-	// Lock the database admin row while reserving ownership. The process-local
-	// mutex serializes this endpoint; the DB lock also protects PostgreSQL when
-	// requests arrive through more than one handler instance in this process.
-	if err := db.Transaction(func(tx *gorm.DB) error {
+	errEmailTaken := errors.New("management client email already exists")
+	errLimitReached := errors.New("management client limit reached")
+	err := db.Transaction(func(tx *gorm.DB) error {
+		// Serialize reservations for this admin before counting, so concurrent
+		// requests cannot both pass the same max-users check.
 		var locked model.ManagementAdmin
 		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).First(&locked, int(admin.ID)).Error; err != nil {
 			return err
 		}
+		var existing int64
+		if err := tx.Model(&model.ClientRecord{}).
+			Where("LOWER(email) = LOWER(?)", strings.TrimSpace(payload.Client.Email)).
+			Count(&existing).Error; err != nil {
+			return err
+		}
+		if existing > 0 {
+			return errEmailTaken
+		}
+		var owned int64
+		if err := tx.Model(&model.ManagementAdminClient{}).
+			Where("management_admin_id = ?", admin.ID).Count(&owned).Error; err != nil {
+			return err
+		}
+		limits := rbac.EffectiveLimits(admin.Role.Limits, admin.PermissionOverrides)
+		if limits.MaxUsers != nil && owned >= *limits.MaxUsers {
+			return errLimitReached
+		}
 		return tx.Create(&model.ManagementAdminClient{
-			ManagementAdminID: int(admin.ID), Email: strings.TrimSpace(payload.Client.Email), CreatedAt: time.Now().UTC(),
+			ManagementAdminID: int(admin.ID),
+			Email: strings.TrimSpace(payload.Client.Email),
+			CreatedAt: time.Now().UTC(),
 		}).Error
-	}); err != nil {
+	})
+	if errors.Is(err, errEmailTaken) {
+		managementJSON(c, http.StatusConflict, false, "client email is already in use", nil)
+		return
+	}
+	if errors.Is(err, errLimitReached) {
+		managementJSON(c, http.StatusForbidden, false, "client count limit reached", nil)
+		return
+	}
+	if err != nil {
 		managementJSON(c, http.StatusConflict, false, "client ownership could not be reserved", nil)
 		return
 	}
@@ -697,6 +753,24 @@ func (a *ManagementController) updateRole(c *gin.Context) {
 		managementJSON(c, http.StatusBadRequest, false, err.Error(), nil)
 		return
 	}
+	// Refuse role-limit changes that would make existing per-admin overrides
+	// wider than the new role policy, which would lock those admins out.
+	var assigned []model.ManagementAdmin
+	if err := database.GetDB().Where("role_id = ?", id).Find(&assigned).Error; err != nil {
+		managementJSON(c, http.StatusInternalServerError, false, "could not validate assigned administrators", nil)
+		return
+	}
+	for _, admin := range assigned {
+		var overrides rbac.RoleLimits
+		if err := decodeStoredJSON(admin.PermissionOverridesJSON, &overrides); err != nil {
+			managementJSON(c, http.StatusConflict, false, "an assigned administrator has invalid limit overrides", nil)
+			return
+		}
+		if err := rbac.ValidateLimitOverrides(role.Limits, overrides); err != nil {
+			managementJSON(c, http.StatusConflict, false, "new role limits conflict with an assigned administrator override", nil)
+			return
+		}
+	}
 	updates := map[string]any{
 		"name": role.Name, "is_owner": false,
 		"permissions_json": encodeStoredJSON(role.Permissions),
@@ -759,7 +833,7 @@ func (a *ManagementController) createAdmin(c *gin.Context) {
 		managementJSON(c, http.StatusBadRequest, false, "username must be 3-64 safe characters", nil)
 		return
 	}
-	if len([]rune(input.Password)) < 12 || len(input.Password) > 72 {
+	if len(input.Password) < 12 || len(input.Password) > 72 {
 		managementJSON(c, http.StatusBadRequest, false, "password must be 12-72 bytes for bcrypt", nil)
 		return
 	}
