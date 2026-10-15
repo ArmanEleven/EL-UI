@@ -295,9 +295,7 @@ export default function AdminPortalPage() {
                 <Descriptions.Item label={t('adminPortal.administrator')}>
                   {me.username}
                 </Descriptions.Item>
-                <Descriptions.Item label={t('adminPortal.role')}>
-                  {me.role.name}
-                </Descriptions.Item>
+                <Descriptions.Item label={t('adminPortal.role')}>{me.role.name}</Descriptions.Item>
                 <Descriptions.Item label={t('adminPortal.allowedInbounds')}>
                   {inbounds.length}
                 </Descriptions.Item>
@@ -366,11 +364,7 @@ export default function AdminPortalPage() {
           <Col xs={24} xl={canCreate ? 14 : 24}>
             <Card title={t('adminPortal.managedClients')}>
               {!canReadClients ? (
-                <Alert
-                  type="info"
-                  showIcon
-                  message={t('adminPortal.noViewClientsPermission')}
-                />
+                <Alert type="info" showIcon message={t('adminPortal.noViewClientsPermission')} />
               ) : (
                 <Table<SafeClient>
                   rowKey="email"
