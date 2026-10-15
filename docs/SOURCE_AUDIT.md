@@ -7,32 +7,40 @@ remains a later engineering task.**
 
 -  [Sanaei 3X-UI](https://github.com/MHSanaei/3x-ui) - `go.mod`: Go module
   `github.com/mhsanaei/3x-ui/v3`, uses Gin, GORM, SQLite/PostgreSQL drivers, Xray libraries and
-  other runtime dependencies. - `docs/architecture.md`: describes Go as the backend source of truth,
+  other runtime dependencies.
+- `docs/architecture.md`: describes Go as the backend source of truth,
   a React/Vite SPA embedded in the Go binary, a separate subscription server, and a runtime
-  abstraction for local/remote nodes. - `internal/web/controller/api.go`: confirms API routes under
+  abstraction for local/remote nodes.
+- `internal/web/controller/api.go`: confirms API routes under
   `/panel/api`, token scopes, CSRF middleware, and native routes for inbounds, clients, server,
-  nodes, and hosts. - `frontend/package.json`: React 19, Ant Design 6, Vite 8, TypeScript, React
-  Router, TanStack Query, Zod, and Vitest scripts. - The repository identifies its license as
+  nodes, and hosts.
+- `frontend/package.json`: React 19, Ant Design 6, Vite 8, TypeScript, React
+  Router, TanStack Query, Zod, and Vitest scripts.
+- The repository identifies its license as
   GPL-3.0.
-
 -  [HMPanel](https://github.com/neoauroraproject/hmpanel) - `README.md`: describes HMPanel as a
   management layer on top of native 3X-UI, with multi-panel/reseller management, advanced traffic
-  accounting, bulk operations, migration, and backup/restore. - `prisma/schema.prisma`: defines a
+  accounting, bulk operations, migration, and backup/restore.
+- `prisma/schema.prisma`: defines a
   separate PostgreSQL management database with Server, Panel, Admin, Inbound, Client and related
   models; includes reseller roles, quota/traffic modes, panel capability metadata and audit-related
-  relations. - `backend/package.json`: NestJS 11 / TypeScript backend with JWT/passport, Bull/Redis,
+  relations.
+- `backend/package.json`: NestJS 11 / TypeScript backend with JWT/passport, Bull/Redis,
   Socket.IO, Axios, Prisma-related tooling and Jest. Notably, the package metadata says `"license":
-  "UNLICENSED"`. - `frontend/package.json`: Next.js 16, React 19, Tailwind CSS 4, Zustand, TanStack
-  Query, Recharts and Socket.IO client. - `docker-compose.yml` and `.env.example`: deploys app +
+  "UNLICENSED"`.
+- `frontend/package.json`: Next.js 16, React 19, Tailwind CSS 4, Zustand, TanStack
+  Query, Recharts and Socket.IO client.
+- `docker-compose.yml` and `.env.example`: deploys app +
   PostgreSQL + Redis; expects JWT/database/admin secrets. Compose mounts the Docker socket, which is
-  a high-privilege capability and must not be copied without a deliberate threat review. - The
+  a high-privilege capability and must not be copied without a deliberate threat review.
+- The
   README states MIT, but a root `LICENSE` file was not found by the connected repository file
   lookup. This conflicts with the backend package's `UNLICENSED` metadata; do not copy/re-distribute
   HMPanel backend source until its applicable license and provenance are clarified.
-
 -  [ArmanEleven/ElevenPanel](https://github.com/ArmanEleven/ElevenPanel) - This is a separate
   repository, not the target EL-UI repository. Its README describes a similar management-layer
-  direction and its `go.mod` declares a Go module. - It should be reviewed as a potentially relevant
+  direction and its `go.mod` declares a Go module.
+- It should be reviewed as a potentially relevant
   existing project before duplicating effort, but it will not be merged into EL-UI automatically.
 
 ## Main compatibility finding
@@ -63,11 +71,17 @@ Preserve upstream attribution and GPL obligations for any derivative 3X-UI distr
 
 ## Remaining checks before implementation
 
--  Pin exact upstream commits/releases instead of tracking moving `main` branches. - Map every
-  HMPanel operation to exact 3X-UI API endpoints and request/response contracts. - Audit schema
+-  Pin exact upstream commits/releases instead of tracking moving `main` branches.
+- Map every
+  HMPanel operation to exact 3X-UI API endpoints and request/response contracts.
+- Audit schema
   migrations and data ownership for panels, clients, inbounds, traffic, quotas and reseller
-  permissions. - Review auth/session/CSRF and secret handling in both projects. - Inspect the
-  existing ElevenPanel repository to determine whether it contains reusable project-specific work. -
-  Decide and document the license/distribution strategy before bundling or redistributing source. -
+  permissions.
+- Review auth/session/CSRF and secret handling in both projects.
+- Inspect the
+  existing ElevenPanel repository to determine whether it contains reusable project-specific work.
+-
+  Decide and document the license/distribution strategy before bundling or redistributing source.
+-
   Implement a disposable-environment proof of concept; do not test migrations against production
   data.
