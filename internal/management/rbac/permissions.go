@@ -111,15 +111,33 @@ func ListOwnerScope(admin *Admin, resource, action string) (OwnerScope, error) {
 func EffectiveLimits(roleLimits, overrides RoleLimits) RoleLimits {
 	result := cloneLimits(roleLimits)
 	overrideLimits := cloneLimits(overrides)
-	if overrideLimits.MaxUsers != nil { result.MaxUsers = overrideLimits.MaxUsers }
-	if overrideLimits.DataLimitMin != nil { result.DataLimitMin = overrideLimits.DataLimitMin }
-	if overrideLimits.DataLimitMax != nil { result.DataLimitMax = overrideLimits.DataLimitMax }
-	if overrideLimits.ExpireMin != nil { result.ExpireMin = overrideLimits.ExpireMin }
-	if overrideLimits.ExpireMax != nil { result.ExpireMax = overrideLimits.ExpireMax }
-	if overrideLimits.MinHWIDPerUser != nil { result.MinHWIDPerUser = overrideLimits.MinHWIDPerUser }
-	if overrideLimits.MaxHWIDPerUser != nil { result.MaxHWIDPerUser = overrideLimits.MaxHWIDPerUser }
-	if overrideLimits.OnHoldTimeoutMin != nil { result.OnHoldTimeoutMin = overrideLimits.OnHoldTimeoutMin }
-	if overrideLimits.OnHoldTimeoutMax != nil { result.OnHoldTimeoutMax = overrideLimits.OnHoldTimeoutMax }
+	if overrideLimits.MaxUsers != nil {
+		result.MaxUsers = overrideLimits.MaxUsers
+	}
+	if overrideLimits.DataLimitMin != nil {
+		result.DataLimitMin = overrideLimits.DataLimitMin
+	}
+	if overrideLimits.DataLimitMax != nil {
+		result.DataLimitMax = overrideLimits.DataLimitMax
+	}
+	if overrideLimits.ExpireMin != nil {
+		result.ExpireMin = overrideLimits.ExpireMin
+	}
+	if overrideLimits.ExpireMax != nil {
+		result.ExpireMax = overrideLimits.ExpireMax
+	}
+	if overrideLimits.MinHWIDPerUser != nil {
+		result.MinHWIDPerUser = overrideLimits.MinHWIDPerUser
+	}
+	if overrideLimits.MaxHWIDPerUser != nil {
+		result.MaxHWIDPerUser = overrideLimits.MaxHWIDPerUser
+	}
+	if overrideLimits.OnHoldTimeoutMin != nil {
+		result.OnHoldTimeoutMin = overrideLimits.OnHoldTimeoutMin
+	}
+	if overrideLimits.OnHoldTimeoutMax != nil {
+		result.OnHoldTimeoutMax = overrideLimits.OnHoldTimeoutMax
+	}
 	return result
 }
 
@@ -132,7 +150,9 @@ func cloneLimits(v RoleLimits) RoleLimits {
 	}
 }
 func cloneInt64(v *int64) *int64 {
-	if v == nil { return nil }
+	if v == nil {
+		return nil
+	}
 	copied := *v
 	return &copied
 }
