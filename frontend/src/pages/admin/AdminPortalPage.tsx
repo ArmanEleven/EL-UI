@@ -302,7 +302,7 @@ export default function AdminPortalPage() {
                   {inbounds.length}
                 </Descriptions.Item>
                 <Descriptions.Item label={t('adminPortal.clientLimit')}>
-                  {me.effectiveLimits.max_users ?? 'Unlimited'}
+                  {me.effectiveLimits.max_users ?? t('unlimited')}
                 </Descriptions.Item>
               </Descriptions>
             </Card>
