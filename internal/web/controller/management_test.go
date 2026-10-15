@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+
 	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
 	"github.com/mhsanaei/3x-ui/v3/internal/management/rbac"
 	"github.com/mhsanaei/3x-ui/v3/internal/web/service"
@@ -132,4 +133,3 @@ func TestManagementPortalKeepsInboundRoutesReadOnlyAndMasterRoutesProtected(t *t
 		}
 	}
 }
-
