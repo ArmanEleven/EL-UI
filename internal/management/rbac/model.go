@@ -17,7 +17,7 @@ const (
 	ResourceCores           = "cores"
 	ResourceSettings        = "settings"
 	ResourceSystem          = "system"
-	ResourceHWIDs            = "hwids"
+	ResourceHWIDs           = "hwids"
 	ResourceAdminRoles      = "admin_roles"
 	ResourceAPIKeys         = "api_keys"
 )
