@@ -255,3 +255,11 @@
     white-space: normal;
   }
 }
+
+[dir='rtl'] .elui-inbound-modal .ant-modal-title {
+  letter-spacing: normal;
+}
+[dir='rtl'] .elui-inbound-modal .advanced-panel__subtitle,
+[dir='rtl'] .elui-inbound-modal .advanced-editor-meta {
+  text-align: start;
+}
