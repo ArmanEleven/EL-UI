@@ -39,13 +39,13 @@ remains a later engineering task.**
 
 The codebases are not drop-in compatible:
 
-| Concern | 3X-UI | HMPanel |
-| --- | --- | --- |
-| Core runtime | Go service, Gin, GORM | Separate NestJS/Node management API |
-| Web frontend | React + Vite + Ant Design; built assets embedded in Go | Next.js + React + Tailwind |
-| Management data | Native panel database and APIs | Separate PostgreSQL/Prisma schema |
-| Background work | Go-managed jobs and panel runtime | NestJS scheduling/queues, Redis/Bull |
-| Integration | Native REST API and local/remote node runtime | Adapter calls to 3X-UI APIs and synchronization |
+| Concern         | 3X-UI                                                  | HMPanel                                         |
+| --------------- | ------------------------------------------------------ | ----------------------------------------------- |
+| Core runtime    | Go service, Gin, GORM                                  | Separate NestJS/Node management API             |
+| Web frontend    | React + Vite + Ant Design; built assets embedded in Go | Next.js + React + Tailwind                      |
+| Management data | Native panel database and APIs                         | Separate PostgreSQL/Prisma schema               |
+| Background work | Go-managed jobs and panel runtime                      | NestJS scheduling/queues, Redis/Bull            |
+| Integration     | Native REST API and local/remote node runtime          | Adapter calls to 3X-UI APIs and synchronization |
 
 A visual-only rebrand will not provide HMPanel's management capabilities. A blind merge would also
 create duplicated data models, runtime assumptions, and upgrade risk.
