@@ -15,6 +15,7 @@ const XrayPage = lazy(() => import('@/pages/xray/XrayPage'));
 const ApiDocsPage = lazy(() => import('@/pages/api-docs/ApiDocsPage'));
 const SponsorsPage = lazy(() => import('@/pages/sponsors/SponsorsPage'));
 const AdminPortalPage = lazy(() => import('@/pages/admin/AdminPortalPage'));
+const AdminManagementPage = lazy(() => import('@/pages/master/AdminManagementPage'));
 
 function withSuspense(node: React.ReactNode) {
   return (
@@ -54,9 +55,11 @@ const routes: RouteObject[] = [
       { path: 'routing', element: withSuspense(<XrayPage />) },
       { path: 'api-docs', element: withSuspense(<ApiDocsPage />) },
       { path: 'sponsors', element: withSuspense(<SponsorsPage />) },
-      { path: 'admin', element: withSuspense(<AdminPortalPage />) },
+      { path: 'admin-management', element: withSuspense(<AdminManagementPage />) },
     ],
   },
+  // Keep delegated admins out of the native Master Panel layout and websocket bridge.
+  { path: '/admin', element: withSuspense(<AdminPortalPage />) },
 ];
 
 function computeBasename() {
