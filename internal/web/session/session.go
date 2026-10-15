@@ -14,11 +14,11 @@ import (
 )
 
 const (
-	loginUserKey      = "LOGIN_USER"
-	loginEpochKey         = "LOGIN_EPOCH"
-	managementAdminIDKey  = "MANAGEMENT_ADMIN_ID"
-	apiAuthUserKey        = "api_auth_user"
-	sessionCookieName = "3x-ui"
+	loginUserKey         = "LOGIN_USER"
+	loginEpochKey        = "LOGIN_EPOCH"
+	managementAdminIDKey = "MANAGEMENT_ADMIN_ID"
+	apiAuthUserKey       = "api_auth_user"
+	sessionCookieName    = "3x-ui"
 )
 
 func init() {
@@ -54,6 +54,12 @@ func SetManagementLogin(c *gin.Context, adminID int) error {
 // ManagementAdminID returns the validated positive ID held by a management
 // session, or zero when this cookie does not represent that identity.
 func ManagementAdminID(c *gin.Context) int {
+	if c == nil {
+		return 0
+	}
+	if _, ok := c.Get("github.com/gin-contrib/sessions"); !ok {
+		return 0
+	}
 	s := sessions.Default(c)
 	switch v := s.Get(managementAdminIDKey).(type) {
 	case int:
@@ -79,13 +85,21 @@ func SetAPIAuthUser(c *gin.Context, user *model.User) {
 }
 
 func GetLoginUser(c *gin.Context) *model.User {
-	if IsManagementLogin(c) {
-		return nil
-	}
 	if v, ok := c.Get(apiAuthUserKey); ok {
 		if u, ok2 := v.(*model.User); ok2 {
 			return u
 		}
+	}
+	// Internal handlers and some trusted API routes do not install browser
+	// sessions. Treat them as anonymous rather than panicking on a missing key.
+	if c == nil {
+		return nil
+	}
+	if _, ok := c.Get("github.com/gin-contrib/sessions"); !ok {
+		return nil
+	}
+	if IsManagementLogin(c) {
+		return nil
 	}
 	s := sessions.Default(c)
 	obj := s.Get(loginUserKey)

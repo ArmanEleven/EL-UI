@@ -46,7 +46,6 @@ func TestSessionUserIDSupportsLegacyUserPayload(t *testing.T) {
 	}
 }
 
-
 func TestManagementLoginIsSeparateFromNativePanelSession(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
@@ -91,13 +90,34 @@ func TestSetNativeLoginClearsManagementIdentity(t *testing.T) {
 		if IsManagementLogin(c) || ManagementAdminID(c) != 0 {
 			t.Fatal("native login must clear management identity")
 		}
-		if GetLoginUser(c) == nil {
-			t.Fatal("native login should remain active")
+		if got := sessions.Default(c).Get(loginUserKey); got != 7 {
+			t.Fatalf("native login ID = %#v, want 7", got)
+		}
+		if got := sessions.Default(c).Get(loginEpochKey); got != int64(0) {
+			t.Fatalf("native login epoch = %#v, want 0", got)
 		}
 		c.Status(http.StatusNoContent)
 	})
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/switch", nil)
+	router.ServeHTTP(rec, req)
+	if rec.Code != http.StatusNoContent {
+		t.Fatalf("status = %d, want 204", rec.Code)
+	}
+}
+
+
+func TestGetLoginUserWithoutSessionMiddlewareReturnsAnonymous(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	router := gin.New()
+	router.GET("/", func(c *gin.Context) {
+		if IsLogin(c) || IsManagementLogin(c) || GetLoginUser(c) != nil {
+			t.Fatal("request without session middleware must stay anonymous")
+		}
+		c.Status(http.StatusNoContent)
+	})
+	rec := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	router.ServeHTTP(rec, req)
 	if rec.Code != http.StatusNoContent {
 		t.Fatalf("status = %d, want 204", rec.Code)

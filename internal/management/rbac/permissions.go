@@ -128,9 +128,9 @@ func ListOwnerScope(admin *Admin, resource, action string) (OwnerScope, error) {
 // leaves a value unlimited, but must not weaken an inherited bound.
 func ValidateLimitOverrides(roleLimits, overrides RoleLimits) error {
 	checks := []struct {
-		name string
+		name           string
 		base, override *int64
-		limit string
+		limit          string
 	}{
 		{"max_users", roleLimits.MaxUsers, overrides.MaxUsers, "max"},
 		{"data_limit_min", roleLimits.DataLimitMin, overrides.DataLimitMin, "min"},
