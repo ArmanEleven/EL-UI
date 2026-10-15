@@ -180,7 +180,7 @@ func TestOwnScopeFailsClosedForUnsupportedResources(t *testing.T) {
 
 func TestOwnScopeRestrictsClientOwnership(t *testing.T) {
 	admin := adminWith(AdminActive, Permissions{ResourceClients: {ActionRead: AllowOwn()}})
-	ownID, otherID := admin.ID, admin.ID + 1
+	ownID, otherID := admin.ID, admin.ID+1
 	if err := CheckTargetPermission(admin, ResourceClients, ActionRead, &ownID); err != nil {
 		t.Fatalf("own client should be allowed: %v", err)
 	}
