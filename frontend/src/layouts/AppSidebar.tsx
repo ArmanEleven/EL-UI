@@ -370,7 +370,9 @@ export default function AppSidebar() {
       >
         <div className={`sider-brand${railCollapsed ? ' is-collapsed' : ''}`}>
           <div className="brand-block">
-            <span className="brand-mark" aria-hidden="true">EL</span>
+            <span className="brand-mark" aria-hidden="true">
+              EL
+            </span>
             <span className="brand-text">{railCollapsed ? 'EL' : 'EL-UI'}</span>
           </div>
           {!railCollapsed && (
@@ -465,7 +467,9 @@ export default function AppSidebar() {
       >
         <div className="drawer-header">
           <div className="brand-block">
-            <span className="brand-mark" aria-hidden="true">EL</span>
+            <span className="brand-mark" aria-hidden="true">
+              EL
+            </span>
             <span className="drawer-brand">EL-UI</span>
           </div>
           <div className="drawer-header-actions">
