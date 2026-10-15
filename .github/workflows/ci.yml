@@ -210,6 +210,28 @@ jobs:
       - name: Format check
         run: npm run format:check
         working-directory: frontend
+      # TEMPORARY: dump canonical formatter output for the EL-UI design branch; remove after fixing format.
+      - name: Temporary format diagnostics
+        if: failure()
+        run: |
+          files=(
+            src/layouts/AppSidebar.css
+            src/layouts/AppSidebar.tsx
+            src/pages/admin/AdminPortalPage.css
+            src/pages/login/LoginPage.css
+            src/pages/login/LoginPage.tsx
+            src/pages/master/AdminManagementPage.css
+            src/styles/elui-identity.css
+            src/styles/page-cards.css
+            src/styles/page-shell.css
+          )
+          npx oxfmt "${files[@]}"
+          for file in "${files[@]}"; do
+            printf 'ELUI_FORMAT_BEGIN:%s\\n' "$file"
+            base64 -w0 "$file"
+            printf '\\nELUI_FORMAT_END:%s\\n' "$file"
+          done
+        working-directory: frontend
       - name: Typecheck
         run: npm run typecheck
         working-directory: frontend
