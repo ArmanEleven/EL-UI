@@ -5,6 +5,8 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/mhsanaei/3x-ui/v3/internal/database"
+	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
 	"github.com/mhsanaei/3x-ui/v3/internal/logger"
 	"github.com/mhsanaei/3x-ui/v3/internal/web/entity"
 	"github.com/mhsanaei/3x-ui/v3/internal/web/middleware"
@@ -76,6 +78,11 @@ func (a *IndexController) sponsorLogo(c *gin.Context) {
 
 // index handles the root route, redirecting logged-in users to the panel or showing the login page.
 func (a *IndexController) index(c *gin.Context) {
+	if session.IsManagementLogin(c) {
+		c.Header("Cache-Control", "no-store")
+		c.Redirect(http.StatusTemporaryRedirect, c.GetString("base_path")+"panel/admin")
+		return
+	}
 	if session.IsLogin(c) {
 		c.Header("Cache-Control", "no-store")
 		c.Redirect(http.StatusTemporaryRedirect, c.GetString("base_path")+"panel/")
@@ -121,6 +128,27 @@ func (a *IndexController) login(c *gin.Context) {
 	user, checkErr := a.userService.CheckUser(form.Username, form.Password, form.TwoFactorCode)
 
 	if user == nil {
+		// The shared login form can authenticate management accounts too, but
+		// native panel usernames always take precedence. Account creation also
+		// rejects native username collisions, so the two identities cannot be
+		// chosen by password when their usernames are equal.
+		if db := database.GetDB(); db != nil {
+			var nativeMatches int64
+			if countErr := db.Model(&model.User{}).Where("username = ?", form.Username).Count(&nativeMatches).Error; countErr == nil && nativeMatches == 0 {
+				if admin, authErr := authenticateManagementCredentials(form.Username, form.Password); authErr == nil {
+					defaultLoginLimiter.registerSuccess(remoteIP, form.Username)
+					if err := session.SetManagementLogin(c, admin.ID); err != nil {
+						logger.Warning("Unable to save management session:", err)
+						pureJsonMsg(c, http.StatusInternalServerError, false, I18nWeb(c, "somethingWentWrong"))
+						return
+					}
+					logger.Infof("management admin logged in successfully: username=%q, IP=%q", admin.Username, remoteIP)
+					_ = db.Model(&model.ManagementAdmin{}).Where("id = ?", admin.ID).Update("last_login_at", time.Now()).Error
+					jsonMsgObj(c, I18nWeb(c, "pages.login.toasts.successLogin"), gin.H{"portal": "management"}, nil)
+					return
+				}
+			}
+		}
 		reason := loginFailureReason(checkErr)
 		if blockedUntil, blocked := defaultLoginLimiter.registerFailure(remoteIP, form.Username); blocked {
 			logger.Warningf("failed login: username=%q, IP=%q, reason=%q, blocked_until=%s", form.Username, remoteIP, reason, blockedUntil.Format(time.RFC3339))

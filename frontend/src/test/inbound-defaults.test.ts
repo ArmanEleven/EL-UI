@@ -27,12 +27,12 @@ import {
   HysteriaClientSchema,
   HysteriaInboundSettingsSchema,
 } from '@/schemas/protocols/inbound/hysteria';
-import { TlsStreamSettingsSchema } from '@/schemas/protocols/security/tls';
 import { MixedInboundSettingsSchema } from '@/schemas/protocols/inbound/mixed';
 import {
   ShadowsocksClientSchema,
   ShadowsocksInboundSettingsSchema,
 } from '@/schemas/protocols/inbound/shadowsocks';
+import { TlsStreamSettingsSchema } from '@/schemas/protocols/security/tls';
 import {
   TrojanClientSchema,
   TrojanInboundSettingsSchema,
@@ -247,7 +247,7 @@ describe('createTlsSettingsWithDefaultCert', () => {
     }
   });
 
-  it("defaults ALPN to http/1.1 for WebSocket (issue #6782)", () => {
+  it('defaults ALPN to http/1.1 for WebSocket (issue #6782)', () => {
     const tls = createTlsSettingsWithDefaultCert('ws');
     expect(tls.alpn).toEqual(['http/1.1']);
     // The overridden value must still satisfy the TLS settings schema.

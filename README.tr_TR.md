@@ -1,231 +1,153 @@
-[English](/README.md) | [فارسی](/README.fa_IR.md) | [العربية](/README.ar_EG.md) | [中文](/README.zh_CN.md) | [Español](/README.es_ES.md) | [Русский](/README.ru_RU.md) | [Türkçe](/README.tr_TR.md)
+<!--
+EL-UI
+Proje lideri ve bakım sorumlusu: ArmanEleven
+Bu proje Sanaei 3X-UI kod tabanını temel alır. LICENSE dosyasını ve üst proje bildirimlerini inceleyin.
+-->
 
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./media/3x-ui-dark.png">
-    <img alt="3x-ui" src="./media/3x-ui-light.png">
-  </picture>
+  <strong>EL-UI</strong>
+</p>
+
+<h1 align="center">EL-UI — 3X-UI için Rol Tabanlı Yönetim Katmanı</h1>
+
+<p align="center">
+  <em><a href="https://github.com/ArmanEleven">ArmanEleven</a> tarafından geliştirilir ve sürdürülür</em>
 </p>
 
 <p align="center">
-  <a href="https://github.com/MHSanaei/3x-ui/releases"><img src="https://img.shields.io/github/v/release/mhsanaei/3x-ui" alt="Release"></a>
-  <a href="https://github.com/MHSanaei/3x-ui/actions"><img src="https://img.shields.io/github/actions/workflow/status/mhsanaei/3x-ui/release.yml.svg" alt="Build"></a>
-  <a href="#"><img src="https://img.shields.io/github/go-mod/go-version/mhsanaei/3x-ui.svg" alt="GO Version"></a>
-  <a href="https://github.com/MHSanaei/3x-ui/releases/latest"><img src="https://img.shields.io/github/downloads/mhsanaei/3x-ui/total.svg" alt="Downloads"></a>
-  <a href="https://www.gnu.org/licenses/gpl-3.0.en.html"><img src="https://img.shields.io/badge/license-GPL%20V3-blue.svg?longCache=true" alt="License"></a>
-  <a href="https://pkg.go.dev/github.com/mhsanaei/3x-ui/v3"><img src="https://pkg.go.dev/badge/github.com/mhsanaei/3x-ui/v3.svg" alt="Go Reference"></a>
-  <a href="https://docs.sanaei.dev"><img src="https://img.shields.io/badge/docs-docs.sanaei.dev-22d3ee" alt="Documentation"></a>
+  <a href="README.md">English</a> ·
+  <a href="README.fa_IR.md">فارسی</a> ·
+  <a href="README.it_IT.md">Italiano</a> ·
+  <a href="README.zh_CN.md">简体中文</a> ·
+  <a href="README.ru_RU.md">Русский</a> ·
+  <a href="README.tr_TR.md">Türkçe</a>
 </p>
 
-**3X-UI**, [Xray-core](https://github.com/XTLS/Xray-core) sunucularını yönetmek için geliştirilmiş profesyonel, açık kaynaklı bir web kontrol panelidir. Tek bir sanal sunucudan (VPS) çok düğümlü (multi-node) dağıtımlara kadar çok çeşitli proxy ve VPN protokollerini kurmak, yapılandırmak ve izlemek için temiz, çok dilli bir arayüz sağlar.
+<p align="center">
+  <img alt="Proje durumu: deneysel" src="https://img.shields.io/badge/status-experimental-orange">
+  <img alt="Çekirdek: 3X-UI" src="https://img.shields.io/badge/core-3X--UI-blue">
+  <img alt="Lisans: GPL-3.0" src="https://img.shields.io/badge/license-GPL--3.0-informational">
+</p>
 
-Orijinal X-UI projesinin geliştirilmiş bir çatallaması (fork) olarak inşa edilen 3X-UI; çok daha geniş protokol desteği, artırılmış kararlılık, kullanıcı başına trafik hesaplama ve kullanım kolaylığı sağlayan birçok yeni özellik sunar.
+**EL-UI**, **ArmanEleven** liderliğinde geliştirilen açık kaynaklı bir projedir. Amacı, [Sanaei 3X-UI](https://github.com/MHSanaei/3x-ui) kod tabanının üzerinde daha temiz ve kapsamlı bir yönetim deneyimi oluşturmaktır. Hedef Xray protokol motorunu değiştirmek değil; mevcut panelin temel yeteneklerini korurken yöneticiler, roller, izinler, kotalar ve operasyonel görünürlük için ayrı bir yönetim katmanı geliştirmektir.
 
-> [!IMPORTANT]
-> Bu proje yalnızca kişisel kullanım için tasarlanmıştır. Lütfen yasadışı amaçlar için veya üretim (production) ortamında kullanmayın.
+> [!WARNING]
+> **EL-UI geliştirme aşamasındadır ve üretim ortamına hazır bir sürüm değildir.** Çoklu yönetici katmanı henüz kimlik doğrulama, API yetkilendirmesi ve kullanıcı arayüzüne uçtan uca bağlanmamıştır. Bu geliştirme dalını üretim sunucularını veya önemli verileri yönetmek için kullanmayın.
 
-## Özellikler
+## Proje hedefleri
 
-- **Çoklu protokol destekli gelen bağlantılar (Inbounds)** — VLESS, VMess, Trojan, Shadowsocks, WireGuard, AmneziaWG, TUIC v5, Hysteria2, MTProto, HTTP, SOCKS (Karma), Dokodemo-door / Tunnel ve TUN.
-- **Modern aktarımlar (transports) ve güvenlik** — TCP (Raw), mKCP, WebSocket, gRPC, HTTPUpgrade ve XHTTP; TLS, XTLS ve REALITY ile güvene alınmıştır.
-- **Dahili AmneziaWG** — DPI'ya dayanıklı WireGuard, panelin içinde bir kullanıcı alanı ağ yığını üzerinde çalışır; çekirdek modülü, DKMS veya ek paket kurulumu gerektirmez.
-- **Dahili TUIC v5** — Yerel UDP geçişi trafik ölçümü, 0-RTT el sıkışmaları ve BBR tıkanıklık kontrolü ile QUIC tabanlı yüksek performanslı proxy.
-- **MTProto proxy'leri** — İstemci başına FakeTLS gizli anahtarları, reklam etiketleri (ad-tag) ve kotalar, mevcut bağlantılar kopmadan anlık olarak uygulanır.
-- **Geri Dönüş (Fallbacks)** — Xray'in fallback desteğini kullanarak tek bir port üzerinde birden fazla protokole (ör. 443 üzerinde hem VLESS hem Trojan) hizmet verin.
-- **Kullanıcı başına yönetim** — Trafik kotaları, bitiş tarihleri, güvenilir adreslere muafiyet tanınabilen IP sınırları, HWID cihaz sınırları, zamanlanmış yenileme döngüleri, canlı çevrimiçi (online) durumu ve tek tıkla paylaşım bağlantıları, QR kodları ve abonelikler.
-- **Trafik istatistikleri** — Gelen bağlantı (Inbound), istemci ve giden bağlantı (Outbound) bazında istatistikler ve sıfırlama kontrolleri.
-- **Çoklu düğüm (Multi-node) desteği** — Tek bir panel üzerinden birden fazla sunucuyu yönetin ve ölçeklendirin; gelen bağlantıları diğer düğümlere klonlayın.
-- **Giden bağlantı (Outbound) ve yönlendirme** — WARP, NordVPN, PIA, özel yönlendirme kuralları, dengeleyiciler arası yük devretme destekli yük dengeleyiciler (load balancers) ve giden bağlantı proxy zincirleme (proxy chaining). Pakete dahil geosite ve geoip kategorileri doğrudan kural düzenleyicisinden taranabilir.
-- **Dahili abonelik sunucusu** — İstemcinin User-Agent bilgisine göre otomatik seçilen raw, JSON ve Clash çıktısı ve [özel sayfa şablonları](docs/custom-subscription-templates.md).
-- Uzaktan izleme ve yönetim için **Telegram ve Discord botları**.
-- Kapsamı sınırlanmış, isteğe bağlı olarak süresi dolan token'lar ve panel içi API referansı sunan **RESTful API**.
-- **Kurulabilir panel (PWA)** — 3X-UI'yi masaüstüne veya telefon ana ekranına sabitleyin.
-- **Esnek depolama** — SQLite (varsayılan) veya PostgreSQL.
-- Koyu ve açık tema seçenekleriyle **13 farklı UI dili**.
-- Kullanıcı başına IP limitlerini zorunlu kılmak için **Fail2ban entegrasyonu**.
+- **Çekirdeği korumak:** 3X-UI'nin Xray, inbound, istemci, abonelik, trafik ve düğüm iş akışlarını sürdürmek.
+- **Gerçek çoklu yönetici desteği:** Her yöneticiye bağımsız kimlik, rol, durum ve sunucu tarafında uygulanan erişim kapsamı sağlamak.
+- **Rol tabanlı izinler:** Açık `NONE`, `OWN` ve `ALL` kapsamlarını kullanmak; açıkça izin verilmeyen işlemleri varsayılan olarak reddetmek.
+- **Kotaları sunucuda denetlemek:** Kullanıcı sayısı, trafik/veri, sona erme, HWID ve tanımlı diğer sınırları yalnızca formlarda göstermek yerine backend işlemlerinde uygulamak.
+- **Sahiplik sınırlarını korumak:** Yöneticilerin kendi rollerinin izin vermediği kayıtları okumasını veya değiştirmesini engellemek.
+- **Denetlenebilir ve geri alınabilir değişiklikler:** Güvenli veritabanı geçişleri, yedekleme/geri yükleme kontrolleri, anlaşılır operasyon günlükleri ve regresyon testleri eklemek.
+- **Kendine özgü bir arayüz geliştirmek:** Çok dilli ve sağdan sola (RTL) yerleşimi destekleyen, erişilebilir ve duyarlı bir yönetim arayüzü oluşturmak.
 
-## Ekran Görüntüleri
+## Güncel geliştirme durumu
 
-<details>
-<summary>Genişletmek için tıklayın</summary>
+Çalışmalar şu anda `feature/rbac-foundation` dalında yürütülüyor.
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./media/01-overview-dark.png">
-  <img alt="Genel Bakış" src="./media/01-overview-light.png">
-</picture>
+| Alan | Durum |
+|---|---|
+| Geliştirme dalındaki 3X-UI çekirdek kaynak kodu | Mevcut; EL-UI sürümünün tam doğrulaması bekleniyor |
+| İlk RBAC modelleri ve izin kontrolleri | Eklendi; birim testleri yazıldı |
+| Ayrı yönetim rolü ve yönetici veritabanı modelleri | Eklendi ve şema geçişine kaydedildi |
+| SQLite ↔ PostgreSQL geçiş modeli listesi | Yeni yönetim tablolarını içerecek şekilde güncellendi |
+| Bağımsız yönetici girişi ve oturum kimliği | Henüz uygulanmadı |
+| Gerçek yönetim API'lerinde izin denetimi | Henüz uygulanmadı |
+| Rol ve yönetici yönetim arayüzü | Henüz uygulanmadı |
+| Tam derleme, entegrasyon testleri ve güvenli yükseltme doğrulaması | Bekliyor |
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./media/02-add-inbound-dark.png">
-  <img alt="Gelen Bağlantılar (Inbounds)" src="./media/02-add-inbound-light.png">
-</picture>
+Bir veritabanı modelinin veya arayüz ekranının bulunması, özelliğin tamamlandığı anlamına gelmez. Her özellik uygulamaya bağlanmalı ve tekrarlanabilir testlerle doğrulanmalıdır. Bu dalın tüm CI durumu henüz doğrulanmadı.
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./media/03-add-client-dark.png">
-  <img alt="Kullanıcı Ekle" src="./media/03-add-client-light.png">
-</picture>
+## Planlanan özellikler
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./media/05-add-nodes-dark.png">
-  <img alt="Yapılandırmalar" src="./media/05-add-nodes-light.png">
-</picture>
+### 1. Yöneticiler ve roller
 
-</details>
+- Tam denetime sahip bir Owner hesabı.
+- İkincil yöneticiler için bağımsız hesaplar.
+- Yönetici hesaplarını oluşturma, düzenleme, devre dışı bırakma ve yönetme.
+- Kaynak ve işlem bazında ayrı izinlere sahip yapılandırılabilir roller.
+- `NONE`, `OWN` ve `ALL` erişim kapsamları.
+- Owner'a özel işlemlerden ayrılmış yönetici portalı.
 
-## Hızlı Başlangıç
+### 2. Kotalar ve erişim politikası
 
-```bash
-bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
-```
+- Her yönetici için oluşturulabilecek kullanıcı/istemci sayısı üst sınırı.
+- Trafik/veri ve sona erme aralıkları için alt ve üst sınırlar.
+- Çekirdeğin desteklediği yerlerde HWID politikası ve kullanıcı başına cihaz sınırları.
+- İzin verilen grup ve şablon listeleri.
+- Kısıtlanmış veya devre dışı yöneticiler için tanımlı davranış.
+- Sınır değerleri ve eşzamanlı istekler için testlerle desteklenen sunucu tarafı kontroller.
 
-Belirli bir sürümü kurmak için, etiketini (ör. `v3.7.0`) ekleyin:
+### 3. İşletim ve güvenilirlik
 
-```bash
-bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) v3.7.0
-```
+- Hassas yönetici işlemleri için denetim kayıtları.
+- Güvenli ve sürümlenmiş veritabanı geçişleri.
+- Sürüm öncesi yedekleme ve geri yükleme testleri.
+- SQLite ile PostgreSQL arasındaki veri geçişi kapsamı.
+- Doğrudan API istekleri, sahiplik izolasyonu, devre dışı hesaplar ve kota denetimi için entegrasyon testleri.
+- Kurulum, yükseltme, geri alma ve sorun giderme belgeleri.
 
-Sürekli güncellenen **dev** sürümünü (kararlı bir sürüm değil; `main` dalından her commit'te oluşturulan en son ön sürüm) kurmak için `dev-latest` değerini geçirin:
+Bunlar proje hedefleridir; tüm özelliklerin şimdiden kullanılabildiği anlamına gelmez.
 
-```bash
-bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) dev-latest
-```
+## Mimari
 
-Kurulum sırasında rastgele bir kullanıcı adı, şifre ve erişim yolu oluşturulur. Kurulumdan sonra, hizmeti başlatabileceğiniz/durdurabileceğiniz, giriş bilgilerinizi görüntüleyebileceğiniz veya sıfırlayabileceğiniz, SSL sertifikalarını yönetebileceğiniz ve çok daha fazlasını yapabileceğiniz yönetim menüsünü açmak için terminalde `x-ui` komutunu çalıştırın.
+EL-UI, protokol ve Xray çekirdeği olarak yerel 3X-UI kod tabanını kullanır. Planlanan yönetim katmanı, yönetim politikalarının çekirdek istemci mantığını veya çalışma zamanı işlemlerini atlamamasını sağlayacak açık sınırlar üzerine kurulacaktır.
 
-Her yayın dosyası, yanında bir `.sha256` sağlama toplamıyla birlikte yayımlanır. Hem `install.sh` hem de güncelleyici, arşivi bu toplama karşı doğrular ve uyuşmazlık halinde işlemi durdurur.
+- **Çekirdek:** [Sanaei 3X-UI](https://github.com/MHSanaei/3x-ui) — Xray yaşam döngüsü, inbound'lar, istemciler, abonelikler ve düğüm işlemleri.
+- **Protokol motoru:** [Xray-core](https://github.com/XTLS/Xray-core).
+- **Backend:** Go, Gin ve GORM.
+- **Frontend:** React, TypeScript, Vite ve Ant Design.
+- **Çekirdekten devralınan veritabanı seçenekleri:** SQLite ve PostgreSQL.
+- **RBAC davranış referansı:** [PasarGuard](https://github.com/PasarGuard/panel) içinde kamuya açık şekilde belgelenmiş kavramlar. EL-UI uygulaması bağımsız geliştirilmektedir; bu, PasarGuard kaynak kodunun yeniden kullanıldığı anlamına gelmez.
 
-Tam dokümantasyon — kurulum, yapılandırma, işletim ve eksiksiz API referansı — için **[docs.sanaei.dev](https://docs.sanaei.dev)** adresini ziyaret edin.
+Ayrıntılar için [mimari önerisini](docs/ELUI-ARCHITECTURE.md), [kaynak kodu denetimini](docs/SOURCE_AUDIT.md) ve [özellik uyumluluk matrisini](docs/FEATURE_MATRIX.md) inceleyin.
 
-### Etkileşimsiz kurulum
+## Geliştirme
 
-Yükleyici, cloud-init için **etkileşimsiz** olarak da çalışır.
-`XUI_NONINTERACTIVE=1` ayarlayın (veya TTY olmadan boru hattına aktarın); kurulum baştan
-sona hiçbir soru sormadan tamamlanır, rastgele kimlik bilgileri oluşturup bunları
-`/etc/x-ui/install-result.env` dosyasına yazar. Şunlar için [`deploy/`](deploy/) klasörüne bakın:
+Araç sürümleri depo manifestleriyle eşleşmelidir. Mevcut dal Go 1.27.2; frontend için Node.js 26 veya üzeri ve npm 11 veya üzeri sürümleri belirtir.
 
-- [Cloud-init user-data](deploy/cloud-init/) — herhangi bir bulutta etkileşimsiz kurulum (Hetzner/AWS/DO/Vultr/GCP/Azure/Oracle)
-- [Hetzner Cloud notları](deploy/marketplace/hetzner/) — Hetzner üzerinde cloud-init tabanlı dağıtım
-
-## Desteklenen Platformlar
-
-**İşletim sistemleri:** Ubuntu, Debian, Armbian, Fedora, CentOS, RHEL, AlmaLinux, Rocky Linux, Oracle Linux, Amazon Linux, Virtuozzo, Arch, Manjaro, Parch, openSUSE (Tumbleweed / Leap), Alpine ve Windows.
-
-**Mimariler:** `amd64` · `386` · `arm64` (aarch64) · `armv7` · `armv6` · `armv5` · `s390x`.
-
-## Veritabanı Seçenekleri
-
-3X-UI kurulum sırasında seçilebilecek iki arka uç (backend) destekler:
-
-- **SQLite** (varsayılan) — `/etc/x-ui/x-ui.db` konumunda tek bir dosya. Kurulum gerektirmez, küçük ve orta ölçekli dağıtımlar için idealdir.
-- **PostgreSQL** — Yüksek kullanıcı sayıları veya çoklu düğüm (multi-node) kurulumları için önerilir. Yükleyici sizin için yerel olarak PostgreSQL kurabilir veya mevcut bir sunucuya DSN bağlantısı kabul edebilir.
-
-Çalışma anında veritabanı türü ortam değişkenleri (environment variables) ile seçilir (yükleyici bunları sizin için `/etc/default/x-ui` dosyasına yazar):
-
-```
-XUI_DB_TYPE=postgres
-XUI_DB_DSN=postgres://xui:password@127.0.0.1:5432/xui?sslmode=disable
-```
-
-### Mevcut bir SQLite Kurulumunu PostgreSQL'e Taşıma
+Go testleri:
 
 ```bash
-x-ui migrate-db --dsn "postgres://xui:password@127.0.0.1:5432/xui?sslmode=disable"
-# ardından /etc/default/x-ui içindeki XUI_DB_TYPE ve XUI_DB_DSN değerlerini ayarlayıp yeniden başlatın:
-systemctl restart x-ui
+go test ./...
 ```
 
-Kaynak SQLite dosyasına dokunulmaz; yeni veritabanının düzgün çalıştığını doğruladıktan sonra eski SQLite dosyasını manuel olarak silebilirsiniz.
-
-### Docker
-
-Varsayılan `docker compose up -d` komutu SQLite kullanmaya devam eder. Birlikte paketlenmiş PostgreSQL servisi ile çalıştırmak için, `docker-compose.yml` dosyasındaki iki `XUI_DB_*` değişken satırının yorumunu kaldırın ve profille başlatın:
+Frontend kontrollerini `frontend/` dizininde çalıştırın:
 
 ```bash
-docker compose --profile postgres up -d
+npm ci
+npm run typecheck
+npm test
+npm run lint
+npm run build
 ```
 
-Docker imajı, kullanıcı başına **IP limitlerini** zorunlu kılmak için Fail2ban ile (varsayılan olarak etkindir) paketlenmiştir. Fail2ban, ihlalcileri `iptables` ile engeller ve bunun için `NET_ADMIN` yetkisine ihtiyaç duyar. `docker-compose.yml` bunu zaten `cap_add` üzerinden vermektedir; ancak konteyneri bunun yerine `docker run` ile başlatırsanız bu yetkileri kendiniz eklemelisiniz, aksi takdirde yasaklamalar günlüğe kaydedilir ancak uygulanmaz:
+Bunlar katkıda bulunanlar için önerilen komutlardır ve **mevcut dalın tüm CI kontrollerini geçtiğini göstermez**. Testleri geçici veritabanları ve test sunucularında çalıştırın; üretim veritabanında geçiş denemeleri yapmayın.
 
-```bash
-docker run -d --cap-add=NET_ADMIN --cap-add=NET_RAW ... ghcr.io/mhsanaei/3x-ui
-```
+## Güvenlik ve veri bütünlüğü
 
-## Ortam Değişkenleri (Environment Variables)
+- İzinleri backend'de uygulayın; bir düğmeyi gizlemek yetkilendirme değildir.
+- Sahiplik kısıtlarını yalnızca arayüzde değil, veritabanı sorgularında uygulayın.
+- Parolaları, API token'larını, abonelik sırlarını veya maskelenmemiş hassas verileri günlüklere yazmayın.
+- Dağıtımdan önce geçişleri ve geri yüklemeyi test verileriyle doğrulayın.
+- Üst projelerin telif bildirimlerini koruyun ve geçerli lisans koşullarına uyun; [LICENSE](LICENSE) dosyasına bakın.
+- Olası güvenlik açıklarını mümkün olduğunda özel bir kanal üzerinden bildirin; [SECURITY.md](SECURITY.md) dosyasını inceleyin.
 
-| Değişken | Açıklama | Varsayılan |
-| --- | --- | --- |
-| `XUI_DB_TYPE` | Veritabanı türü: `sqlite` veya `postgres` | `sqlite` |
-| `XUI_DB_DSN` | PostgreSQL bağlantı dizesi (eğer `XUI_DB_TYPE=postgres` ise) | — |
-| `XUI_DB_FOLDER` | SQLite veritabanı dizini | `/etc/x-ui` |
-| `XUI_DB_MAX_OPEN_CONNS` | Maksimum açık bağlantı sayısı (PostgreSQL havuzu) | — |
-| `XUI_DB_MAX_IDLE_CONNS` | Maksimum boşta bekleme bağlantısı (PostgreSQL havuzu) | — |
-| `XUI_INIT_WEB_BASE_PATH` | Web paneli için başlangıç URI yolu | `/` |
-| `XUI_ENABLE_FAIL2BAN` | Fail2ban tabanlı IP limit uygulamasını etkinleştir | `true` |
-| `XUI_LOG_LEVEL` | Günlük (Log) ayrıntı seviyesi (`debug`, `info`, `warning`, `error`) | `info` |
-| `XUI_DEBUG` | Hata ayıklama (debug) modunu etkinleştir | `false` |
-| `XUI_TUNNEL_HEALTH_MONITOR` | Tünel sağlık izleyicisini etkinleştir (bir URL'yi yoklar ve tekrarlanan başarısızlıklardan sonra xray'i yeniden başlatır; yeniden başlatma tüm istemcilerin bağlantısını düşürür) | `false` |
-| `XUI_TUNNEL_HEALTH_PROXY` | Yoklamanın gönderildiği proxy; yoklamanın tüneli test etmesi için bunu yerel bir xray gelen bağlantısına yönlendirin (ör. `socks5://127.0.0.1:1080`). Boş bırakılırsa yoklama yalnızca ana makine bağlantısını kontrol eder | — |
-| `XUI_TUNNEL_HEALTH_URL` | Tünel sağlığı için yoklanan URL | `https://www.cloudflare.com/cdn-cgi/trace` |
-| `XUI_TUNNEL_HEALTH_INTERVAL` | Yoklamalar arasındaki aralık | `30s` |
-| `XUI_TUNNEL_HEALTH_TIMEOUT` | Yoklama başına zaman aşımı | `10s` |
-| `XUI_TUNNEL_HEALTH_FAILURES` | Yeniden başlatma tetiklenmeden önceki ardışık başarısızlık sayısı | `3` |
-| `XUI_TUNNEL_HEALTH_COOLDOWN` | Ardışık yeniden başlatmalar arasındaki minimum gecikme | `5m` |
-| `NODE_TOKEN_ENCRYPTION` | Düğüm API token'ları için beklemede şifreleme: `off`, `migration` veya `required` (`XUI_` öneki yoktur) | `off` |
-| `XUI_NODE_TOKEN_KEY_FILE` | Etkin anahtar kimliğini ve base64 kodlu 32 baytlık anahtarlarını içeren JSON anahtarlığı (mod `0600`) | `/etc/x-ui/node_token_key.json` |
-| `XUI_NODE_TOKEN_KEY` | Tek bir base64 kodlu 32 baytlık anahtar; yalnızca anahtar dosyası yüklenemediğinde kullanılır | — |
+## Proje liderliği ve teşekkürler
 
-Tam liste [ortam değişkenleri referansında](https://docs.sanaei.dev/docs/reference/env-vars) yer alır.
+**Proje lideri ve bakım sorumlusu:** [ArmanEleven](https://github.com/ArmanEleven).
 
-## Desteklenen Diller
+EL-UI, [Sanaei 3X-UI](https://github.com/MHSanaei/3x-ui) ve [Xray-core](https://github.com/XTLS/Xray-core) projelerinin çalışmalarını temel alır. İlgili bakım sorumlularına ve katkıda bulunanlara açıkça atıfta bulunmak önemlidir. PasarGuard'da belgelenmiş yönetim davranışları da işlevsel bir referans olarak incelenir.
 
-Panel arayüzü 13 farklı dilde mevcuttur:
+## Lisans
 
-İngilizce · Farsça · Arapça · Çince (Basitleştirilmiş) · Çince (Geleneksel) · İspanyolca · Rusça · Ukraynaca · Türkçe · Vietnamca · Japonca · Endonezce · Portekizce (Brezilya)
+EL-UI dağıtılırken üst kaynak kodunun lisans gereklilikleri ve bildirimleri korunmalıdır. Projeyi değiştirmeden veya yeniden dağıtmadan önce [LICENSE](LICENSE) dosyasını inceleyin.
 
-## Katkıda Bulunma
-
-Katkılarınızı her zaman bekliyoruz. Bir sorun (issue) açmadan veya pull request (PR) göndermeden önce lütfen [Katkıda Bulunma Kılavuzunu](/CONTRIBUTING.md) okuyun.
-
-## Özel Teşekkürler
-
-- [alireza0](https://github.com/alireza0/)
-
-## Teşekkür & Atıf
-
-- [Iran v2ray rules](https://github.com/chocolate4u/Iran-v2ray-rules) (Lisans: **GPL-3.0**): _Geliştirilmiş v2ray/xray ve v2ray/xray-clients yönlendirme (routing) kuralları; yerleşik İran alan adları ile güvenlik ve reklam engelleme odaklıdır._
-- [Russia v2ray rules](https://github.com/runetfreedom/russia-v2ray-rules-dat) (Lisans: **GPL-3.0**): _Bu depo, Rusya'daki engellenen alan adları ve adreslere dayalı otomatik olarak güncellenen V2Ray yönlendirme kurallarını içerir._
-
-## Topluluk Araçları
-
-3x-ui çevresindeki topluluk tarafından oluşturulmuş araçlar ve entegrasyonlar.
-
-- [terraform-provider-3x-ui](https://github.com/batonogov/terraform-provider-threexui) (Lisans: **MIT**): _Gelen bağlantılarnı, kullanıcıları, panel ayarlarını ve Xray yapılandırmasını Terraform / OpenTofu ile kod olarak (as code) yönetin._
-- [3X-UI Manager](https://github.com/yukh975/3X-UI-Manager) (Lisans: **MIT**): _3x-ui için yerel Android istemcisi — kontrol paneli, gelen bağlantılar, QR ile paylaşımlı kullanıcılar, düğümler ve çoklu panel yönetimi. F-Droid'de mevcut._
-
-## Projeyi Destekleyin
-
-**Eğer bu proje size faydalı olduysa, bir yıldız verebilirsiniz**:star2:
-
-<a href="https://www.buymeacoffee.com/MHSanaei" target="_blank">
-<img src="./media/default-yellow.png" alt="Bana Bir Kahve Ismarla" style="height: 70px !important;width: 277px !important;" >
-</a>
-
-</br>
-<a href="https://nowpayments.io/donation/hsanaei" target="_blank" rel="noreferrer noopener">
-   <img src="./media/donation-button-black.svg" alt="NOWPayments üzerinden Kripto Bağış Butonu">
-</a>
-
-## Yıldız Geçmişi
-
-<a href="https://www.star-history.com/?repos=mhsanaei%2F3x-ui&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=mhsanaei/3x-ui&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=mhsanaei/3x-ui&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=mhsanaei/3x-ui&type=date&legend=top-left" />
- </picture>
-</a>
+---
 
 <p align="center">
- <a href="https://www.star-history.com/mhsanaei/3x-ui">
-  <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/badge?repo=MHSanaei/3x-ui&type=rank&theme=dark" /><source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/badge?repo=MHSanaei/3x-ui&type=rank" /><img alt="Star History Rank" src="https://api.star-history.com/badge?repo=MHSanaei/3x-ui&type=rank" /></picture> <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/badge?repo=MHSanaei/3x-ui&type=trending&theme=dark" /><source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/badge?repo=MHSanaei/3x-ui&type=trending" /><img alt="GitHub Trending Repository of the Day" src="https://api.star-history.com/badge?repo=MHSanaei/3x-ui&type=trending" /></picture>
- </a>
+  <sub><a href="https://github.com/ArmanEleven">ArmanEleven</a> tarafından tasarlanır ve sürdürülür · Abartılı vaatler yerine doğrulanabilir doğruluk.</sub>
 </p>

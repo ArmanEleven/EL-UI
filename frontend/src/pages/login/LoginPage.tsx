@@ -80,8 +80,11 @@ export default function LoginPage() {
   const onSubmit = useCallback(async (values: LoginForm) => {
     setSubmitting(true);
     try {
-      const msg = await HttpUtil.post('/login', values);
-      if (msg.success) window.location.href = basePath + 'panel/';
+      const msg = await HttpUtil.post<{ portal?: string }>('/login', values);
+      if (msg.success) {
+        const target = msg.obj?.portal === 'management' ? 'panel/admin' : 'panel/';
+        window.location.href = basePath + target;
+      }
     } finally {
       setSubmitting(false);
     }

@@ -1,0 +1,44 @@
+.management-portal {
+  min-height: 100vh;
+  background: var(--ant-color-bg-layout, #f5f7fa);
+}
+
+.management-content {
+  width: min(1440px, 100%);
+  margin: 0 auto;
+  padding: clamp(16px, 3vw, 36px);
+}
+
+.management-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.management-topbar h2 {
+  margin: 4px 0 0;
+}
+
+.management-lower {
+  margin-top: 16px;
+}
+
+.management-loading {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+}
+
+.management-footnote {
+  display: block;
+  margin-top: 20px;
+}
+
+@media (max-width: 640px) {
+  .management-topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
