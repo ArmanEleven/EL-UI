@@ -29,6 +29,7 @@ type APIController struct {
 
 // NewAPIController creates a new APIController instance and initializes its routes.
 func NewAPIController(g *gin.RouterGroup) *APIController {
+	NewManagementController(g)
 	a := &APIController{}
 	a.initRouter(g)
 	return a
