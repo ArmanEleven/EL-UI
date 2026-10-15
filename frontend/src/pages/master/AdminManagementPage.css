@@ -34,38 +34,62 @@
   }
 }
 
-
 /* EL-UI Master Panel admin-management surfaces. */
 .admin-management-page {
   min-height: 100vh;
-  background: radial-gradient(ellipse at 86% -8%, rgba(151, 218, 126, 0.10), transparent 34%), var(--ant-color-bg-layout);
+  background:
+    radial-gradient(ellipse at 86% -8%, rgba(151, 218, 126, 0.1), transparent 34%),
+    var(--ant-color-bg-layout);
 }
 .admin-management-header {
-  padding: 20px 22px; border: 1px solid rgba(47, 119, 82, 0.12);
-  border-radius: 18px; background: rgba(255, 255, 255, 0.62);
-  box-shadow: 0 10px 30px rgba(35, 71, 43, 0.045); backdrop-filter: blur(14px);
+  padding: 20px 22px;
+  border: 1px solid rgba(47, 119, 82, 0.12);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow: 0 10px 30px rgba(35, 71, 43, 0.045);
+  backdrop-filter: blur(14px);
 }
-.admin-management-header h2 { font-weight: 800; letter-spacing: -0.045em; }
+.admin-management-header h2 {
+  font-weight: 800;
+  letter-spacing: -0.045em;
+}
 .admin-management-page .ant-card {
-  border: 1px solid rgba(47, 119, 82, 0.12); border-radius: 17px;
+  border: 1px solid rgba(47, 119, 82, 0.12);
+  border-radius: 17px;
   box-shadow: 0 12px 30px rgba(24, 54, 32, 0.05);
 }
-.admin-management-page .ant-card-head { border-bottom-color: rgba(47, 119, 82, 0.10); }
-.admin-management-page .ant-card-head-title { font-weight: 750; letter-spacing: -0.02em; }
+.admin-management-page .ant-card-head {
+  border-bottom-color: rgba(47, 119, 82, 0.1);
+}
+.admin-management-page .ant-card-head-title {
+  font-weight: 750;
+  letter-spacing: -0.02em;
+}
 body.dark .admin-management-page {
-  background: radial-gradient(ellipse at 86% -8%, rgba(116, 193, 133, 0.08), transparent 34%), #0e1510;
+  background:
+    radial-gradient(ellipse at 86% -8%, rgba(116, 193, 133, 0.08), transparent 34%), #0e1510;
 }
 body.dark .admin-management-header {
-  border-color: rgba(158, 232, 182, 0.12); background: rgba(17, 25, 19, 0.72);
+  border-color: rgba(158, 232, 182, 0.12);
+  background: rgba(17, 25, 19, 0.72);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.16);
 }
 body.dark .admin-management-page .ant-card {
-  border-color: rgba(158, 232, 182, 0.10);
+  border-color: rgba(158, 232, 182, 0.1);
   background: linear-gradient(145deg, rgba(22, 32, 24, 0.98), rgba(14, 21, 16, 0.98));
 }
-body.dark .admin-management-page .ant-card-head { border-bottom-color: rgba(158, 232, 182, 0.10); }
-html[data-theme='ultra-dark'] body.dark .admin-management-page { background: #030604; }
+body.dark .admin-management-page .ant-card-head {
+  border-bottom-color: rgba(158, 232, 182, 0.1);
+}
+html[data-theme='ultra-dark'] body.dark .admin-management-page {
+  background: #030604;
+}
 @media (max-width: 640px) {
-  .admin-management-page { padding: 14px; }
-  .admin-management-header { padding: 16px; border-radius: 15px; }
+  .admin-management-page {
+    padding: 14px;
+  }
+  .admin-management-header {
+    padding: 16px;
+    border-radius: 15px;
+  }
 }
