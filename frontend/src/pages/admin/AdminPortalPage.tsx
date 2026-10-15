@@ -215,7 +215,7 @@ export default function AdminPortalPage() {
         render: (v: number) => expiryLabel(v, t('unlimited')),
       },
       {
-        title: 'Status',
+        title: t('status'),
         dataIndex: 'enabled',
         width: 105,
         render: (v: boolean) => (

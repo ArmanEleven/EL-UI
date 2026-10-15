@@ -2,7 +2,11 @@ package controller
 
 import (
 	"encoding/json"
+	"net/http"
+	"net/http/httptest"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 	"testing"
 
 	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
@@ -90,3 +94,43 @@ func TestCanManagementAccessInboundAllScopeMayBeRestrictedByAllowList(t *testing
 		t.Fatal("configured allow-list must narrow even ALL scope")
 	}
 }
+
+func TestManagementPortalKeepsInboundRoutesReadOnlyAndMasterRoutesProtected(t *testing.T) {
+	previousMode := gin.Mode()
+	gin.SetMode(gin.TestMode)
+	t.Cleanup(func() { gin.SetMode(previousMode) })
+
+	engine := gin.New()
+	NewManagementController(engine.Group("/panel/api"))
+
+	seenInboundReads := map[string]bool{}
+	for _, route := range engine.Routes() {
+		if strings.Contains(route.Path, "/management-api/inbounds") {
+			if route.Method != http.MethodGet {
+				t.Errorf("delegated management inbound route %s %s must be read-only", route.Method, route.Path)
+			}
+			seenInboundReads[route.Method+" "+route.Path] = true
+		}
+	}
+	for _, route := range []string{
+		"GET /panel/api/management-api/inbounds",
+		"GET /panel/api/management-api/inbounds/:id",
+	} {
+		if !seenInboundReads[route] {
+			t.Errorf("expected read-only management route %q to be registered", route)
+		}
+	}
+
+	for _, path := range []string{
+		"/panel/api/management-api/master/roles",
+		"/panel/api/management-api/master/admins",
+	} {
+		request := httptest.NewRequest(http.MethodGet, path, nil)
+		response := httptest.NewRecorder()
+		engine.ServeHTTP(response, request)
+		if response.Code != http.StatusUnauthorized {
+			t.Errorf("unauthenticated request to %s returned %d, want %d", path, response.Code, http.StatusUnauthorized)
+		}
+	}
+}
+
