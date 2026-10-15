@@ -209,6 +209,8 @@ jobs:
       - name: Lint
         run: npm run lint
         working-directory: frontend
+      - name: Diagnose formatter output (temporary)
+        run: npx oxfmt src/pages/admin/AdminPortalPage.tsx && git diff -- src/pages/admin/AdminPortalPage.tsx
       - name: Format check
         run: npm run format:check
         working-directory: frontend
