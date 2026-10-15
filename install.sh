@@ -467,7 +467,7 @@ setup_ssl_certificate() {
     ~/.acme.sh/acme.sh --installcert --force -d ${domain} \
         --key-file /root/cert/${domain}/privkey.pem \
         --fullchain-file /root/cert/${domain}/fullchain.pem \
-        --reloadcmd "systemctl restart x-ui" > /dev/null 2>&1
+        --reloadcmd "el-ui restart" > /dev/null 2>&1
 
     if [ $? -ne 0 ]; then
         echo -e "${yellow}Failed to install certificate${plain}"
@@ -536,7 +536,7 @@ setup_ip_certificate() {
     fi
 
     # Set reload command for auto-renewal (add || true so it doesn't fail during first install)
-    local reloadCmd="systemctl restart x-ui 2>/dev/null || rc-service x-ui restart 2>/dev/null || true"
+    local reloadCmd="el-ui restart"
 
     # Choose port for HTTP-01 listener (default 80, prompt override)
     local WebPort=""
@@ -767,8 +767,8 @@ ssl_cert_issue() {
     fi
 
     # Setup reload command
-    reloadCmd="systemctl restart x-ui || rc-service x-ui restart"
-    echo -e "${green}Default --reloadcmd for ACME is: ${yellow}systemctl restart x-ui || rc-service x-ui restart${plain}"
+    reloadCmd="el-ui restart"
+    echo -e "${green}Default --reloadcmd for ACME is: ${yellow}el-ui restart${plain}"
     echo -e "${green}This command will run on every certificate issue and renew.${plain}"
     if [[ "$NONINTERACTIVE" == "1" ]]; then
         setReloadcmd="n"
@@ -776,17 +776,17 @@ ssl_cert_issue() {
         read -rp "Would you like to modify --reloadcmd for ACME? (y/n): " setReloadcmd
     fi
     if [[ "$setReloadcmd" == "y" || "$setReloadcmd" == "Y" ]]; then
-        echo -e "\n${green}\t1.${plain} Preset: systemctl reload nginx ; systemctl restart x-ui"
+        echo -e "\n${green}\t1.${plain} Preset: systemctl reload nginx ; el-ui restart"
         echo -e "${green}\t2.${plain} Input your own command"
         echo -e "${green}\t0.${plain} Keep default reloadcmd"
         read -rp "Choose an option: " choice
         case "$choice" in
             1)
-                echo -e "${green}Reloadcmd is: systemctl reload nginx ; systemctl restart x-ui${plain}"
-                reloadCmd="systemctl reload nginx ; systemctl restart x-ui"
+                echo -e "${green}Reloadcmd is: systemctl reload nginx ; el-ui restart${plain}"
+                reloadCmd="systemctl reload nginx ; el-ui restart"
                 ;;
             2)
-                echo -e "${yellow}It's recommended to put x-ui restart at the end${plain}"
+                echo -e "${yellow}It's recommended to put el-ui restart at the end${plain}"
                 read -rp "Please enter your custom reloadcmd: " reloadCmd
                 echo -e "${green}Reloadcmd is: ${reloadCmd}${plain}"
                 ;;
@@ -2035,7 +2035,7 @@ install_x-ui() {
     echo -e "┌───────────────────────────────────────────────────────┐
 │  ${blue}EL-UI control menu usages (subcommands):${plain}              │
 │                                                       │
-│  ${blue}el-ui${plain}              - Admin Management Script          │
+│  ${blue}el-ui${plain}              - Panel Management CLI          │
 │  ${blue}el-ui start${plain}        - Start                            │
 │  ${blue}el-ui stop${plain}         - Stop                             │
 │  ${blue}el-ui restart${plain}      - Restart                          │
