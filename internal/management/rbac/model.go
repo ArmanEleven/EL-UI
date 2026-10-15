@@ -75,7 +75,7 @@ type RoleLimits struct {
 
 func (l RoleLimits) Validate() error {
 	values := []struct {
-		name string
+		name  string
 		value *int64
 	}{
 		{"max_users", l.MaxUsers}, {"data_limit_min", l.DataLimitMin},
@@ -90,7 +90,7 @@ func (l RoleLimits) Validate() error {
 		}
 	}
 	for _, bounds := range []struct {
-		name string
+		name     string
 		min, max *int64
 	}{
 		{"data_limit", l.DataLimitMin, l.DataLimitMax},
