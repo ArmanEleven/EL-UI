@@ -193,3 +193,15 @@ html[data-theme='ultra-dark'] body.dark .management-portal {
     transition: none;
   }
 }
+
+/* Direction-aware finishing touches for Persian, Arabic and other RTL locales. */
+[dir='rtl'] .management-portal .management-topbar h2 {
+  letter-spacing: normal;
+}
+[dir='rtl'] .management-portal .ant-descriptions {
+  text-align: start;
+}
+[dir='rtl'] .management-portal .ant-table,
+[dir='rtl'] .management-portal .ant-form {
+  text-align: start;
+}
