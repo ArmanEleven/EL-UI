@@ -65,7 +65,7 @@ func TestValidateManagementClientPayloadRejectsNegativeExpiryBeforeDatabaseLooku
 		},
 	}
 	payload := &service.ClientCreatePayload{
-		Client: model.Client{Email: "client@example.com", ExpiryTime: -1},
+		Client:     model.Client{Email: "client@example.com", ExpiryTime: -1},
 		InboundIds: []int{1},
 	}
 	err := validateManagementClientPayload(admin, payload)
@@ -78,7 +78,7 @@ func TestCanManagementAccessInboundAllScopeMayBeRestrictedByAllowList(t *testing
 	admin := &rbac.Admin{
 		ID: 3, Status: rbac.AdminActive,
 		Role: &rbac.Role{
-			Name: "reader",
+			Name:        "reader",
 			Permissions: rbac.Permissions{rbac.ResourceInbounds: {rbac.ActionRead: rbac.AllowAll()}},
 		},
 	}
