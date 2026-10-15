@@ -5,8 +5,10 @@ implemented** merely because it is listed here. Every row must be verified again
 tests before its status changes.
 
 Status meanings: - **Audit pending** — source-level behavior and dependencies still need inspection.
-- **Design pending** — integration approach not yet approved. - **Not started** — no EL-UI
-implementation yet. - **Verified** — implemented and backed by a reproducible test.
+- **Design pending** — integration approach not yet approved.
+- **Not started** — no EL-UI
+implementation yet.
+- **Verified** — implemented and backed by a reproducible test.
 
 | Capability                       | 3X-UI baseline                                | HMPanel-described capability                                 | Initial EL-UI status | Verification needed                                                                     |
 | -------------------------------- | --------------------------------------------- | ------------------------------------------------------------ | -------------------- | --------------------------------------------------------------------------------------- |
@@ -35,9 +37,12 @@ schema, and tests have been inspected.
 ## Source-level findings
 
 -  3X-UI already provides a Go-based native core, REST endpoints under `/panel/api`, scoped API
-  tokens, CSRF middleware, native inbounds/clients, and local/remote node runtime behavior. -
+  tokens, CSRF middleware, native inbounds/clients, and local/remote node runtime behavior.
+-
   HMPanel uses a separate PostgreSQL/Prisma data model for management entities and a separate
-  NestJS/Next.js stack. This makes a blind code merge inappropriate. - The HMPanel README says MIT,
+  NestJS/Next.js stack. This makes a blind code merge inappropriate.
+- The HMPanel README says MIT,
   while `backend/package.json` declares `UNLICENSED` and the root LICENSE lookup did not find a
-  file. Direct backend code reuse remains blocked pending license clarification. - The repository
+  file. Direct backend code reuse remains blocked pending license clarification.
+- The repository
   includes `docs/SOURCE_AUDIT.md` with the current evidence and the remaining decision gates.
