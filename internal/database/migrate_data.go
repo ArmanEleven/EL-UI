@@ -38,6 +38,8 @@ import (
 func migrationModels() []any {
 	return []any{
 		&model.User{},
+		&model.ManagementAdminRole{},
+		&model.ManagementAdmin{},
 		&model.Setting{},
 		&model.HistoryOfSeeders{},
 		&model.Node{},
