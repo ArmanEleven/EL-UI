@@ -120,8 +120,13 @@ type RoleAccess struct {
 	AllowedGroupIDs    []int64 `json:"allowed_group_ids"`
 }
 
-func (a RoleAccess) AllowsGroup(id int64) bool    { return containsAllowedID(a.AllowedGroupIDs, id) }
-func (a RoleAccess) AllowsTemplate(id int64) bool { return containsAllowedID(a.AllowedTemplateIDs, id) }
+func (a RoleAccess) AllowsGroup(id int64) bool {
+	return containsAllowedID(a.AllowedGroupIDs, id)
+}
+
+func (a RoleAccess) AllowsTemplate(id int64) bool {
+	return containsAllowedID(a.AllowedTemplateIDs, id)
+}
 
 func containsAllowedID(allowed []int64, id int64) bool {
 	if allowed == nil {
