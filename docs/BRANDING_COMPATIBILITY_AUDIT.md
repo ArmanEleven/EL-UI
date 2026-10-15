@@ -15,15 +15,15 @@ and must not be removed.
 
 ## Verified compatibility dependencies to retain for now
 
-| Identifier / dependency | Current role | Decision |
-| --- | --- | --- |
-| `/usr/local/x-ui` | Default installation/storage path used by legacy scripts | Keep until an explicit, tested migration copies or references existing data safely. |
-| `XUI_MAIN_FOLDER`, `XUI_SERVICE`, other `XUI_*` variables | Existing installer/runtime configuration contract | Keep as compatibility variables. Add EL-UI aliases only with defined precedence and regression tests. |
-| `/etc/systemd/system` and existing service unit names | Service installation/upgrade target | Inspect actual unit names and migration behavior before renaming. Never create a second competing service accidentally. |
-| `x-ui.sh` and the internal `x-ui` executable target | Existing CLI implementation / compatibility target | Keep as implementation compatibility for now; expose `el-ui` as the documented user-facing command. |
-| `github.com/mhsanaei/3x-ui/v3/...` Go import paths | Go module and upstream package identity | Do not mass-rewrite imports without a coordinated module/package migration and full Go build/test validation. |
-| Upstream source and release URLs | Current installer/updater acquisition path | Treat as a material release dependency, not a completed EL-UI release pipeline. Do not replace with guessed EL-UI release URLs. |
-| Upstream attribution, license notices, compatibility docs | Legal and technical provenance | Retain and make clear; this is not a user-facing product-label defect. |
+| Identifier / dependency                                   | Current role                                             | Decision                                                                                                                        |
+| --------------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `/usr/local/x-ui`                                         | Default installation/storage path used by legacy scripts | Keep until an explicit, tested migration copies or references existing data safely.                                             |
+| `XUI_MAIN_FOLDER`, `XUI_SERVICE`, other `XUI_*` variables | Existing installer/runtime configuration contract        | Keep as compatibility variables. Add EL-UI aliases only with defined precedence and regression tests.                           |
+| `/etc/systemd/system` and existing service unit names     | Service installation/upgrade target                      | Inspect actual unit names and migration behavior before renaming. Never create a second competing service accidentally.         |
+| `x-ui.sh` and the internal `x-ui` executable target       | Existing CLI implementation / compatibility target       | Keep as implementation compatibility for now; expose `el-ui` as the documented user-facing command.                             |
+| `github.com/mhsanaei/3x-ui/v3/...` Go import paths        | Go module and upstream package identity                  | Do not mass-rewrite imports without a coordinated module/package migration and full Go build/test validation.                   |
+| Upstream source and release URLs                          | Current installer/updater acquisition path               | Treat as a material release dependency, not a completed EL-UI release pipeline. Do not replace with guessed EL-UI release URLs. |
+| Upstream attribution, license notices, compatibility docs | Legal and technical provenance                           | Retain and make clear; this is not a user-facing product-label defect.                                                          |
 
 ## Known gaps requiring follow-up
 
