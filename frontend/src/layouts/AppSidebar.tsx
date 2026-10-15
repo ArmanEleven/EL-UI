@@ -169,7 +169,7 @@ function saveSidebarPinned(pinned: boolean) {
 
 export default function AppSidebar() {
   const { t } = useTranslation();
-  const { isDark, isUltra, toggleTheme, toggleUltra } = useTheme();
+  const { isDark, isUltra, cycleTheme: advanceTheme } = useTheme();
   const { open: openCommandPalette } = useCommandPalette();
   const navigate = useNavigate();
   const { pathname, hash } = useLocation();
@@ -341,17 +341,9 @@ export default function AppSidebar() {
   const cycleTheme = useCallback(
     (id: string) => {
       pauseAnimationsUntilLeave(id);
-      if (!isDark) {
-        toggleTheme();
-        if (isUltra) toggleUltra();
-      } else if (!isUltra) {
-        toggleUltra();
-      } else {
-        toggleUltra();
-        toggleTheme();
-      }
+      advanceTheme();
     },
-    [isDark, isUltra, toggleTheme, toggleUltra],
+    [advanceTheme],
   );
 
   return (

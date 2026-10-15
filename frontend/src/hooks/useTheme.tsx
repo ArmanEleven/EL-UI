@@ -3,146 +3,139 @@ import type { ReactNode } from 'react';
 import { theme as antdTheme } from 'antd';
 import type { ThemeConfig } from 'antd';
 
+import { getThemePreset, isThemeId, THEME_IDS, type ThemeId } from '@/theme/themes';
+
+const STORAGE_THEME = 'elui-theme';
 const STORAGE_DARK = 'dark-mode';
 const STORAGE_ULTRA = 'isUltraDarkThemeEnabled';
 
 function readBool(key: string, fallback: boolean): boolean {
-  const raw = localStorage.getItem(key);
-  if (raw === null) return fallback;
-  return raw === 'true';
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw === null) return fallback;
+    return raw === 'true';
+  } catch {
+    return fallback;
+  }
 }
 
-function applyDom(isDark: boolean, isUltra: boolean) {
+function readInitialTheme(): ThemeId {
+  try {
+    const stored = localStorage.getItem(STORAGE_THEME);
+    if (isThemeId(stored)) return stored;
+  } catch {
+    // Storage can be unavailable in privacy modes; fall back to legacy defaults.
+  }
+  if (readBool(STORAGE_ULTRA, false)) return 'ultra-dark';
+  return readBool(STORAGE_DARK, true) ? 'graphite' : 'light';
+}
+
+function applyDom(themeId: ThemeId) {
+  const preset = getThemePreset(themeId);
   document.body.classList.remove('dark', 'light');
-  document.body.classList.add(isDark ? 'dark' : 'light');
-  // Native scrollbars read color-scheme, not the body class.
-  document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
-  if (isUltra) {
+  document.body.classList.add(preset.isDark ? 'dark' : 'light');
+  document.documentElement.style.colorScheme = preset.isDark ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-palette', themeId);
+  if (preset.isUltra) {
     document.documentElement.setAttribute('data-theme', 'ultra-dark');
   } else {
     document.documentElement.removeAttribute('data-theme');
   }
+
+  const root = document.documentElement;
+  root.style.setProperty('--elui-bg', preset.background);
+  root.style.setProperty('--elui-surface', preset.surface);
+  root.style.setProperty('--elui-surface-elevated', preset.elevated);
+  root.style.setProperty('--elui-text', preset.text);
+  root.style.setProperty('--elui-muted-text', preset.mutedText);
+  root.style.setProperty('--elui-accent', preset.accent);
+  root.style.setProperty('--elui-accent-strong', preset.accentStrong);
+  root.style.setProperty('--elui-border', preset.border);
+
   const msg = document.getElementById('message');
   if (msg) {
     msg.classList.remove('dark', 'light');
-    msg.classList.add(isDark ? 'dark' : 'light');
+    msg.classList.add(preset.isDark ? 'dark' : 'light');
   }
 }
 
-// module load so the document is in the right theme before React mounts.
-const initialDark = readBool(STORAGE_DARK, true);
-const initialUltra = readBool(STORAGE_ULTRA, false);
-applyDom(initialDark, initialUltra);
+// Apply before React mounts to avoid a flash of the wrong palette.
+const initialThemeId = readInitialTheme();
+applyDom(initialThemeId);
 
-const DARK_TOKENS = {
-  colorBgBase: '#0e1510',
-  colorBgLayout: '#0e1510',
-  colorBgContainer: '#151e17',
-  colorBgElevated: '#1e2a21',
-  colorPrimary: '#2f8a5b',
-  colorPrimaryHover: '#399b68',
-  colorPrimaryActive: '#26734c',
-};
-const ULTRA_DARK_TOKENS = {
-  colorBgBase: '#030604',
-  colorBgLayout: '#030604',
-  colorBgContainer: '#0b100c',
-  colorBgElevated: '#141c16',
-  colorPrimary: '#328b5c',
-  colorPrimaryHover: '#3aa76b',
-  colorPrimaryActive: '#26744d',
-};
-const DARK_LAYOUT_TOKENS = {
-  bodyBg: '#0e1510',
-  headerBg: '#101711',
-  headerColor: '#edf7ed',
-  footerBg: '#0e1510',
-  siderBg: '#101711',
-  triggerBg: '#1e2a21',
-  triggerColor: '#edf7ed',
-};
-const ULTRA_DARK_LAYOUT_TOKENS = {
-  bodyBg: '#030604',
-  headerBg: '#070b08',
-  headerColor: '#edf7ed',
-  footerBg: '#030604',
-  siderBg: '#070b08',
-  triggerBg: '#141c16',
-  triggerColor: '#edf7ed',
-};
-const DARK_MENU_TOKENS = {
-  darkItemBg: '#101711',
-  darkSubMenuItemBg: '#0e1510',
-  darkPopupBg: '#1e2a21',
-};
-const ULTRA_DARK_MENU_TOKENS = {
-  darkItemBg: '#070b08',
-  darkSubMenuItemBg: '#030604',
-  darkPopupBg: '#141c16',
-};
-const DARK_CARD_TOKENS = {
-  colorBorderSecondary: 'rgba(158, 232, 182, 0.10)',
-};
-const ULTRA_DARK_CARD_TOKENS = {
-  colorBorderSecondary: 'rgba(158, 232, 182, 0.08)',
-};
 const STATISTIC_TOKENS = {
   contentFontSize: 17,
   titleFontSize: 11,
 };
-const LIGHT_CONTRAST_TOKENS = {
-  colorTextDescription: 'rgba(0, 0, 0, 0.58)',
-  colorTextTertiary: 'rgba(0, 0, 0, 0.58)',
-  colorTextPlaceholder: '#767676',
-  colorError: '#cf1322',
-  colorErrorText: '#cf1322',
-  colorSuccessText: '#237804',
-};
-const LIGHT_BUTTON_TOKENS = {
-  colorPrimary: '#2f7752',
-  colorPrimaryHover: '#256642',
-  colorPrimaryActive: '#1f5438',
-};
-
-// hashed:false drops the `:where(.css-<hash>)` wrapper antd puts around every
-// rule. It costs nothing in specificity — `:where()` contributes zero, so the
-// panel's own `.ant-*` overrides still win — and it removes roughly 5,700
-// wrappers, 16% of the generated stylesheet, from what the browser has to parse.
-//
-// cssVar.key pins the CSS-variable scope. Every panel page mounts its own
-// ConfigProvider (there is no root one), and without a fixed key each mints a
-// fresh useId-derived scope, so navigating re-serialises and re-injects the whole
-// token block under a new class instead of reusing the one already in the head.
 const SHARED_STYLE_CONFIG = {
   hashed: false,
   cssVar: { key: 'elui' },
 } as const;
 
-export function buildAntdThemeConfig(isDark: boolean, isUltra: boolean): ThemeConfig {
-  if (!isDark) {
+export function buildAntdThemeConfig(
+  isDark: boolean,
+  isUltra: boolean,
+  themeId?: ThemeId,
+): ThemeConfig {
+  const id = themeId ?? (isUltra ? 'ultra-dark' : isDark ? 'graphite' : 'light');
+  const preset = getThemePreset(id);
+  const primary = preset.accentStrong;
+  const token = {
+    colorBgBase: preset.background,
+    colorBgLayout: preset.background,
+    colorBgContainer: preset.surface,
+    colorBgElevated: preset.elevated,
+    colorTextBase: preset.text,
+    colorPrimary: primary,
+    colorPrimaryHover: preset.accent,
+    colorPrimaryActive: preset.accentStrong,
+    colorTextDescription: preset.mutedText,
+    colorTextTertiary: preset.mutedText,
+    colorTextPlaceholder: preset.mutedText,
+    colorBorderSecondary: preset.border,
+    colorError: '#ff626e',
+    colorErrorText: '#d9363e',
+    colorSuccessText: '#269b70',
+  };
+
+  if (!preset.isDark) {
     return {
       ...SHARED_STYLE_CONFIG,
       algorithm: antdTheme.defaultAlgorithm,
-      token: {
-        ...LIGHT_CONTRAST_TOKENS,
-        colorPrimary: '#2f7752',
-        colorPrimaryHover: '#256642',
-        colorPrimaryActive: '#1f5438',
-      },
+      token,
       components: {
         Statistic: STATISTIC_TOKENS,
-        Button: LIGHT_BUTTON_TOKENS,
+        Button: {
+          colorPrimary: primary,
+          colorPrimaryHover: preset.accent,
+          colorPrimaryActive: preset.accentStrong,
+        },
       },
     };
   }
+
   return {
     ...SHARED_STYLE_CONFIG,
     algorithm: antdTheme.darkAlgorithm,
-    token: isUltra ? ULTRA_DARK_TOKENS : DARK_TOKENS,
+    token,
     components: {
-      Layout: isUltra ? ULTRA_DARK_LAYOUT_TOKENS : DARK_LAYOUT_TOKENS,
-      Menu: isUltra ? ULTRA_DARK_MENU_TOKENS : DARK_MENU_TOKENS,
-      Card: isUltra ? ULTRA_DARK_CARD_TOKENS : DARK_CARD_TOKENS,
+      Layout: {
+        bodyBg: preset.background,
+        headerBg: preset.background,
+        headerColor: preset.text,
+        footerBg: preset.background,
+        siderBg: preset.background,
+        triggerBg: preset.elevated,
+        triggerColor: preset.text,
+      },
+      Menu: {
+        darkItemBg: preset.background,
+        darkSubMenuItemBg: preset.background,
+        darkPopupBg: preset.elevated,
+      },
+      Card: {
+        colorBorderSecondary: preset.border,
+      },
       Statistic: STATISTIC_TOKENS,
     },
   };
@@ -164,6 +157,9 @@ export function pauseAnimationsUntilLeave(elementId: string): void {
 interface ThemeContextValue {
   isDark: boolean;
   isUltra: boolean;
+  themeId: ThemeId;
+  setTheme: (themeId: ThemeId) => void;
+  cycleTheme: () => void;
   toggleTheme: () => void;
   toggleUltra: () => void;
   antdThemeConfig: ThemeConfig;
@@ -172,23 +168,44 @@ interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [isDark, setIsDark] = useState<boolean>(initialDark);
-  const [isUltra, setIsUltra] = useState<boolean>(initialUltra);
+  const [themeId, setThemeId] = useState<ThemeId>(initialThemeId);
+  const preset = getThemePreset(themeId);
+  const isDark = preset.isDark;
+  const isUltra = preset.isUltra;
 
   useLayoutEffect(() => {
-    applyDom(isDark, isUltra);
-    localStorage.setItem(STORAGE_DARK, String(isDark));
-    localStorage.setItem(STORAGE_ULTRA, String(isUltra));
-  }, [isDark, isUltra]);
+    applyDom(themeId);
+    try {
+      localStorage.setItem(STORAGE_THEME, themeId);
+      // Keep legacy keys in sync so older UI entry points keep behaving.
+      localStorage.setItem(STORAGE_DARK, String(isDark));
+      localStorage.setItem(STORAGE_ULTRA, String(isUltra));
+    } catch {
+      // The active in-memory theme still works when storage is blocked.
+    }
+  }, [themeId, isDark, isUltra]);
 
-  const toggleTheme = useCallback(() => setIsDark((v) => !v), []);
-  const toggleUltra = useCallback(() => setIsUltra((v) => !v), []);
+  const setTheme = useCallback((nextTheme: ThemeId) => setThemeId(nextTheme), []);
+  const cycleTheme = useCallback(() => {
+    setThemeId((current) => {
+      const index = THEME_IDS.indexOf(current);
+      return THEME_IDS[(index + 1) % THEME_IDS.length];
+    });
+  }, []);
+  const toggleTheme = useCallback(() => {
+    setThemeId((current) => (getThemePreset(current).isDark ? 'light' : 'graphite'));
+  }, []);
+  const toggleUltra = useCallback(() => {
+    setThemeId((current) => (getThemePreset(current).isUltra ? 'graphite' : 'ultra-dark'));
+  }, []);
 
-  const antdThemeConfig = useMemo(() => buildAntdThemeConfig(isDark, isUltra), [isDark, isUltra]);
-
+  const antdThemeConfig = useMemo(
+    () => buildAntdThemeConfig(isDark, isUltra, themeId),
+    [isDark, isUltra, themeId],
+  );
   const value = useMemo<ThemeContextValue>(
-    () => ({ isDark, isUltra, toggleTheme, toggleUltra, antdThemeConfig }),
-    [isDark, isUltra, toggleTheme, toggleUltra, antdThemeConfig],
+    () => ({ isDark, isUltra, themeId, setTheme, cycleTheme, toggleTheme, toggleUltra, antdThemeConfig }),
+    [isDark, isUltra, themeId, setTheme, cycleTheme, toggleTheme, toggleUltra, antdThemeConfig],
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
