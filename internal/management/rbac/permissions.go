@@ -149,6 +149,7 @@ func cloneLimits(v RoleLimits) RoleLimits {
 		OnHoldTimeoutMin: cloneInt64(v.OnHoldTimeoutMin), OnHoldTimeoutMax: cloneInt64(v.OnHoldTimeoutMax),
 	}
 }
+
 func cloneInt64(v *int64) *int64 {
 	if v == nil {
 		return nil
