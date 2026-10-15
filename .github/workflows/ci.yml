@@ -227,9 +227,10 @@ jobs:
           )
           npx oxfmt "${files[@]}"
           for file in "${files[@]}"; do
-            printf 'ELUI_FORMAT_BEGIN:%s\\n' "$file"
+            echo "ELUI_FORMAT_BEGIN:$file"
             base64 -w0 "$file"
-            printf '\\nELUI_FORMAT_END:%s\\n' "$file"
+            echo
+            echo "ELUI_FORMAT_END:$file"
           done
         working-directory: frontend
       - name: Typecheck
