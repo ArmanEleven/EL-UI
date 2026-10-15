@@ -64,7 +64,6 @@ type SafeClient = {
   group: string;
   createdAt: number;
 };
-type Envelope<T> = { success: boolean; msg?: string; obj: T | null };
 type CreateClientForm = {
   email: string;
   inboundIds: number[];
@@ -97,7 +96,6 @@ export default function AdminPortalPage() {
   const [form] = Form.useForm<CreateClientForm>();
 
   const load = useCallback(async () => {
-    setLoading(true);
     try {
       const [meResp, inboundResp, clientResp] = await Promise.all([
         HttpUtil.get<ManagementMe>('/management-api/auth/me', undefined, { silent: true }),
