@@ -143,6 +143,7 @@ func containsAllowedID(allowed []int64, id int64) bool {
 func (a RoleAccess) FilterGroupIDs(requested []int64) []int64 {
 	return intersectIDs(requested, a.AllowedGroupIDs)
 }
+
 func (a RoleAccess) FilterTemplateIDs(requested []int64) []int64 {
 	return intersectIDs(requested, a.AllowedTemplateIDs)
 }
@@ -195,26 +196,26 @@ type RoleHWIDSettings struct {
 }
 
 type Role struct {
-	Name                        string             `json:"name"`
-	IsOwner                     bool               `json:"is_owner"`
-	Permissions                 Permissions        `json:"permissions"`
-	Limits                      RoleLimits         `json:"limits"`
-	Features                    RoleFeatures       `json:"features"`
-	Access                      RoleAccess         `json:"access"`
-	HWID                        RoleHWIDSettings   `json:"hwid"`
-	DisabledWhenLimited         bool               `json:"disabled_when_limited"`
-	DisconnectUsersWhenLimited  bool               `json:"disconnect_users_when_limited"`
-	DisconnectUsersWhenDisabled bool               `json:"disconnect_users_when_disabled"`
+	Name                        string           `json:"name"`
+	IsOwner                     bool             `json:"is_owner"`
+	Permissions                 Permissions      `json:"permissions"`
+	Limits                      RoleLimits       `json:"limits"`
+	Features                    RoleFeatures     `json:"features"`
+	Access                      RoleAccess       `json:"access"`
+	HWID                        RoleHWIDSettings `json:"hwid"`
+	DisabledWhenLimited         bool             `json:"disabled_when_limited"`
+	DisconnectUsersWhenLimited  bool             `json:"disconnect_users_when_limited"`
+	DisconnectUsersWhenDisabled bool             `json:"disconnect_users_when_disabled"`
 }
 
 // NewRole applies the reference role-creation defaults.
 func NewRole(name string) Role {
 	return Role{
-		Name: name,
-		Permissions: make(Permissions),
-		Features: RoleFeatures{CanUseResetStrategy: true, CanUseNextPlan: true},
-		HWID: RoleHWIDSettings{Mode: HWIDUseGlobal},
-		DisconnectUsersWhenLimited: true,
+		Name:                        name,
+		Permissions:                 make(Permissions),
+		Features:                    RoleFeatures{CanUseResetStrategy: true, CanUseNextPlan: true},
+		HWID:                        RoleHWIDSettings{Mode: HWIDUseGlobal},
+		DisconnectUsersWhenLimited:  true,
 		DisconnectUsersWhenDisabled: true,
 	}
 }
@@ -251,9 +252,9 @@ func (r Role) Validate() error {
 type AdminStatus string
 
 const (
-	AdminActive AdminStatus = "active"
+	AdminActive   AdminStatus = "active"
 	AdminDisabled AdminStatus = "disabled"
-	AdminLimited AdminStatus = "limited"
+	AdminLimited  AdminStatus = "limited"
 )
 
 // Admin is an authorization context; it does not replace the native 3X-UI user model.
