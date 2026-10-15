@@ -40,8 +40,8 @@ import { TuicClientSchema, TuicInboundSettingsSchema } from '@/schemas/protocols
 import { TunnelInboundSettingsSchema } from '@/schemas/protocols/inbound/tunnel';
 import { VlessClientSchema, VlessInboundSettingsSchema } from '@/schemas/protocols/inbound/vless';
 import { VmessClientSchema, VmessInboundSettingsSchema } from '@/schemas/protocols/inbound/vmess';
-import { WireguardInboundSettingsSchema } from '@/schemas/protocols/inbound/wireguard';
 import { TlsStreamSettingsSchema } from '@/schemas/protocols/security/tls';
+import { WireguardInboundSettingsSchema } from '@/schemas/protocols/inbound/wireguard';
 
 // Tests pass explicit seeds for every random field so the assertions don't
 // depend on window.crypto (the node test env has no crypto.randomUUID).
