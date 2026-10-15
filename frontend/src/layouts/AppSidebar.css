@@ -59,40 +59,9 @@
 
 .brand-actions .sidebar-pin,
 .brand-actions .sidebar-docs,
-.brand-actions .sidebar-donate,
 .brand-actions .sidebar-theme-cycle {
   width: 26px;
   height: 26px;
-}
-
-.sidebar-donate {
-  background: transparent;
-  border: none;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--ant-color-text-secondary);
-  text-decoration: none;
-  flex-shrink: 0;
-  transition:
-    background-color 0.2s,
-    transform 0.15s,
-    color 0.2s;
-}
-
-.sidebar-donate:hover,
-.sidebar-donate:focus-visible {
-  background-color: rgba(236, 72, 153, 0.12);
-  color: #ec4899;
-  transform: scale(1.08);
-  outline: none;
-}
-
-.sidebar-donate .anticon {
-  font-size: 16px;
 }
 
 .sidebar-docs {
@@ -448,4 +417,43 @@ body.dark .drawer-brand {
 }
 .sider-brand.is-collapsed .brand-text {
   display: none;
+}
+
+
+/* Active navigation is intentionally quiet until selected. */
+.sider-nav .ant-menu-item-selected,
+.sider-utility .ant-menu-item-selected,
+.drawer-menu .ant-menu-item-selected {
+  background: rgba(47, 138, 91, 0.13) !important;
+  color: #256642 !important;
+  font-weight: 750;
+}
+
+.sider-nav .ant-menu-item-selected .anticon,
+.sider-utility .ant-menu-item-selected .anticon,
+.drawer-menu .ant-menu-item-selected .anticon {
+  color: #2f8a5b !important;
+}
+
+body.dark .sider-nav .ant-menu-item-selected,
+body.dark .sider-utility .ant-menu-item-selected,
+body.dark .drawer-menu .ant-menu-item-selected {
+  background: rgba(115, 210, 139, 0.12) !important;
+  color: #b8f6c7 !important;
+}
+
+body.dark .sider-nav .ant-menu-item-selected .anticon,
+body.dark .sider-utility .ant-menu-item-selected .anticon,
+body.dark .drawer-menu .ant-menu-item-selected .anticon {
+  color: #9ee8b6 !important;
+}
+
+.sider-version {
+  border-radius: 9px;
+  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+
+.sider-version:hover {
+  border-color: rgba(47, 138, 91, 0.24);
+  background: rgba(47, 138, 91, 0.08);
 }
