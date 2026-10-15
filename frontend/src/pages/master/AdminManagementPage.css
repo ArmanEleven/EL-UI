@@ -1,3 +1,38 @@
+.admin-management-page {
+  padding: clamp(16px, 3vw, 32px);
+}
+
+.admin-management-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.admin-management-header h2 {
+  margin: 4px 0;
+}
+
+.admin-management-grid {
+  margin-top: 16px;
+}
+
+.admin-management-card {
+  margin-top: 16px;
+}
+
+.admin-management-loading {
+  display: grid;
+  min-height: 60vh;
+  place-items: center;
+}
+
+@media (max-width: 640px) {
+  .admin-management-header {
+    flex-direction: column;
+  }
+}
 
 
 /* EL-UI Master Panel admin-management surfaces. */
