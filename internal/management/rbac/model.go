@@ -78,10 +78,14 @@ func (l RoleLimits) Validate() error {
 		name  string
 		value *int64
 	}{
-		{"max_users", l.MaxUsers}, {"data_limit_min", l.DataLimitMin},
-		{"data_limit_max", l.DataLimitMax}, {"expire_min", l.ExpireMin},
-		{"expire_max", l.ExpireMax}, {"min_hwid_per_user", l.MinHWIDPerUser},
-		{"max_hwid_per_user", l.MaxHWIDPerUser}, {"on_hold_timeout_min", l.OnHoldTimeoutMin},
+		{"max_users", l.MaxUsers},
+		{"data_limit_min", l.DataLimitMin},
+		{"data_limit_max", l.DataLimitMax},
+		{"expire_min", l.ExpireMin},
+		{"expire_max", l.ExpireMax},
+		{"min_hwid_per_user", l.MinHWIDPerUser},
+		{"max_hwid_per_user", l.MaxHWIDPerUser},
+		{"on_hold_timeout_min", l.OnHoldTimeoutMin},
 		{"on_hold_timeout_max", l.OnHoldTimeoutMax},
 	}
 	for _, item := range values {
