@@ -183,7 +183,9 @@ export default function LoginPage() {
             ) : (
               <div className="login-card">
                 <div className="brand">
-                  <span className="brand-symbol" aria-hidden="true">EL</span>
+                  <span className="brand-symbol" aria-hidden="true">
+                    EL
+                  </span>
                   <span className="brand-name">EL-UI</span>
                   <span className="brand-caption">CONTROL PLANE</span>
                   <span className="brand-accent" aria-hidden="true" />
