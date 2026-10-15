@@ -7,6 +7,7 @@ import (
 
 	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
 	"github.com/mhsanaei/3x-ui/v3/internal/management/rbac"
+	"github.com/mhsanaei/3x-ui/v3/internal/web/service"
 )
 
 func TestProjectManagementInboundDoesNotExposeStoredSettings(t *testing.T) {
@@ -50,6 +51,26 @@ func TestCanManagementAccessInboundRequiresReadGrantAndExplicitOwnID(t *testing.
 	admin.Role.Access.AllowedInboundIDs = nil
 	if canManagementAccessInbound(admin, 10) {
 		t.Fatal("OWN scope without an explicit inbound allow-list must deny")
+	}
+}
+
+func TestValidateManagementClientPayloadRejectsNegativeExpiryBeforeDatabaseLookup(t *testing.T) {
+	admin := &rbac.Admin{
+		ID: 3, Status: rbac.AdminActive,
+		Role: &rbac.Role{
+			Name: "writer",
+			Permissions: rbac.Permissions{
+				rbac.ResourceClients: {rbac.ActionCreate: rbac.AllowOwn()},
+			},
+		},
+	}
+	payload := &service.ClientCreatePayload{
+		Client: model.Client{Email: "client@example.com", ExpiryTime: -1},
+		InboundIds: []int{1},
+	}
+	err := validateManagementClientPayload(admin, payload)
+	if err == nil || !strings.Contains(err.Error(), "expiry") {
+		t.Fatalf("negative expiry should be rejected before database checks, got %v", err)
 	}
 }
 
