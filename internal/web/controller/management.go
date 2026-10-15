@@ -226,9 +226,25 @@ func (a *ManagementController) requireManagementAdmin(c *gin.Context) {
 	c.Next()
 }
 
+func isNativeOwnerUser(user *model.User, ownerID int) bool {
+	return user != nil && ownerID > 0 && user.Id == ownerID
+}
+
 func (a *ManagementController) requireNativeOwner(c *gin.Context) {
-	if session.GetLoginUser(c) == nil {
+	user := session.GetLoginUser(c)
+	if user == nil {
 		managementJSON(c, http.StatusUnauthorized, false, "Master Panel authentication required", nil)
+		c.Abort()
+		return
+	}
+	ownerID, err := nativeOwnerID()
+	if err != nil {
+		managementJSON(c, http.StatusInternalServerError, false, "could not verify panel owner", nil)
+		c.Abort()
+		return
+	}
+	if !isNativeOwnerUser(user, ownerID) {
+		managementJSON(c, http.StatusForbidden, false, "Master Panel owner access required", nil)
 		c.Abort()
 		return
 	}
