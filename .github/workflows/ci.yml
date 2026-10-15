@@ -207,6 +207,11 @@ jobs:
       - name: Lint
         run: npm run lint
         working-directory: frontend
+      - name: DEBUG temporary oxfmt output
+        run: |
+          npx oxfmt src/test/inbound-defaults.test.ts
+          git diff -- src/test/inbound-defaults.test.ts
+        working-directory: frontend
       - name: Format check
         run: npm run format:check
         working-directory: frontend
