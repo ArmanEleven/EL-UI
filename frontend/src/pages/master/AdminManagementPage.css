@@ -1,5 +1,15 @@
 .admin-management-page {
+  min-height: 100vh;
   padding: clamp(16px, 3vw, 32px);
+  color: var(--elui-text, var(--ant-color-text));
+  background:
+    radial-gradient(
+      ellipse at 86% -8%,
+      color-mix(in srgb, var(--elui-accent, var(--ant-color-primary)) 10%, transparent),
+      transparent 36%
+    ),
+    var(--elui-bg, var(--ant-color-bg-layout));
+  transition: background-color 220ms ease, color 220ms ease;
 }
 
 .admin-management-header {
@@ -8,10 +18,22 @@
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 20px;
+  padding: 20px 22px;
+  border: 1px solid var(--elui-border, var(--ant-color-border-secondary));
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--elui-surface, var(--ant-color-bg-container)) 88%, transparent);
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 color-mix(in srgb, var(--elui-text, #fff) 4%, transparent);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  transition: background-color 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
 }
 
 .admin-management-header h2 {
   margin: 4px 0;
+  font-weight: 800;
+  letter-spacing: -0.045em;
 }
 
 .admin-management-grid {
@@ -28,68 +50,122 @@
   place-items: center;
 }
 
-@media (max-width: 640px) {
-  .admin-management-header {
-    flex-direction: column;
-  }
+.admin-management-page .ant-card {
+  min-width: 0;
+  border: 1px solid var(--elui-border, var(--ant-color-border-secondary));
+  border-radius: 17px;
+  background: color-mix(in srgb, var(--elui-surface, var(--ant-color-bg-container)) 92%, transparent);
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.075),
+    inset 0 1px 0 color-mix(in srgb, var(--elui-text, #fff) 3%, transparent);
+  transition: background-color 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
 }
 
-/* EL-UI Master Panel admin-management surfaces. */
-.admin-management-page {
-  min-height: 100vh;
-  background:
-    radial-gradient(ellipse at 86% -8%, rgba(151, 218, 126, 0.1), transparent 34%),
-    var(--ant-color-bg-layout);
-}
-.admin-management-header {
-  padding: 20px 22px;
-  border: 1px solid rgba(47, 119, 82, 0.12);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.62);
-  box-shadow: 0 10px 30px rgba(35, 71, 43, 0.045);
-  backdrop-filter: blur(14px);
-}
-.admin-management-header h2 {
-  font-weight: 800;
-  letter-spacing: -0.045em;
-}
-.admin-management-page .ant-card {
-  border: 1px solid rgba(47, 119, 82, 0.12);
-  border-radius: 17px;
-  box-shadow: 0 12px 30px rgba(24, 54, 32, 0.05);
-}
 .admin-management-page .ant-card-head {
-  border-bottom-color: rgba(47, 119, 82, 0.1);
+  border-bottom-color: var(--elui-border, var(--ant-color-border-secondary));
+  background: color-mix(in srgb, var(--elui-surface, var(--ant-color-bg-container)) 78%, transparent);
 }
+
 .admin-management-page .ant-card-head-title {
   font-weight: 750;
   letter-spacing: -0.02em;
 }
-body.dark .admin-management-page {
-  background:
-    radial-gradient(ellipse at 86% -8%, rgba(116, 193, 133, 0.08), transparent 34%), #0e1510;
+
+.admin-management-page .ant-card-body {
+  min-width: 0;
 }
-body.dark .admin-management-header {
-  border-color: rgba(158, 232, 182, 0.12);
-  background: rgba(17, 25, 19, 0.72);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.16);
+
+.admin-management-page .ant-table-wrapper {
+  max-width: 100%;
+  overflow-x: auto;
 }
-body.dark .admin-management-page .ant-card {
-  border-color: rgba(158, 232, 182, 0.1);
-  background: linear-gradient(145deg, rgba(22, 32, 24, 0.98), rgba(14, 21, 16, 0.98));
+
+.admin-management-page .ant-table-thead > tr > th {
+  border-bottom-color: var(--elui-border, var(--ant-color-border-secondary));
+  background: color-mix(in srgb, var(--elui-accent, var(--ant-color-primary)) 7%, var(--elui-surface, var(--ant-color-bg-container)));
 }
-body.dark .admin-management-page .ant-card-head {
-  border-bottom-color: rgba(158, 232, 182, 0.1);
+
+.admin-management-page .ant-table-tbody > tr > td {
+  transition: background-color 140ms ease;
 }
-html[data-theme='ultra-dark'] body.dark .admin-management-page {
-  background: #030604;
+
+.admin-management-page .ant-table-tbody > tr:hover > td {
+  background: color-mix(in srgb, var(--elui-accent, var(--ant-color-primary)) 7%, var(--elui-surface, var(--ant-color-bg-container)));
 }
+
+.admin-management-page .ant-card,
+.admin-management-page .ant-form,
+.admin-management-page .ant-table,
+.admin-management-page .ant-descriptions {
+  min-width: 0;
+}
+
+.admin-management-page .ant-input,
+.admin-management-page .ant-input-affix-wrapper,
+.admin-management-page .ant-input-number,
+.admin-management-page .ant-select-selector {
+  border-radius: 10px;
+}
+
+.admin-management-page .ant-btn {
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.admin-management-page .ant-btn-primary {
+  box-shadow: 0 5px 16px color-mix(in srgb, var(--elui-accent-strong, var(--ant-color-primary)) 18%, transparent);
+}
+
+.admin-management-page .ant-btn-primary:hover {
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--elui-accent-strong, var(--ant-color-primary)) 24%, transparent);
+}
+
+.admin-management-page .ant-tag {
+  border-radius: 999px;
+}
+
 @media (max-width: 640px) {
   .admin-management-page {
     padding: 14px;
   }
+
   .admin-management-header {
+    align-items: stretch;
+    flex-direction: column;
     padding: 16px;
     border-radius: 15px;
+  }
+
+  .admin-management-header > div:last-child,
+  .admin-management-header .ant-space,
+  .admin-management-header .ant-btn {
+    max-width: 100%;
+  }
+
+  .admin-management-page .ant-card-head {
+    padding-inline: 14px;
+  }
+
+  .admin-management-page .ant-card-body {
+    padding: 14px;
+  }
+}
+
+@media (max-width: 420px) {
+  .admin-management-page {
+    padding: 8px;
+  }
+
+  .admin-management-header {
+    padding: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-management-page,
+  .admin-management-header,
+  .admin-management-page .ant-card,
+  .admin-management-page .ant-table-tbody > tr > td {
+    transition: none;
   }
 }
