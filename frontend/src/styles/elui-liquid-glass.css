@@ -1,0 +1,161 @@
+/* Palette-aware surface overrides for legacy panel pages. */
+:root {
+  --bg-page: var(--elui-bg, #09121d);
+  --bg-card: var(--elui-surface, #101e2c);
+}
+
+.index-page,
+.clients-page,
+.inbounds-page,
+.xray-page,
+.settings-page,
+.nodes-page,
+.groups-page,
+.hosts-page,
+.api-docs-page,
+.sponsors-page {
+  --bg-page: var(--elui-bg, #09121d);
+  --bg-card: var(--elui-surface, #101e2c);
+  background-color: var(--elui-bg, #09121d) !important;
+  color: var(--elui-text, #edf7ff);
+  transition: background-color 240ms ease, color 220ms ease;
+}
+
+.index-page .ant-layout,
+.index-page .ant-layout-content,
+.clients-page .ant-layout,
+.clients-page .ant-layout-content,
+.inbounds-page .ant-layout,
+.inbounds-page .ant-layout-content,
+.xray-page .ant-layout,
+.xray-page .ant-layout-content,
+.settings-page .ant-layout,
+.settings-page .ant-layout-content,
+.nodes-page .ant-layout,
+.nodes-page .ant-layout-content,
+.groups-page .ant-layout,
+.groups-page .ant-layout-content,
+.hosts-page .ant-layout,
+.hosts-page .ant-layout-content,
+.api-docs-page .ant-layout,
+.api-docs-page .ant-layout-content {
+  background: transparent !important;
+}
+
+.index-page .ant-card,
+.clients-page .ant-card,
+.inbounds-page .ant-card,
+.xray-page .ant-card,
+.settings-page .ant-card,
+.nodes-page .ant-card,
+.groups-page .ant-card,
+.hosts-page .ant-card,
+.api-docs-page .ant-card,
+.sponsors-page .ant-card {
+  border-color: var(--elui-border, rgba(145, 225, 255, 0.18)) !important;
+  background: color-mix(in srgb, var(--elui-surface, #101e2c) 84%, transparent) !important;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.075),
+    inset 0 1px 0 color-mix(in srgb, var(--elui-text, #edf7ff) 4%, transparent) !important;
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  transition:
+    background-color 240ms ease,
+    border-color 240ms ease,
+    box-shadow 220ms ease,
+    transform 180ms cubic-bezier(0.2, 0.75, 0.25, 1);
+}
+
+.index-page .ant-card .ant-card-head,
+.clients-page .ant-card .ant-card-head,
+.inbounds-page .ant-card .ant-card-head,
+.xray-page .ant-card .ant-card-head,
+.settings-page .ant-card .ant-card-head,
+.nodes-page .ant-card .ant-card-head,
+.groups-page .ant-card .ant-card-head,
+.hosts-page .ant-card .ant-card-head,
+.api-docs-page .ant-card .ant-card-head,
+.sponsors-page .ant-card .ant-card-head {
+  border-bottom-color: var(--elui-border, rgba(145, 225, 255, 0.18)) !important;
+  background: color-mix(in srgb, var(--elui-surface, #101e2c) 72%, transparent) !important;
+}
+
+.index-page .ant-card.ant-card-hoverable:hover,
+.clients-page .ant-card.ant-card-hoverable:hover,
+.inbounds-page .ant-card.ant-card-hoverable:hover,
+.xray-page .ant-card.ant-card-hoverable:hover,
+.settings-page .ant-card.ant-card-hoverable:hover,
+.nodes-page .ant-card.ant-card-hoverable:hover,
+.groups-page .ant-card.ant-card-hoverable:hover,
+.hosts-page .ant-card.ant-card-hoverable:hover,
+.api-docs-page .ant-card.ant-card-hoverable:hover,
+.sponsors-page .ant-card.ant-card-hoverable:hover {
+  border-color: color-mix(in srgb, var(--elui-accent) 54%, var(--elui-border)) !important;
+  box-shadow:
+    0 14px 36px rgba(0, 0, 0, 0.13),
+    inset 0 1px 0 color-mix(in srgb, var(--elui-text) 5%, transparent) !important;
+}
+
+.index-page .summary-card,
+.clients-page .summary-card,
+.inbounds-page .summary-card,
+.nodes-page .summary-card,
+.groups-page .summary-card {
+  border-color: var(--elui-border, rgba(145, 225, 255, 0.18));
+  background: color-mix(in srgb, var(--elui-surface, #101e2c) 88%, transparent);
+}
+
+html[data-palette='horizon'] .index-page .ant-card,
+html[data-palette='horizon'] .clients-page .ant-card,
+html[data-palette='horizon'] .inbounds-page .ant-card,
+html[data-palette='horizon'] .xray-page .ant-card,
+html[data-palette='horizon'] .settings-page .ant-card,
+html[data-palette='horizon'] .nodes-page .ant-card,
+html[data-palette='horizon'] .groups-page .ant-card,
+html[data-palette='horizon'] .hosts-page .ant-card,
+html[data-palette='horizon'] .api-docs-page .ant-card,
+html[data-palette='horizon'] .sponsors-page .ant-card {
+  background: color-mix(in srgb, var(--elui-surface, #fff) 92%, transparent) !important;
+  box-shadow:
+    0 8px 24px rgba(24, 48, 80, 0.055),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85) !important;
+}
+
+html[data-palette='obsidian'] .index-page .ant-card,
+html[data-palette='obsidian'] .clients-page .ant-card,
+html[data-palette='obsidian'] .inbounds-page .ant-card,
+html[data-palette='obsidian'] .xray-page .ant-card,
+html[data-palette='obsidian'] .settings-page .ant-card,
+html[data-palette='obsidian'] .nodes-page .ant-card,
+html[data-palette='obsidian'] .groups-page .ant-card,
+html[data-palette='obsidian'] .hosts-page .ant-card,
+html[data-palette='obsidian'] .api-docs-page .ant-card,
+html[data-palette='obsidian'] .sponsors-page .ant-card {
+  background: color-mix(in srgb, var(--elui-surface, #0a0d11) 94%, transparent) !important;
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.025) !important;
+}
+
+html[data-palette='iridescent'] body {
+  background:
+    radial-gradient(ellipse at 10% 0%, rgba(99, 171, 255, 0.13), transparent 38%),
+    radial-gradient(ellipse at 92% 8%, rgba(183, 115, 255, 0.13), transparent 36%),
+    radial-gradient(ellipse at 60% 100%, rgba(99, 232, 219, 0.07), transparent 40%),
+    var(--elui-bg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .index-page .ant-card,
+  .clients-page .ant-card,
+  .inbounds-page .ant-card,
+  .xray-page .ant-card,
+  .settings-page .ant-card,
+  .nodes-page .ant-card,
+  .groups-page .ant-card,
+  .hosts-page .ant-card,
+  .api-docs-page .ant-card,
+  .sponsors-page .ant-card {
+    transition: none !important;
+  }
+}

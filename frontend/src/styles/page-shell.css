@@ -7,8 +7,8 @@
 .groups-page,
 .api-docs-page,
 .sponsors-page {
-  --bg-page: #e6e8ec;
-  --bg-card: #ffffff;
+  --bg-page: var(--elui-bg, #f2f6fb);
+  --bg-card: var(--elui-surface, #ffffff);
   min-height: 100vh;
   background: var(--bg-page);
 }
@@ -22,8 +22,8 @@
 .groups-page.is-dark,
 .api-docs-page.is-dark,
 .sponsors-page.is-dark {
-  --bg-page: #1a1b1f;
-  --bg-card: #23252b;
+  --bg-page: var(--elui-bg, #09121d);
+  --bg-card: var(--elui-surface, #101e2c);
 }
 
 .index-page.is-dark.is-ultra,
@@ -35,8 +35,8 @@
 .groups-page.is-dark.is-ultra,
 .api-docs-page.is-dark.is-ultra,
 .sponsors-page.is-dark.is-ultra {
-  --bg-page: #000;
-  --bg-card: #101013;
+  --bg-page: var(--elui-bg, #030405);
+  --bg-card: var(--elui-surface, #0a0d11);
 }
 
 .index-page .ant-layout,
@@ -193,20 +193,20 @@ body.dark .ant-dropdown-menu-item-divider {
 /* Hosts page shares the standard panel page shell (background, transparent
    layout, content padding, summary-card padding). */
 .hosts-page {
-  --bg-page: #e6e8ec;
-  --bg-card: #ffffff;
+  --bg-page: var(--elui-bg, #f2f6fb);
+  --bg-card: var(--elui-surface, #ffffff);
   min-height: 100vh;
   background: var(--bg-page);
 }
 
 .hosts-page.is-dark {
-  --bg-page: #1a1b1f;
-  --bg-card: #23252b;
+  --bg-page: var(--elui-bg, #09121d);
+  --bg-card: var(--elui-surface, #101e2c);
 }
 
 .hosts-page.is-dark.is-ultra {
-  --bg-page: #000;
-  --bg-card: #101013;
+  --bg-page: var(--elui-bg, #030405);
+  --bg-card: var(--elui-surface, #0a0d11);
 }
 
 .hosts-page .ant-layout,
@@ -241,7 +241,7 @@ body.dark .ant-dropdown-menu-item-divider {
 .hosts-page,
 .api-docs-page,
 .sponsors-page {
-  background-color: #f3f6f0;
+  background-color: var(--elui-bg, #f2f6fb);
 }
 body.dark .index-page,
 body.dark .clients-page,
@@ -253,9 +253,9 @@ body.dark .groups-page,
 body.dark .hosts-page,
 body.dark .api-docs-page,
 body.dark .sponsors-page {
-  --bg-page: #0e1510;
-  --bg-card: #151e17;
-  background-color: #0e1510;
+  --bg-page: var(--elui-bg, #09121d);
+  --bg-card: var(--elui-surface, #101e2c);
+  background-color: var(--elui-bg, #09121d);
 }
 html[data-theme='ultra-dark'] body.dark .index-page,
 html[data-theme='ultra-dark'] body.dark .clients-page,
@@ -267,7 +267,7 @@ html[data-theme='ultra-dark'] body.dark .groups-page,
 html[data-theme='ultra-dark'] body.dark .hosts-page,
 html[data-theme='ultra-dark'] body.dark .api-docs-page,
 html[data-theme='ultra-dark'] body.dark .sponsors-page {
-  --bg-page: #030604;
-  --bg-card: #0b100c;
-  background-color: #030604;
+  --bg-page: var(--elui-bg, #030405);
+  --bg-card: var(--elui-surface, #0a0d11);
+  background-color: var(--elui-bg, #030405);
 }

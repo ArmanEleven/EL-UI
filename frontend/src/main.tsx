@@ -6,10 +6,12 @@ import '@/styles/utils.css';
 import '@/styles/page-shell.css';
 import '@/styles/page-cards.css';
 import '@/styles/elui-identity.css';
+import '@/styles/elui-liquid-glass.css';
 
 import { setupHttp } from '@/api/http-init';
 import { readyI18n } from '@/i18n/react';
 import { ThemeProvider } from '@/hooks/useTheme';
+import ThemePicker from '@/components/ThemePicker';
 import { QueryProvider } from '@/api/QueryProvider';
 import { router } from '@/routes';
 
@@ -52,7 +54,10 @@ readyI18n().then(() => {
     createRoot(root).render(
       <ThemeProvider>
         <QueryProvider>
-          <RouterProvider router={router} />
+          <>
+            <RouterProvider router={router} />
+            <ThemePicker />
+          </>
         </QueryProvider>
       </ThemeProvider>,
     );
