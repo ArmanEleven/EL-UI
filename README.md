@@ -8,7 +8,7 @@ This project builds on the Sanaei 3X-UI codebase. See LICENSE and upstream notic
   <strong>EL-UI</strong>
 </p>
 
-<h1 align="center">EL-UI — A Role-Aware Management Layer for 3X-UI</h1>
+<h1 align="center">EL-UI — Independent Control Plane for Secure Panel Operations</h1>
 
 <p align="center">
   <em>Built with care by <a href="https://github.com/ArmanEleven">ArmanEleven</a></em>
@@ -29,7 +29,7 @@ This project builds on the Sanaei 3X-UI codebase. See LICENSE and upstream notic
   <img alt="License: GPL-3.0" src="https://img.shields.io/badge/license-GPL--3.0-informational">
 </p>
 
-EL-UI is an open-source project led by **ArmanEleven** to build a cleaner, more capable management experience on top of the [Sanaei 3X-UI](https://github.com/MHSanaei/3x-ui) codebase. The goal is not to replace the Xray protocol engine, but to preserve the native panel's core capabilities while developing a carefully separated management layer for administrators, roles, permissions, quotas, and operational visibility.
+**EL-UI** is an open-source panel and control-plane project led by **ArmanEleven**. It is being developed as a distinct product with its own interface, administration model, and operational workflow, while retaining compatibility with the upstream [Sanaei 3X-UI](https://github.com/MHSanaei/3x-ui) codebase where required. The upstream relationship is disclosed for attribution and compatibility; it is not the product's user-facing identity.
 
 > [!WARNING]
 > **EL-UI is under active development and is not a production-ready release.** The multi-admin management layer is not yet connected end-to-end to authentication, API authorization, and the user interface. Do not use this development branch to manage production servers or valuable data.
@@ -42,7 +42,7 @@ EL-UI is an open-source project led by **ArmanEleven** to build a cleaner, more 
 - **Enforce quotas on the server:** apply user-count, data-limit, expiry, HWID, and other configured limits in backend operations—not just in forms.
 - **Keep ownership boundaries:** prevent an administrator from reading or changing records outside the scope granted to their role.
 - **Make changes auditable and reversible:** introduce safe migrations, backup/restore checks, clear operational logs, and regression tests.
-- **Build a distinctive UI:** develop an accessible, responsive management interface with internationalization and right-to-left support.
+- **Build a distinctive product:** deliver an accessible, responsive EL-UI interface with internationalization, right-to-left support, and a consistent visual system.
 
 ## Current development status
 
@@ -94,9 +94,9 @@ These are project targets, not a claim that every capability is already availabl
 
 ## Architecture
 
-EL-UI uses the native 3X-UI codebase as the protocol/Xray core. The intended management layer will be designed around explicit boundaries so that management policies do not bypass the core's client and runtime logic.
+EL-UI currently retains the upstream 3X-UI implementation as a compatibility foundation for Xray and existing panel operations. This is a documented technical dependency, not a claim that the upstream core has already been fully forked or renamed. Management policies must remain separated from core client and runtime logic.
 
-- **Core:** [Sanaei 3X-UI](https://github.com/MHSanaei/3x-ui) — native Xray lifecycle, inbounds, clients, subscriptions, and node operations.
+- **Compatibility foundation:** [Sanaei 3X-UI](https://github.com/MHSanaei/3x-ui) — retained for upstream attribution and compatibility with native Xray lifecycle, inbound, client, subscription, and node operations.
 - **Protocol engine:** [Xray-core](https://github.com/XTLS/Xray-core).
 - **Backend:** Go, Gin, and GORM.
 - **Frontend:** React, TypeScript, Vite, and Ant Design.
@@ -151,3 +151,16 @@ EL-UI's distribution must preserve the upstream license requirements and notices
 <p align="center">
   <sub>Designed and maintained by <a href="https://github.com/ArmanEleven">ArmanEleven</a> · Built incrementally, with correctness before claims.</sub>
 </p>
+
+
+## Command-line entry point
+
+Use `el-ui` for panel operations on new installations:
+
+```bash
+el-ui status
+el-ui restart
+el-ui settings
+```
+
+The previous launcher remains an internal compatibility target during the migration. Service and storage identifiers will be migrated separately with an upgrade path that protects existing installations.

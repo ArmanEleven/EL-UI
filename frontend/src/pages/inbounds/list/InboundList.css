@@ -211,3 +211,63 @@
 .tag-name .inbound-host-remarks {
   font-weight: 400;
 }
+
+/* Final polish for dense inbound tables and their mobile card equivalent. */
+.inbounds-page .ant-card {
+  border-color: var(--ant-color-border-secondary);
+  border-radius: 14px;
+}
+.inbounds-page .ant-table-thead > tr > th {
+  font-weight: 700;
+  white-space: nowrap;
+}
+.inbounds-page .ant-table-tbody > tr > td {
+  transition: background-color 120ms ease;
+}
+.inbounds-page .ant-table-tbody > tr:hover > td {
+  background: color-mix(in srgb, var(--ant-color-primary) 5%, var(--ant-color-bg-container));
+}
+.inbounds-page .ant-btn:focus-visible,
+.inbounds-page .ant-checkbox-wrapper:focus-visible,
+.inbounds-page .row-action-trigger:focus-visible {
+  outline: 2px solid var(--ant-color-primary);
+  outline-offset: 3px;
+}
+.inbound-card {
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease,
+    box-shadow 140ms ease;
+}
+.inbound-card:focus-within {
+  border-color: var(--ant-color-primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ant-color-primary) 12%, transparent);
+}
+@media (max-width: 480px) {
+  .inbounds-page .ant-card-head {
+    align-items: flex-start;
+  }
+  .inbounds-page .ant-card-head-title {
+    min-width: 0;
+    overflow-x: auto;
+  }
+  .inbounds-page .ant-card-body {
+    padding: 8px 6px;
+  }
+  .inbound-card {
+    padding: 10px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .inbounds-page .ant-table-tbody > tr > td,
+  .inbound-card {
+    transition: none;
+  }
+}
+
+[dir='rtl'] .inbounds-page .ant-card-head-title {
+  text-align: start;
+}
+[dir='rtl'] .inbound-card .tag-name {
+  text-align: start;
+}

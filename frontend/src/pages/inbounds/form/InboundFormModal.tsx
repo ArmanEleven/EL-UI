@@ -1158,11 +1158,12 @@ export default function InboundFormModal({
       <Modal
         open={open}
         title={title}
+        className="elui-inbound-modal"
         okText={okText}
         cancelText={t('close')}
         confirmLoading={saving}
         mask={{ closable: false }}
-        width={780}
+        width="min(1040px, calc(100vw - 24px))"
         onOk={submit}
         onCancel={onClose}
         destroyOnHidden

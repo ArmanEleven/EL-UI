@@ -1,62 +1,265 @@
-.vless-auth-state {
-  display: block;
-  margin-top: 6px;
+.elui-inbound-modal .ant-modal-content {
+  overflow: hidden;
+  border: 1px solid var(--ant-color-border-secondary);
+  border-radius: 18px;
+  box-shadow: 0 24px 80px rgb(0 0 0 / 28%);
 }
 
-.wg-peer {
-  margin-top: 4px;
+.elui-inbound-modal .ant-modal-header {
+  padding: 22px 24px 16px;
+  margin-bottom: 0;
+  border-bottom: 1px solid var(--ant-color-border-secondary);
 }
 
-.advanced-shell {
+.elui-inbound-modal .ant-modal-title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.elui-inbound-modal .ant-modal-body {
+  max-height: min(72vh, 820px);
+  padding: 18px 24px 24px;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.elui-inbound-modal .ant-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 24px 20px;
+  margin-top: 0;
+  border-top: 1px solid var(--ant-color-border-secondary);
+}
+
+.elui-inbound-modal .ant-modal-footer .ant-btn {
+  min-height: 38px;
+  border-radius: 9px;
+  font-weight: 600;
+}
+
+.elui-inbound-modal .ant-tabs-nav {
+  margin-bottom: 20px;
+}
+
+.elui-inbound-modal > .ant-modal-content .ant-tabs-nav::before {
+  border-bottom-color: var(--ant-color-border-secondary);
+}
+
+.elui-inbound-modal .ant-tabs-tab {
+  padding: 10px 13px;
+  border-radius: 9px 9px 0 0;
+  transition:
+    color 160ms ease,
+    background-color 160ms ease;
+}
+
+.elui-inbound-modal .ant-tabs-tab:hover {
+  background: var(--ant-color-fill-quaternary);
+}
+
+.elui-inbound-modal .ant-tabs-tab-btn {
+  font-weight: 600;
+}
+
+.elui-inbound-modal .ant-form-item {
+  margin-bottom: 17px;
+}
+
+.elui-inbound-modal .ant-form-item-label > label {
+  font-weight: 600;
+}
+
+.elui-inbound-modal .ant-input,
+.elui-inbound-modal .ant-input-number,
+.elui-inbound-modal .ant-select-selector,
+.elui-inbound-modal .ant-picker,
+.elui-inbound-modal .ant-input-affix-wrapper {
+  border-radius: 9px !important;
+}
+
+.elui-inbound-modal .ant-input,
+.elui-inbound-modal .ant-input-number,
+.elui-inbound-modal .ant-picker,
+.elui-inbound-modal .ant-input-affix-wrapper {
+  min-height: 38px;
+}
+
+.elui-inbound-modal .ant-input-number {
+  width: 100%;
+}
+
+.elui-inbound-modal .ant-alert {
+  border-radius: 10px;
+}
+
+.elui-inbound-modal .ant-card {
+  border-radius: 12px;
+}
+
+.elui-inbound-modal .ant-radio-button-wrapper {
+  min-height: 34px;
+  line-height: 32px;
+}
+
+.elui-inbound-modal .ant-input:focus,
+.elui-inbound-modal .ant-input-focused,
+.elui-inbound-modal .ant-select-focused .ant-select-selector,
+.elui-inbound-modal .ant-input-number-focused,
+.elui-inbound-modal .ant-picker-focused {
+  box-shadow: 0 0 0 3px rgb(72 187 139 / 14%);
+}
+
+.elui-inbound-modal .advanced-shell {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.advanced-panel {
-  padding: 14px;
+.elui-inbound-modal .advanced-panel {
+  padding: 16px;
   border: 1px solid var(--ant-color-border-secondary);
-  border-radius: 12px;
+  border-radius: 14px;
   background: var(--ant-color-fill-quaternary);
 }
 
-.advanced-panel__header {
-  margin-bottom: 12px;
+.elui-inbound-modal .advanced-panel__header {
+  margin-bottom: 14px;
 }
 
-.advanced-panel__title {
+.elui-inbound-modal .advanced-panel__title {
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.4;
 }
 
-.advanced-panel__subtitle {
+.elui-inbound-modal .advanced-panel__subtitle {
   margin-top: 4px;
-  opacity: 0.7;
-  line-height: 1.5;
+  color: var(--ant-color-text-secondary);
+  line-height: 1.55;
 }
 
-.advanced-inner-tabs .ant-tabs-nav {
+.elui-inbound-modal .advanced-inner-tabs .ant-tabs-nav {
   margin-bottom: 12px;
 }
 
-.advanced-inner-tabs .ant-tabs-tab {
+.elui-inbound-modal .advanced-inner-tabs .ant-tabs-tab {
   padding-inline: 14px;
 }
 
-.advanced-editor-meta {
+.elui-inbound-modal .advanced-editor-meta {
   margin-bottom: 10px;
-  opacity: 0.75;
-  line-height: 1.5;
+  color: var(--ant-color-text-secondary);
+  line-height: 1.55;
+}
+
+.elui-inbound-modal .vless-auth-state {
+  display: block;
+  margin-top: 6px;
+}
+
+.elui-inbound-modal .wg-peer {
+  margin-top: 4px;
 }
 
 @media (max-width: 768px) {
-  .advanced-panel {
+  .elui-inbound-modal .ant-modal-content {
+    border-radius: 14px;
+  }
+
+  .elui-inbound-modal .ant-modal-header {
+    padding: 16px 16px 12px;
+  }
+
+  .elui-inbound-modal .ant-modal-body {
+    max-height: calc(100dvh - 150px);
+    padding: 14px 14px 18px;
+  }
+
+  .elui-inbound-modal .ant-modal-footer {
+    flex-wrap: wrap;
+    padding: 12px 14px 14px;
+  }
+
+  .elui-inbound-modal .ant-modal-footer .ant-btn {
+    flex: 1 1 auto;
+  }
+
+  .elui-inbound-modal .ant-tabs-nav {
+    margin-bottom: 14px;
+  }
+
+  .elui-inbound-modal .ant-tabs-tab {
+    padding: 8px 10px;
+  }
+
+  .elui-inbound-modal .ant-form-item {
+    margin-bottom: 14px;
+  }
+
+  .elui-inbound-modal .advanced-panel {
     padding: 12px;
     border-radius: 10px;
   }
 
-  .advanced-inner-tabs .ant-tabs-tab {
+  .elui-inbound-modal .advanced-inner-tabs .ant-tabs-tab {
+    padding-inline: 9px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .elui-inbound-modal .ant-tabs-tab {
+    transition: none;
+  }
+}
+
+/* Consistent focus and keyboard navigation across protocol-specific editors. */
+.elui-inbound-modal .ant-btn:focus-visible,
+.elui-inbound-modal .ant-tabs-tab-btn:focus-visible,
+.elui-inbound-modal .ant-collapse-header:focus-visible {
+  outline: 2px solid var(--ant-color-primary);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+.elui-inbound-modal .ant-form-item-explain,
+.elui-inbound-modal .ant-form-item-extra {
+  line-height: 1.55;
+}
+.elui-inbound-modal .ant-tabs-nav-list {
+  max-width: 100%;
+}
+.elui-inbound-modal .ant-tabs-nav {
+  scrollbar-width: thin;
+}
+.elui-inbound-modal .ant-tabs-tab {
+  white-space: nowrap;
+}
+.elui-inbound-modal .advanced-panel,
+.elui-inbound-modal .ant-card {
+  min-width: 0;
+}
+.elui-inbound-modal .ant-input,
+.elui-inbound-modal textarea {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 480px) {
+  .elui-inbound-modal .ant-modal-body {
     padding-inline: 10px;
   }
+  .elui-inbound-modal .advanced-panel {
+    padding: 10px;
+  }
+  .elui-inbound-modal .ant-form-item-label > label {
+    height: auto;
+    white-space: normal;
+  }
+}
+
+[dir='rtl'] .elui-inbound-modal .ant-modal-title {
+  letter-spacing: normal;
+}
+[dir='rtl'] .elui-inbound-modal .advanced-panel__subtitle,
+[dir='rtl'] .elui-inbound-modal .advanced-editor-meta {
+  text-align: start;
 }

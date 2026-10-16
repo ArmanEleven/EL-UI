@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import {
   Alert,
   Button,
   Card,
   Col,
+  ConfigProvider,
   Descriptions,
   Form,
   Input,
@@ -21,6 +23,7 @@ import {
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { HttpUtil } from '@/utils';
+import { useTheme } from '@/hooks/useTheme';
 import './AdminPortalPage.css';
 
 type Permission = { allowed: boolean; scope: number };
@@ -73,25 +76,28 @@ type CreateClientForm = {
 
 const { Title, Text } = Typography;
 
-function bytesLabel(bytes: number): string {
-  if (!bytes) return 'Unlimited';
+function bytesLabel(bytes: number, unlimitedLabel = 'Unlimited'): string {
+  if (!bytes) return unlimitedLabel;
   if (bytes < 1024 ** 3) return `${(bytes / 1024 ** 2).toFixed(0)} MB`;
   return `${(bytes / 1024 ** 3).toFixed(1)} GB`;
 }
 
-function expiryLabel(value: number): string {
-  if (!value) return 'Unlimited';
+function expiryLabel(value: number, unlimitedLabel = 'Unlimited'): string {
+  if (!value) return unlimitedLabel;
   const date = new Date(value);
   return Number.isNaN(date.valueOf()) ? '—' : date.toLocaleString();
 }
 
 export default function AdminPortalPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+  const { antdThemeConfig } = useTheme();
   const [messageApi, messageContextHolder] = message.useMessage();
   const [me, setMe] = useState<ManagementMe | null>(null);
   const [inbounds, setInbounds] = useState<SafeInbound[]>([]);
   const [clients, setClients] = useState<SafeClient[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const [form] = Form.useForm<CreateClientForm>();
 
@@ -109,12 +115,29 @@ export default function AdminPortalPage() {
       setMe(meResp.obj);
       setInbounds(inboundResp.success && inboundResp.obj ? inboundResp.obj : []);
       setClients(clientResp.success && clientResp.obj ? clientResp.obj : []);
+      const canReadInbounds = !!meResp.obj.role.permissions?.inbounds?.read?.allowed;
+      const canReadClients = !!meResp.obj.role.permissions?.clients?.read?.allowed;
+      if ((!inboundResp.success && canReadInbounds) || (!clientResp.success && canReadClients)) {
+        setLoadError(t('adminPortal.loadFailed'));
+      } else {
+        setLoadError(null);
+      }
+    } catch {
+      setLoadError(t('adminPortal.loadFailed'));
     } finally {
       setLoading(false);
     }
-  }, [navigate]);
+  }, [navigate, t]);
+
+  const refresh = useCallback(() => {
+    setLoading(true);
+    setLoadError(null);
+    void load();
+  }, [load]);
 
   useEffect(() => {
+    // The initial fetch is asynchronous; state updates happen after the network requests settle.
+    // oxlint-disable-next-line react-hooks/set-state-in-effect
     void load();
   }, [load]);
 
@@ -142,76 +165,78 @@ export default function AdminPortalPage() {
           { headers: { 'Content-Type': 'application/json' }, silent: true },
         );
         if (!response.success) {
-          messageApi.error(response.msg || 'Client creation failed');
+          messageApi.error(response.msg || t('adminPortal.createFailed'));
           return;
         }
-        messageApi.success('Client created');
+        messageApi.success(t('adminPortal.createSuccess'));
         form.resetFields();
         await load();
+      } catch {
+        messageApi.error(t('adminPortal.createFailed'));
       } finally {
         setCreating(false);
       }
     },
-    [form, load, messageApi],
+    [form, load, messageApi, t],
   );
 
   const inboundColumns = useMemo<ColumnsType<SafeInbound>>(
     () => [
       { title: 'ID', dataIndex: 'id', width: 72 },
-      { title: 'Remark', dataIndex: 'remark', ellipsis: true },
+      { title: t('remark'), dataIndex: 'remark', ellipsis: true },
       {
-        title: 'Protocol',
+        title: t('protocol'),
         dataIndex: 'protocol',
         width: 125,
         render: (v: string) => <Tag>{v}</Tag>,
       },
-      { title: 'Port', dataIndex: 'port', width: 95 },
-      { title: 'Clients', dataIndex: 'clientCount', width: 100 },
+      { title: t('adminPortal.port'), dataIndex: 'port', width: 95 },
+      { title: t('clients'), dataIndex: 'clientCount', width: 100 },
       {
-        title: 'Status',
+        title: t('status'),
         dataIndex: 'enabled',
         width: 110,
         render: (v: boolean) => (
-          <Tag color={v ? 'success' : 'default'}>{v ? 'Enabled' : 'Disabled'}</Tag>
+          <Tag color={v ? 'success' : 'default'}>{v ? t('enabled') : t('disabled')}</Tag>
         ),
       },
       {
-        title: 'Traffic used',
+        title: t('adminPortal.trafficUsed'),
         key: 'traffic',
         width: 150,
         render: (_: unknown, row: SafeInbound) =>
-          `${bytesLabel(row.up + row.down)} / ${bytesLabel(row.total)}`,
+          `${bytesLabel(row.up + row.down, t('unlimited'))} / ${bytesLabel(row.total, t('unlimited'))}`,
       },
     ],
-    [],
+    [t],
   );
 
   const clientColumns = useMemo<ColumnsType<SafeClient>>(
     () => [
-      { title: 'Email / Name', dataIndex: 'email', ellipsis: true },
-      { title: 'Group', dataIndex: 'group', render: (v: string) => v || '—' },
+      { title: t('adminPortal.emailColumn'), dataIndex: 'email', ellipsis: true },
+      { title: t('adminPortal.group'), dataIndex: 'group', render: (v: string) => v || '—' },
       {
-        title: 'Volume (GB)',
+        title: t('adminPortal.volume'),
         dataIndex: 'totalGB',
         width: 125,
-        render: (v: number) => v || 'Unlimited',
+        render: (v: number) => v || t('unlimited'),
       },
       {
-        title: 'Expires',
+        title: t('adminPortal.expires'),
         dataIndex: 'expiryTime',
         width: 180,
-        render: (v: number) => expiryLabel(v),
+        render: (v: number) => expiryLabel(v, t('unlimited')),
       },
       {
-        title: 'Status',
+        title: t('status'),
         dataIndex: 'enabled',
         width: 105,
         render: (v: boolean) => (
-          <Tag color={v ? 'success' : 'default'}>{v ? 'Enabled' : 'Disabled'}</Tag>
+          <Tag color={v ? 'success' : 'default'}>{v ? t('enabled') : t('disabled')}</Tag>
         ),
       },
     ],
-    [],
+    [t],
   );
 
   const canCreate = !!me?.role.permissions?.clients?.create?.allowed;
@@ -219,138 +244,166 @@ export default function AdminPortalPage() {
 
   if (loading)
     return (
-      <div className="management-loading">
-        <Spin size="large" />
-      </div>
+      <ConfigProvider theme={antdThemeConfig}>
+        <div className="management-loading">
+          <Spin size="large" />
+        </div>
+      </ConfigProvider>
     );
   if (!me) return null;
 
   return (
-    <Layout className="management-portal">
-      {messageContextHolder}
-      <Layout.Content className="management-content">
-        <div className="management-topbar">
-          <div>
-            <Text type="secondary">EL-UI · Management</Text>
-            <Title level={2}>Admin Portal</Title>
+    <ConfigProvider theme={antdThemeConfig}>
+      <Layout className="management-portal">
+        {messageContextHolder}
+        <Layout.Content className="management-content">
+          <div className="management-topbar">
+            <div>
+              <Text type="secondary">{t('adminPortal.brand')}</Text>
+              <Title level={2}>{t('adminPortal.title')}</Title>
+            </div>
+            <Space wrap>
+              <Tag color={me.status === 'active' ? 'success' : 'warning'}>{me.status}</Tag>
+              <Button onClick={refresh}>{t('adminPortal.refresh')}</Button>
+              <Button
+                onClick={async () => {
+                  await HttpUtil.post(
+                    '/management-api/auth/logout',
+                    {},
+                    {
+                      headers: { 'Content-Type': 'application/json' },
+                      silent: true,
+                    },
+                  );
+                  window.location.href = window.X_UI_BASE_PATH || '/';
+                }}
+              >
+                {t('adminPortal.logout')}
+              </Button>
+            </Space>
           </div>
-          <Space wrap>
-            <Tag color={me.status === 'active' ? 'success' : 'warning'}>{me.status}</Tag>
-            <Button onClick={() => void load()}>Refresh</Button>
-            <Button
-              onClick={async () => {
-                await HttpUtil.post(
-                  '/management-api/auth/logout',
-                  {},
-                  {
-                    headers: { 'Content-Type': 'application/json' },
-                    silent: true,
-                  },
-                );
-                window.location.href = window.X_UI_BASE_PATH || '/';
-              }}
-            >
-              Log out
-            </Button>
-          </Space>
-        </div>
 
-        <Row gutter={[16, 16]}>
-          <Col xs={24} xl={8}>
-            <Card>
-              <Descriptions column={1} size="small">
-                <Descriptions.Item label="Administrator">{me.username}</Descriptions.Item>
-                <Descriptions.Item label="Role">{me.role.name}</Descriptions.Item>
-                <Descriptions.Item label="Allowed inbounds">{inbounds.length}</Descriptions.Item>
-                <Descriptions.Item label="Client limit">
-                  {me.effectiveLimits.max_users ?? 'Unlimited'}
-                </Descriptions.Item>
-              </Descriptions>
-            </Card>
-          </Col>
-          <Col xs={24} xl={16}>
-            <Card title="Allowed inbounds">
-              <Table<SafeInbound>
-                rowKey="id"
-                size="small"
-                loading={loading}
-                columns={inboundColumns}
-                dataSource={inbounds}
-                pagination={{ pageSize: 8, showSizeChanger: false }}
-                locale={{ emptyText: 'No inbounds are available for this role.' }}
-              />
-            </Card>
-          </Col>
-        </Row>
+          {loadError && (
+            <Alert
+              type="warning"
+              showIcon
+              message={loadError}
+              action={
+                <Button size="small" onClick={() => void load()}>
+                  {t('adminPortal.refresh')}
+                </Button>
+              }
+            />
+          )}
 
-        <Row gutter={[16, 16]} className="management-lower">
-          <Col xs={24} xl={canCreate ? 10 : 24}>
-            <Card title="Create client">
-              {!canCreate ? (
-                <Alert type="info" showIcon message="Your role does not allow client creation." />
-              ) : (
-                <Form<CreateClientForm> form={form} layout="vertical" onFinish={createClient}>
-                  <Form.Item
-                    name="email"
-                    label="Client email / name"
-                    rules={[{ required: true, whitespace: true }, { max: 128 }]}
-                  >
-                    <Input autoComplete="off" placeholder="client@example.com" />
-                  </Form.Item>
-                  <Form.Item
-                    name="inboundIds"
-                    label="Allowed inbounds"
-                    rules={[{ required: true, type: 'array', min: 1 }]}
-                  >
-                    <Select
-                      mode="multiple"
-                      options={inbounds.map((ib) => ({
-                        value: ib.id,
-                        label: `#${ib.id} · ${ib.remark || ib.protocol} : ${ib.port}`,
-                      }))}
-                      placeholder="Select one or more inbounds"
-                    />
-                  </Form.Item>
-                  <Form.Item name="totalGB" label="Traffic limit (GB, 0 = unlimited)">
-                    <InputNumber min={0} precision={0} style={{ width: '100%' }} placeholder="0" />
-                  </Form.Item>
-                  <Form.Item name="expiryHours" label="Expiry in hours (0 = unlimited)">
-                    <InputNumber min={0} precision={0} style={{ width: '100%' }} placeholder="0" />
-                  </Form.Item>
-                  <Button type="primary" htmlType="submit" block loading={creating}>
-                    Create client
-                  </Button>
-                </Form>
-              )}
-            </Card>
-          </Col>
-          <Col xs={24} xl={canCreate ? 14 : 24}>
-            <Card title="Managed clients">
-              {!canReadClients ? (
-                <Alert
-                  type="info"
-                  showIcon
-                  message="Your role does not allow viewing managed clients."
-                />
-              ) : (
-                <Table<SafeClient>
-                  rowKey="email"
+          <Row gutter={[16, 16]}>
+            <Col xs={24} xl={8}>
+              <Card>
+                <Descriptions column={1} size="small">
+                  <Descriptions.Item label={t('adminPortal.administrator')}>
+                    {me.username}
+                  </Descriptions.Item>
+                  <Descriptions.Item label={t('adminPortal.role')}>
+                    {me.role.name}
+                  </Descriptions.Item>
+                  <Descriptions.Item label={t('adminPortal.allowedInbounds')}>
+                    {inbounds.length}
+                  </Descriptions.Item>
+                  <Descriptions.Item label={t('adminPortal.clientLimit')}>
+                    {me.effectiveLimits.max_users ?? t('unlimited')}
+                  </Descriptions.Item>
+                </Descriptions>
+              </Card>
+            </Col>
+            <Col xs={24} xl={16}>
+              <Card title={t('adminPortal.allowedInbounds')}>
+                <Table<SafeInbound>
+                  rowKey="id"
                   size="small"
-                  columns={clientColumns}
-                  dataSource={clients}
+                  loading={loading}
+                  columns={inboundColumns}
+                  dataSource={inbounds}
                   pagination={{ pageSize: 8, showSizeChanger: false }}
-                  locale={{ emptyText: 'No managed clients yet.' }}
-                  scroll={{ x: 600 }}
+                  locale={{ emptyText: t('adminPortal.noInbounds') }}
                 />
-              )}
-            </Card>
-          </Col>
-        </Row>
-        <Text className="management-footnote" type="secondary">
-          This portal has no inbound edit/delete controls. Authorization is enforced by the server
-          for every request.
-        </Text>
-      </Layout.Content>
-    </Layout>
+              </Card>
+            </Col>
+          </Row>
+
+          <Row gutter={[16, 16]} className="management-lower">
+            <Col xs={24} xl={canCreate ? 10 : 24}>
+              <Card title={t('adminPortal.createClient')}>
+                {!canCreate ? (
+                  <Alert type="info" showIcon message={t('adminPortal.noCreatePermission')} />
+                ) : (
+                  <Form<CreateClientForm> form={form} layout="vertical" onFinish={createClient}>
+                    <Form.Item
+                      name="email"
+                      label={t('adminPortal.clientEmail')}
+                      rules={[{ required: true, whitespace: true }, { max: 128 }]}
+                    >
+                      <Input autoComplete="off" placeholder={t('adminPortal.clientPlaceholder')} />
+                    </Form.Item>
+                    <Form.Item
+                      name="inboundIds"
+                      label={t('adminPortal.allowedInbounds')}
+                      rules={[{ required: true, type: 'array', min: 1 }]}
+                    >
+                      <Select
+                        mode="multiple"
+                        options={inbounds.map((ib) => ({
+                          value: ib.id,
+                          label: `#${ib.id} · ${ib.remark || ib.protocol} : ${ib.port}`,
+                        }))}
+                        placeholder={t('adminPortal.selectInbounds')}
+                      />
+                    </Form.Item>
+                    <Form.Item name="totalGB" label={t('adminPortal.trafficLimit')}>
+                      <InputNumber
+                        min={0}
+                        precision={0}
+                        style={{ width: '100%' }}
+                        placeholder="0"
+                      />
+                    </Form.Item>
+                    <Form.Item name="expiryHours" label={t('adminPortal.expiryHours')}>
+                      <InputNumber
+                        min={0}
+                        precision={0}
+                        style={{ width: '100%' }}
+                        placeholder="0"
+                      />
+                    </Form.Item>
+                    <Button type="primary" htmlType="submit" block loading={creating}>
+                      {t('adminPortal.createClient')}
+                    </Button>
+                  </Form>
+                )}
+              </Card>
+            </Col>
+            <Col xs={24} xl={canCreate ? 14 : 24}>
+              <Card title={t('adminPortal.managedClients')}>
+                {!canReadClients ? (
+                  <Alert type="info" showIcon message={t('adminPortal.noViewClientsPermission')} />
+                ) : (
+                  <Table<SafeClient>
+                    rowKey="email"
+                    size="small"
+                    columns={clientColumns}
+                    dataSource={clients}
+                    pagination={{ pageSize: 8, showSizeChanger: false }}
+                    locale={{ emptyText: t('adminPortal.noClients') }}
+                    scroll={{ x: 600 }}
+                  />
+                )}
+              </Card>
+            </Col>
+          </Row>
+          <Text className="management-footnote" type="secondary">
+            {t('adminPortal.footnote')}
+          </Text>
+        </Layout.Content>
+      </Layout>
+    </ConfigProvider>
   );
 }

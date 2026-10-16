@@ -132,3 +132,66 @@
 .hosts-page .ant-card .ant-card-actions {
   background: transparent;
 }
+
+/* EL-UI card language layered over inherited card defaults. */
+.index-page .ant-card,
+.clients-page .ant-card,
+.inbounds-page .ant-card,
+.xray-page .ant-card,
+.settings-page .ant-card,
+.nodes-page .ant-card,
+.groups-page .ant-card,
+.hosts-page .ant-card,
+.api-docs-page .ant-card {
+  border: 1px solid rgba(47, 119, 82, 0.11);
+  border-radius: 16px;
+  box-shadow: 0 10px 26px rgba(23, 59, 34, 0.045);
+}
+body.dark .index-page .ant-card,
+body.dark .clients-page .ant-card,
+body.dark .inbounds-page .ant-card,
+body.dark .xray-page .ant-card,
+body.dark .settings-page .ant-card,
+body.dark .nodes-page .ant-card,
+body.dark .groups-page .ant-card,
+body.dark .hosts-page .ant-card,
+body.dark .api-docs-page .ant-card {
+  border-color: rgba(158, 232, 182, 0.09);
+  background: linear-gradient(145deg, rgba(22, 32, 24, 0.98), rgba(14, 21, 16, 0.98));
+  box-shadow:
+    0 14px 34px rgba(0, 0, 0, 0.17),
+    inset 0 1px 0 rgba(225, 255, 232, 0.025);
+}
+html[data-theme='ultra-dark'] body.dark .index-page .ant-card,
+html[data-theme='ultra-dark'] body.dark .clients-page .ant-card,
+html[data-theme='ultra-dark'] body.dark .inbounds-page .ant-card,
+html[data-theme='ultra-dark'] body.dark .xray-page .ant-card,
+html[data-theme='ultra-dark'] body.dark .settings-page .ant-card,
+html[data-theme='ultra-dark'] body.dark .nodes-page .ant-card,
+html[data-theme='ultra-dark'] body.dark .groups-page .ant-card,
+html[data-theme='ultra-dark'] body.dark .hosts-page .ant-card,
+html[data-theme='ultra-dark'] body.dark .api-docs-page .ant-card {
+  background: linear-gradient(145deg, #0d130f, #070a08);
+}
+.index-page .ant-card .ant-card-head,
+.clients-page .ant-card .ant-card-head,
+.inbounds-page .ant-card .ant-card-head,
+.xray-page .ant-card .ant-card-head,
+.settings-page .ant-card .ant-card-head,
+.nodes-page .ant-card .ant-card-head,
+.groups-page .ant-card .ant-card-head,
+.hosts-page .ant-card .ant-card-head,
+.api-docs-page .ant-card .ant-card-head {
+  border-bottom-color: rgba(47, 119, 82, 0.1);
+}
+body.dark .index-page .ant-card .ant-card-head,
+body.dark .clients-page .ant-card .ant-card-head,
+body.dark .inbounds-page .ant-card .ant-card-head,
+body.dark .xray-page .ant-card .ant-card-head,
+body.dark .settings-page .ant-card .ant-card-head,
+body.dark .nodes-page .ant-card .ant-card-head,
+body.dark .groups-page .ant-card .ant-card-head,
+body.dark .hosts-page .ant-card .ant-card-head,
+body.dark .api-docs-page .ant-card .ant-card-head {
+  border-bottom-color: rgba(158, 232, 182, 0.09);
+}

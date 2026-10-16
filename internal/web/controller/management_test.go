@@ -2,8 +2,12 @@ package controller
 
 import (
 	"encoding/json"
+	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/gin-gonic/gin"
 
 	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
 	"github.com/mhsanaei/3x-ui/v3/internal/management/rbac"
@@ -88,5 +92,58 @@ func TestCanManagementAccessInboundAllScopeMayBeRestrictedByAllowList(t *testing
 	admin.Role.Access.AllowedInboundIDs = []int64{12}
 	if canManagementAccessInbound(admin, 10) || !canManagementAccessInbound(admin, 12) {
 		t.Fatal("configured allow-list must narrow even ALL scope")
+	}
+}
+
+func TestManagementPortalKeepsInboundRoutesReadOnlyAndMasterRoutesProtected(t *testing.T) {
+	if !isNativeOwnerUser(&model.User{Id: 1}, 1) {
+		t.Fatal("native owner should be allowed")
+	}
+	if isNativeOwnerUser(&model.User{Id: 2}, 1) || isNativeOwnerUser(nil, 1) || isNativeOwnerUser(&model.User{Id: 1}, 0) {
+		t.Fatal("only the exact native owner may access master management routes")
+	}
+
+	previousMode := gin.Mode()
+	gin.SetMode(gin.TestMode)
+	t.Cleanup(func() { gin.SetMode(previousMode) })
+
+	engine := gin.New()
+	NewManagementController(engine.Group("/panel/api"))
+
+	seenInboundReads := map[string]bool{}
+	for _, route := range engine.Routes() {
+		if strings.Contains(route.Path, "/management-api/inbounds") {
+			if route.Method != http.MethodGet {
+				t.Errorf("delegated management inbound route %s %s must be read-only", route.Method, route.Path)
+			}
+			seenInboundReads[route.Method+" "+route.Path] = true
+		}
+	}
+	for _, route := range []string{
+		"GET /panel/api/management-api/inbounds",
+		"GET /panel/api/management-api/inbounds/:id",
+	} {
+		if !seenInboundReads[route] {
+			t.Errorf("expected read-only management route %q to be registered", route)
+		}
+	}
+
+	// Both the delegated portal and owner-only API must reject requests
+	// without a session. This guards the server boundary independently of UI
+	// route hiding or client-side navigation.
+	for _, path := range []string{
+		"/panel/api/management-api/auth/me",
+		"/panel/api/management-api/inbounds",
+		"/panel/api/management-api/clients",
+		"/panel/api/management-api/master/inbounds",
+		"/panel/api/management-api/master/roles",
+		"/panel/api/management-api/master/admins",
+	} {
+		request := httptest.NewRequest(http.MethodGet, path, nil)
+		response := httptest.NewRecorder()
+		engine.ServeHTTP(response, request)
+		if response.Code != http.StatusUnauthorized {
+			t.Errorf("unauthenticated request to %s returned %d, want %d", path, response.Code, http.StatusUnauthorized)
+		}
 	}
 }
