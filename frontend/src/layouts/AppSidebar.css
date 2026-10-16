@@ -310,12 +310,12 @@
 
 body.dark .ant-drawer-content,
 body.dark .ant-drawer-body {
-  background-color: #15161a;
+  background-color: var(--elui-surface, var(--ant-color-bg-container));
 }
 
 html[data-theme='ultra-dark'] body.dark .ant-drawer-content,
 html[data-theme='ultra-dark'] body.dark .ant-drawer-body {
-  background-color: #050507;
+  background-color: var(--elui-bg, #030405);
 }
 
 body.dark .ant-drawer-body .drawer-menu,
