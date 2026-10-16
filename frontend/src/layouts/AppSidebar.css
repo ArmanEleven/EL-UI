@@ -347,7 +347,7 @@ body.dark .ant-drawer-body .drawer-menu .ant-menu-item-group-list {
 .sider-brand {
   height: 68px;
   padding-inline: 14px;
-  border-bottom-color: rgba(47, 138, 91, 0.12);
+  border-bottom-color: var(--elui-border, var(--ant-color-border-secondary));
 }
 
 .brand-block {
@@ -360,12 +360,12 @@ body.dark .ant-drawer-body .drawer-menu .ant-menu-item-group-list {
   display: inline-grid;
   place-items: center;
   flex: 0 0 30px;
-  border: 1px solid rgba(158, 232, 182, 0.45);
+  border: 1px solid color-mix(in srgb, var(--elui-accent, var(--ant-color-primary)) 55%, var(--elui-border, transparent));
   border-radius: 9px;
-  background: linear-gradient(145deg, #b8f6c7, #58be81);
-  color: #0c1b11;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--elui-accent, var(--ant-color-primary)) 52%, var(--elui-surface, #101e2c)), var(--elui-accent-strong, var(--ant-color-primary)));
+  color: var(--elui-bg, var(--ant-color-bg-layout));
   box-shadow:
-    0 5px 14px rgba(47, 138, 91, 0.2),
+    0 5px 14px color-mix(in srgb, var(--elui-accent-strong, var(--ant-color-primary)) 20%, transparent),
     inset 0 1px 0 rgba(255, 255, 255, 0.6);
   font-size: 11px;
   font-weight: 900;
@@ -380,17 +380,17 @@ body.dark .ant-drawer-body .drawer-menu .ant-menu-item-group-list {
 }
 
 .ant-sidebar > .ant-layout-sider {
-  border-inline-end: 1px solid rgba(47, 138, 91, 0.1);
-  background: linear-gradient(180deg, #fbfdf9 0%, #f4f8f1 100%);
+  border-inline-end: 1px solid var(--elui-border, var(--ant-color-border-secondary));
+  background: linear-gradient(180deg, var(--elui-surface, var(--ant-color-bg-container)) 0%, var(--elui-bg, var(--ant-color-bg-layout)) 100%);
 }
 
 body.dark .ant-sidebar > .ant-layout-sider {
-  border-inline-end-color: rgba(158, 232, 182, 0.1);
-  background: linear-gradient(180deg, #101711 0%, #0c120e 100%);
+  border-inline-end-color: var(--elui-border, var(--ant-color-border-secondary));
+  background: linear-gradient(180deg, var(--elui-surface, var(--ant-color-bg-container)) 0%, var(--elui-bg, var(--ant-color-bg-layout)) 100%);
 }
 
 html[data-theme='ultra-dark'] body.dark .ant-sidebar > .ant-layout-sider {
-  background: linear-gradient(180deg, #080c09 0%, #030604 100%);
+  background: linear-gradient(180deg, var(--elui-surface, var(--ant-color-bg-container)) 0%, var(--elui-bg, #030405) 100%);
 }
 
 .sider-nav {
@@ -411,12 +411,12 @@ html[data-theme='ultra-dark'] body.dark .ant-sidebar > .ant-layout-sider {
 
 body.dark .sider-brand,
 body.dark .drawer-header {
-  border-bottom-color: rgba(158, 232, 182, 0.1);
+  border-bottom-color: var(--elui-border, var(--ant-color-border-secondary));
 }
 
 body.dark .brand-text,
 body.dark .drawer-brand {
-  color: #edf7ed;
+  color: var(--elui-text, var(--ant-color-text));
 }
 
 .drawer-brand {
@@ -435,28 +435,28 @@ body.dark .drawer-brand {
 .sider-nav .ant-menu-item-selected,
 .sider-utility .ant-menu-item-selected,
 .drawer-menu .ant-menu-item-selected {
-  background: rgba(47, 138, 91, 0.13) !important;
-  color: #256642 !important;
+  background: color-mix(in srgb, var(--elui-accent, var(--ant-color-primary)) 13%, transparent) !important;
+  color: var(--elui-accent-strong, var(--ant-color-primary)) !important;
   font-weight: 750;
 }
 
 .sider-nav .ant-menu-item-selected .anticon,
 .sider-utility .ant-menu-item-selected .anticon,
 .drawer-menu .ant-menu-item-selected .anticon {
-  color: #2f8a5b !important;
+  color: var(--elui-accent, var(--ant-color-primary)) !important;
 }
 
 body.dark .sider-nav .ant-menu-item-selected,
 body.dark .sider-utility .ant-menu-item-selected,
 body.dark .drawer-menu .ant-menu-item-selected {
-  background: rgba(115, 210, 139, 0.12) !important;
-  color: #b8f6c7 !important;
+  background: color-mix(in srgb, var(--elui-accent, var(--ant-color-primary)) 12%, transparent) !important;
+  color: var(--elui-accent, var(--ant-color-primary)) !important;
 }
 
 body.dark .sider-nav .ant-menu-item-selected .anticon,
 body.dark .sider-utility .ant-menu-item-selected .anticon,
 body.dark .drawer-menu .ant-menu-item-selected .anticon {
-  color: #9ee8b6 !important;
+  color: var(--elui-accent, var(--ant-color-primary)) !important;
 }
 
 .sider-version {
@@ -468,6 +468,6 @@ body.dark .drawer-menu .ant-menu-item-selected .anticon {
 }
 
 .sider-version:hover {
-  border-color: rgba(47, 138, 91, 0.24);
-  background: rgba(47, 138, 91, 0.08);
+  border-color: color-mix(in srgb, var(--elui-accent, var(--ant-color-primary)) 24%, var(--elui-border, transparent));
+  background: color-mix(in srgb, var(--elui-accent, var(--ant-color-primary)) 8%, transparent);
 }
