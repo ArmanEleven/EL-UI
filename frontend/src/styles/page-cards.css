@@ -182,7 +182,7 @@ html[data-theme='ultra-dark'] body.dark .api-docs-page .ant-card {
 .groups-page .ant-card .ant-card-head,
 .hosts-page .ant-card .ant-card-head,
 .api-docs-page .ant-card .ant-card-head {
-  border-bottom-color: rgba(47, 119, 82, 0.1);
+  border-bottom-color: var(--elui-border, rgba(145, 225, 255, 0.18));
 }
 body.dark .index-page .ant-card .ant-card-head,
 body.dark .clients-page .ant-card .ant-card-head,
