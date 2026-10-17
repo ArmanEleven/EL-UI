@@ -26,6 +26,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { HttpUtil, LanguageManager } from '@/utils';
 import { FormField, rhfZodValidate } from '@/components/form/rhf';
 import { setMessageInstance } from '@/utils/messageBus';
+import ThemePicker from '@/components/ThemePicker';
 import SponsorSlot from '@/components/sponsor/SponsorSlot';
 import { pauseAnimationsUntilLeave, useTheme } from '@/hooks/useTheme';
 import { LoginFormSchema, TwoFactorCodeSchema, type LoginFormValues } from '@/schemas/login';
@@ -149,6 +150,7 @@ export default function LoginPage() {
               icon={themeIcon}
               onClick={cycleTheme}
             />
+            <ThemePicker inline />
             <Popover
               rootClassName={isDark ? 'dark' : 'light'}
               placement="bottomRight"
