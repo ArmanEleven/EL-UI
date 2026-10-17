@@ -20,6 +20,7 @@ export interface ThemePreset {
   background: string;
   backgroundDeep?: string;
   surface: string;
+  surfaceGlass: string;
   surfaceSecondary?: string;
   surfaceTertiary?: string;
   elevated: string;
@@ -30,6 +31,9 @@ export interface ThemePreset {
   accentStrong: string;
   border: string;
   borderStrong?: string;
+  glow: string;
+  shadow: string;
+  shadowSoft: string;
 }
 
 export const THEME_PRESETS: Record<ThemeId, ThemePreset> = {
@@ -42,6 +46,7 @@ export const THEME_PRESETS: Record<ThemeId, ThemePreset> = {
     background: '#080f1b',
     backgroundDeep: '#050a12',
     surface: '#101a29',
+    surfaceGlass: 'rgb(16 26 41 / 78%)',
     surfaceSecondary: '#142236',
     surfaceTertiary: '#1b2b42',
     elevated: '#1b2b42',
@@ -52,6 +57,9 @@ export const THEME_PRESETS: Record<ThemeId, ThemePreset> = {
     accentStrong: '#2daddc',
     border: 'rgb(150 187 223 / 15%)',
     borderStrong: 'rgb(150 187 223 / 25%)',
+    glow: '0 0 42px rgb(101 216 255 / 12%)',
+    shadow: '0 24px 70px rgb(0 0 0 / 28%)',
+    shadowSoft: '0 12px 36px rgb(0 0 0 / 18%)',
   },
 
   obsidian: {
@@ -63,6 +71,7 @@ export const THEME_PRESETS: Record<ThemeId, ThemePreset> = {
     background: '#050607',
     backgroundDeep: '#000000',
     surface: '#0d0f12',
+    surfaceGlass: 'rgb(13 15 18 / 82%)',
     surfaceSecondary: '#14171c',
     surfaceTertiary: '#1c2128',
     elevated: '#1c2128',
@@ -73,6 +82,9 @@ export const THEME_PRESETS: Record<ThemeId, ThemePreset> = {
     accentStrong: '#aebdcd',
     border: 'rgb(212 221 231 / 12%)',
     borderStrong: 'rgb(212 221 231 / 22%)',
+    glow: '0 0 40px rgb(220 230 240 / 5%)',
+    shadow: '0 24px 70px rgb(0 0 0 / 28%)',
+    shadowSoft: '0 12px 36px rgb(0 0 0 / 18%)',
   },
 
   amethyst: {
@@ -84,6 +96,7 @@ export const THEME_PRESETS: Record<ThemeId, ThemePreset> = {
     background: '#100b1b',
     backgroundDeep: '#090611',
     surface: '#1a1428',
+    surfaceGlass: 'rgb(26 20 40 / 80%)',
     surfaceSecondary: '#241b36',
     surfaceTertiary: '#302447',
     elevated: '#302447',
@@ -94,6 +107,9 @@ export const THEME_PRESETS: Record<ThemeId, ThemePreset> = {
     accentStrong: '#9a72ef',
     border: 'rgb(197 166 255 / 16%)',
     borderStrong: 'rgb(197 166 255 / 26%)',
+    glow: '0 0 44px rgb(197 166 255 / 12%)',
+    shadow: '0 24px 70px rgb(0 0 0 / 28%)',
+    shadowSoft: '0 12px 36px rgb(0 0 0 / 18%)',
   },
 
   emerald: {
@@ -105,6 +121,7 @@ export const THEME_PRESETS: Record<ThemeId, ThemePreset> = {
     background: '#07130f',
     backgroundDeep: '#030a07',
     surface: '#0e2018',
+    surfaceGlass: 'rgb(14 32 24 / 80%)',
     surfaceSecondary: '#163025',
     surfaceTertiary: '#1d3d2e',
     elevated: '#1d3d2e',
@@ -115,6 +132,9 @@ export const THEME_PRESETS: Record<ThemeId, ThemePreset> = {
     accentStrong: '#42bd80',
     border: 'rgb(140 231 184 / 16%)',
     borderStrong: 'rgb(140 231 184 / 26%)',
+    glow: '0 0 40px rgb(140 231 184 / 10%)',
+    shadow: '0 24px 70px rgb(0 0 0 / 28%)',
+    shadowSoft: '0 12px 36px rgb(0 0 0 / 18%)',
   },
 
   crimson: {
@@ -126,6 +146,7 @@ export const THEME_PRESETS: Record<ThemeId, ThemePreset> = {
     background: '#18090e',
     backgroundDeep: '#0b0407',
     surface: '#251018',
+    surfaceGlass: 'rgb(37 16 24 / 80%)',
     surfaceSecondary: '#321620',
     surfaceTertiary: '#421d2b',
     elevated: '#421d2b',
@@ -136,6 +157,9 @@ export const THEME_PRESETS: Record<ThemeId, ThemePreset> = {
     accentStrong: '#e65d7b',
     border: 'rgb(255 155 174 / 16%)',
     borderStrong: 'rgb(255 155 174 / 26%)',
+    glow: '0 0 42px rgb(255 155 174 / 10%)',
+    shadow: '0 24px 70px rgb(0 0 0 / 28%)',
+    shadowSoft: '0 12px 36px rgb(0 0 0 / 18%)',
   },
 
   amber: {
@@ -147,6 +171,7 @@ export const THEME_PRESETS: Record<ThemeId, ThemePreset> = {
     background: '#171006',
     backgroundDeep: '#0b0803',
     surface: '#251b0b',
+    surfaceGlass: 'rgb(37 27 11 / 80%)',
     surfaceSecondary: '#33240e',
     surfaceTertiary: '#433014',
     elevated: '#433014',
@@ -157,6 +182,9 @@ export const THEME_PRESETS: Record<ThemeId, ThemePreset> = {
     accentStrong: '#e8ae45',
     border: 'rgb(255 218 145 / 16%)',
     borderStrong: 'rgb(255 218 145 / 26%)',
+    glow: '0 0 42px rgb(255 218 145 / 10%)',
+    shadow: '0 24px 70px rgb(0 0 0 / 28%)',
+    shadowSoft: '0 12px 36px rgb(0 0 0 / 18%)',
   },
 
   horizon: {
@@ -168,6 +196,7 @@ export const THEME_PRESETS: Record<ThemeId, ThemePreset> = {
     background: '#eef3f9',
     backgroundDeep: '#e6edf5',
     surface: '#ffffff',
+    surfaceGlass: 'rgb(255 255 255 / 82%)',
     surfaceSecondary: '#f7faff',
     surfaceTertiary: '#edf3fa',
     elevated: '#f7faff',
@@ -178,6 +207,9 @@ export const THEME_PRESETS: Record<ThemeId, ThemePreset> = {
     accentStrong: '#2868d5',
     border: 'rgb(38 73 119 / 13%)',
     borderStrong: 'rgb(38 73 119 / 22%)',
+    glow: '0 0 38px rgb(76 139 245 / 8%)',
+    shadow: '0 24px 70px rgb(31 57 90 / 12%)',
+    shadowSoft: '0 12px 36px rgb(31 57 90 / 8%)',
   },
 
   iridescent: {
@@ -189,6 +221,7 @@ export const THEME_PRESETS: Record<ThemeId, ThemePreset> = {
     background: '#0b0b16',
     backgroundDeep: '#05050d',
     surface: '#141528',
+    surfaceGlass: 'rgb(20 21 40 / 80%)',
     surfaceSecondary: '#1b1d35',
     surfaceTertiary: '#252747',
     elevated: '#252747',
@@ -199,6 +232,9 @@ export const THEME_PRESETS: Record<ThemeId, ThemePreset> = {
     accentStrong: '#ad91ff',
     border: 'rgb(174 168 255 / 17%)',
     borderStrong: 'rgb(174 168 255 / 28%)',
+    glow: '0 0 46px rgb(173 145 255 / 13%)',
+    shadow: '0 24px 70px rgb(0 0 0 / 28%)',
+    shadowSoft: '0 12px 36px rgb(0 0 0 / 18%)',
   },
 };
 
