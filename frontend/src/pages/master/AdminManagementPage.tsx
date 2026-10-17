@@ -6,6 +6,7 @@ import {
   Card,
   Checkbox,
   Col,
+  ConfigProvider,
   Form,
   Input,
   InputNumber,
@@ -20,6 +21,7 @@ import {
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { HttpUtil } from '@/utils';
+import { useTheme } from '@/hooks/useTheme';
 import './AdminManagementPage.css';
 
 type PermissionGrant = { allowed: boolean; scope: number };
@@ -108,6 +110,7 @@ function roleToForm(role: Role): Partial<RoleForm> {
 }
 
 export default function AdminManagementPage() {
+  const { antdThemeConfig } = useTheme();
   const [messageApi, contextHolder] = message.useMessage();
   const queryClient = useQueryClient();
   const [savingRole, setSavingRole] = useState(false);
@@ -354,13 +357,16 @@ export default function AdminManagementPage() {
 
   if (loading)
     return (
-      <div className="admin-management-loading">
-        <Spin size="large" />
-      </div>
+      <ConfigProvider theme={antdThemeConfig}>
+        <div className="admin-management-loading">
+          <Spin size="large" />
+        </div>
+      </ConfigProvider>
     );
 
   return (
-    <div className="admin-management-page">
+    <ConfigProvider theme={antdThemeConfig}>
+      <div className="admin-management-page">
       {contextHolder}
       <div className="admin-management-header">
         <div>
@@ -541,6 +547,7 @@ export default function AdminManagementPage() {
           </Card>
         </Col>
       </Row>
-    </div>
+      </div>
+    </ConfigProvider>
   );
 }
