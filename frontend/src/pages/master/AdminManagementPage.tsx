@@ -367,186 +367,186 @@ export default function AdminManagementPage() {
   return (
     <ConfigProvider theme={antdThemeConfig}>
       <div className="admin-management-page">
-      {contextHolder}
-      <div className="admin-management-header">
-        <div>
-          <Text type="secondary">EL-UI · Master controls</Text>
-          <Title level={2}>Admin Management</Title>
-          <Text type="secondary">
-            Create scoped roles and delegated accounts. Server-side authorization remains
-            authoritative.
-          </Text>
+        {contextHolder}
+        <div className="admin-management-header">
+          <div>
+            <Text type="secondary">EL-UI · Master controls</Text>
+            <Title level={2}>Admin Management</Title>
+            <Text type="secondary">
+              Create scoped roles and delegated accounts. Server-side authorization remains
+              authoritative.
+            </Text>
+          </div>
+          <Button onClick={() => void refresh()}>Refresh</Button>
         </div>
-        <Button onClick={() => void refresh()}>Refresh</Button>
-      </div>
-      {queryError && (
+        {queryError && (
+          <Alert
+            showIcon
+            type="error"
+            message={
+              queryError instanceof Error ? queryError.message : 'Could not load management data'
+            }
+            description="Confirm that you are signed in to the Master Panel, then refresh the page."
+            className="admin-management-error"
+          />
+        )}
         <Alert
           showIcon
-          type="error"
-          message={
-            queryError instanceof Error ? queryError.message : 'Could not load management data'
-          }
-          description="Confirm that you are signed in to the Master Panel, then refresh the page."
-          className="admin-management-error"
+          type="warning"
+          message="Protect the Master Panel account"
+          description="Delegated accounts are separate from the native Master identity. The Owner role cannot be assigned through this page."
         />
-      )}
-      <Alert
-        showIcon
-        type="warning"
-        message="Protect the Master Panel account"
-        description="Delegated accounts are separate from the native Master identity. The Owner role cannot be assigned through this page."
-      />
-      <Row gutter={[16, 16]} className="admin-management-grid">
-        <Col xs={24} xl={12}>
-          <Card title={selectedRole ? 'Edit role: ' + selectedRole.role.name : 'Create role'}>
-            <Form<RoleForm>
-              form={roleForm}
-              layout="vertical"
-              initialValues={{
-                permissionsJSON: DEFAULT_PERMISSIONS,
-                allowedInboundIds: [],
-                allInbounds: false,
-              }}
-              onFinish={saveRole}
-            >
-              <Form.Item
-                name="name"
-                label="Role name"
-                rules={[{ required: true, whitespace: true }, { max: 64 }]}
+        <Row gutter={[16, 16]} className="admin-management-grid">
+          <Col xs={24} xl={12}>
+            <Card title={selectedRole ? 'Edit role: ' + selectedRole.role.name : 'Create role'}>
+              <Form<RoleForm>
+                form={roleForm}
+                layout="vertical"
+                initialValues={{
+                  permissionsJSON: DEFAULT_PERMISSIONS,
+                  allowedInboundIds: [],
+                  allInbounds: false,
+                }}
+                onFinish={saveRole}
               >
-                <Input placeholder="reseller-readonly" />
-              </Form.Item>
-              <Form.Item
-                name="permissionsJSON"
-                label="Permissions JSON"
-                rules={[{ required: true }]}
-              >
-                <Input.TextArea rows={8} spellCheck={false} />
-              </Form.Item>
-              <Form.Item name="allInbounds" valuePropName="checked">
-                <Checkbox>Allow every Master inbound (only for ALL scope)</Checkbox>
-              </Form.Item>
-              <Form.Item name="allowedInboundIds" label="Allowed inbounds">
-                <Select
-                  mode="multiple"
-                  allowClear
-                  disabled={!!allInbounds}
-                  options={inbounds.map((inbound) => ({
-                    value: inbound.id,
-                    label:
-                      '#' +
-                      inbound.id +
-                      ' · ' +
-                      (inbound.remark || inbound.protocol) +
-                      ' : ' +
-                      inbound.port,
-                  }))}
-                  placeholder="Select specific inbound IDs"
-                />
-              </Form.Item>
-              <Row gutter={12}>
-                <Col span={12}>
-                  <Form.Item name="maxUsers" label="Max clients">
-                    <InputNumber min={0} precision={0} style={{ width: '100%' }} />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item name="dataLimitMinGB" label="Min volume (GB)">
-                    <InputNumber min={0} precision={2} style={{ width: '100%' }} />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item name="dataLimitMaxGB" label="Max volume (GB)">
-                    <InputNumber min={0} precision={2} style={{ width: '100%' }} />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item name="expiryMinHours" label="Min expiry (hours)">
-                    <InputNumber min={0} precision={0} style={{ width: '100%' }} />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item name="expiryMaxHours" label="Max expiry (hours)">
-                    <InputNumber min={0} precision={0} style={{ width: '100%' }} />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Space>
-                <Button type="primary" htmlType="submit" loading={savingRole}>
-                  {selectedRole ? 'Save role' : 'Create role'}
-                </Button>
-                {selectedRole && (
-                  <Button
-                    onClick={() => {
-                      setSelectedRole(null);
-                      roleForm.resetFields();
-                    }}
-                  >
-                    Cancel edit
+                <Form.Item
+                  name="name"
+                  label="Role name"
+                  rules={[{ required: true, whitespace: true }, { max: 64 }]}
+                >
+                  <Input placeholder="reseller-readonly" />
+                </Form.Item>
+                <Form.Item
+                  name="permissionsJSON"
+                  label="Permissions JSON"
+                  rules={[{ required: true }]}
+                >
+                  <Input.TextArea rows={8} spellCheck={false} />
+                </Form.Item>
+                <Form.Item name="allInbounds" valuePropName="checked">
+                  <Checkbox>Allow every Master inbound (only for ALL scope)</Checkbox>
+                </Form.Item>
+                <Form.Item name="allowedInboundIds" label="Allowed inbounds">
+                  <Select
+                    mode="multiple"
+                    allowClear
+                    disabled={!!allInbounds}
+                    options={inbounds.map((inbound) => ({
+                      value: inbound.id,
+                      label:
+                        '#' +
+                        inbound.id +
+                        ' · ' +
+                        (inbound.remark || inbound.protocol) +
+                        ' : ' +
+                        inbound.port,
+                    }))}
+                    placeholder="Select specific inbound IDs"
+                  />
+                </Form.Item>
+                <Row gutter={12}>
+                  <Col span={12}>
+                    <Form.Item name="maxUsers" label="Max clients">
+                      <InputNumber min={0} precision={0} style={{ width: '100%' }} />
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item name="dataLimitMinGB" label="Min volume (GB)">
+                      <InputNumber min={0} precision={2} style={{ width: '100%' }} />
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item name="dataLimitMaxGB" label="Max volume (GB)">
+                      <InputNumber min={0} precision={2} style={{ width: '100%' }} />
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item name="expiryMinHours" label="Min expiry (hours)">
+                      <InputNumber min={0} precision={0} style={{ width: '100%' }} />
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item name="expiryMaxHours" label="Max expiry (hours)">
+                      <InputNumber min={0} precision={0} style={{ width: '100%' }} />
+                    </Form.Item>
+                  </Col>
+                </Row>
+                <Space>
+                  <Button type="primary" htmlType="submit" loading={savingRole}>
+                    {selectedRole ? 'Save role' : 'Create role'}
                   </Button>
-                )}
-              </Space>
-            </Form>
-          </Card>
-          <Card title="Create delegated admin" className="admin-management-card">
-            <Form<AdminForm>
-              form={adminForm}
-              layout="vertical"
-              initialValues={{ permissionOverridesJSON: '{}' }}
-              onFinish={createAdmin}
-            >
-              <Form.Item
-                name="username"
-                label="Username"
-                rules={[
-                  { required: true, min: 3, max: 64, pattern: /^[a-zA-Z0-9][a-zA-Z0-9._-]*$/ },
-                ]}
+                  {selectedRole && (
+                    <Button
+                      onClick={() => {
+                        setSelectedRole(null);
+                        roleForm.resetFields();
+                      }}
+                    >
+                      Cancel edit
+                    </Button>
+                  )}
+                </Space>
+              </Form>
+            </Card>
+            <Card title="Create delegated admin" className="admin-management-card">
+              <Form<AdminForm>
+                form={adminForm}
+                layout="vertical"
+                initialValues={{ permissionOverridesJSON: '{}' }}
+                onFinish={createAdmin}
               >
-                <Input autoComplete="off" />
-              </Form.Item>
-              <Form.Item
-                name="password"
-                label="Initial password (12–72 bytes)"
-                rules={[{ required: true, min: 12, max: 72 }]}
-              >
-                <Input.Password autoComplete="new-password" />
-              </Form.Item>
-              <Form.Item name="roleId" label="Role" rules={[{ required: true }]}>
-                <Select
-                  options={roles.map((role) => ({ value: role.id, label: role.role.name }))}
-                />
-              </Form.Item>
-              <Form.Item name="permissionOverridesJSON" label="Per-admin limit overrides (JSON)">
-                <Input.TextArea rows={3} spellCheck={false} />
-              </Form.Item>
-              <Button type="primary" htmlType="submit" loading={savingAdmin} block>
-                Create administrator
-              </Button>
-            </Form>
-          </Card>
-        </Col>
-        <Col xs={24} xl={12}>
-          <Card title="Roles">
-            <Table<RoleRow>
-              rowKey="id"
-              size="small"
-              columns={roleColumns}
-              dataSource={roles}
-              pagination={{ pageSize: 6 }}
-            />
-          </Card>
-          <Card title="Delegated administrators" className="admin-management-card">
-            <Table<AdminRow>
-              rowKey="id"
-              size="small"
-              columns={adminColumns}
-              dataSource={admins}
-              pagination={{ pageSize: 6 }}
-              scroll={{ x: 650 }}
-            />
-          </Card>
-        </Col>
-      </Row>
+                <Form.Item
+                  name="username"
+                  label="Username"
+                  rules={[
+                    { required: true, min: 3, max: 64, pattern: /^[a-zA-Z0-9][a-zA-Z0-9._-]*$/ },
+                  ]}
+                >
+                  <Input autoComplete="off" />
+                </Form.Item>
+                <Form.Item
+                  name="password"
+                  label="Initial password (12–72 bytes)"
+                  rules={[{ required: true, min: 12, max: 72 }]}
+                >
+                  <Input.Password autoComplete="new-password" />
+                </Form.Item>
+                <Form.Item name="roleId" label="Role" rules={[{ required: true }]}>
+                  <Select
+                    options={roles.map((role) => ({ value: role.id, label: role.role.name }))}
+                  />
+                </Form.Item>
+                <Form.Item name="permissionOverridesJSON" label="Per-admin limit overrides (JSON)">
+                  <Input.TextArea rows={3} spellCheck={false} />
+                </Form.Item>
+                <Button type="primary" htmlType="submit" loading={savingAdmin} block>
+                  Create administrator
+                </Button>
+              </Form>
+            </Card>
+          </Col>
+          <Col xs={24} xl={12}>
+            <Card title="Roles">
+              <Table<RoleRow>
+                rowKey="id"
+                size="small"
+                columns={roleColumns}
+                dataSource={roles}
+                pagination={{ pageSize: 6 }}
+              />
+            </Card>
+            <Card title="Delegated administrators" className="admin-management-card">
+              <Table<AdminRow>
+                rowKey="id"
+                size="small"
+                columns={adminColumns}
+                dataSource={admins}
+                pagination={{ pageSize: 6 }}
+                scroll={{ x: 650 }}
+              />
+            </Card>
+          </Col>
+        </Row>
       </div>
     </ConfigProvider>
   );
