@@ -310,12 +310,14 @@
 
 body.dark .ant-drawer-content,
 body.dark .ant-drawer-body {
-  background-color: var(--elui-surface, var(--ant-color-bg-container));
+  background-color: color-mix(in srgb, var(--elui-surface, var(--ant-color-bg-container)) 88%, transparent);
+  backdrop-filter: blur(var(--elui-glass-blur, 18px)) saturate(var(--elui-glass-saturation, 145%));
+  -webkit-backdrop-filter: blur(var(--elui-glass-blur, 18px)) saturate(var(--elui-glass-saturation, 145%));
 }
 
 html[data-theme='ultra-dark'] body.dark .ant-drawer-content,
 html[data-theme='ultra-dark'] body.dark .ant-drawer-body {
-  background-color: var(--elui-bg, #030405);
+  background-color: color-mix(in srgb, var(--elui-bg, #050607) 88%, transparent);
 }
 
 body.dark .ant-drawer-body .drawer-menu,
@@ -406,16 +408,18 @@ body.dark .ant-sidebar > .ant-layout-sider {
   border-inline-end-color: var(--elui-border, var(--ant-color-border-secondary));
   background: linear-gradient(
     180deg,
-    var(--elui-surface, var(--ant-color-bg-container)) 0%,
-    var(--elui-bg, var(--ant-color-bg-layout)) 100%
+    color-mix(in srgb, var(--elui-surface, var(--ant-color-bg-container)) 88%, transparent),
+    color-mix(in srgb, var(--bg-deep, var(--elui-bg, var(--ant-color-bg-layout))) 94%, transparent)
   );
+  backdrop-filter: blur(var(--elui-glass-blur, 18px)) saturate(var(--elui-glass-saturation, 145%));
+  -webkit-backdrop-filter: blur(var(--elui-glass-blur, 18px)) saturate(var(--elui-glass-saturation, 145%));
 }
 
 html[data-theme='ultra-dark'] body.dark .ant-sidebar > .ant-layout-sider {
   background: linear-gradient(
     180deg,
-    var(--elui-surface, var(--ant-color-bg-container)) 0%,
-    var(--elui-bg, #030405) 100%
+    color-mix(in srgb, var(--elui-surface, var(--ant-color-bg-container)) 88%, transparent),
+    color-mix(in srgb, var(--bg-deep, var(--elui-bg, #050607)) 94%, transparent)
   );
 }
 
