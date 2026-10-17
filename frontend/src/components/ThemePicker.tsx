@@ -73,7 +73,7 @@ export default function ThemePicker({ inline = false }: { inline?: boolean } = {
       <Popover
         content={content}
         trigger="click"
-        placement="topRight"
+        placement={inline ? 'bottomRight' : 'topRight'}
         open={open}
         onOpenChange={setOpen}
         arrow={false}
