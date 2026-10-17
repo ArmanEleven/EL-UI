@@ -108,7 +108,8 @@
 .elui-inbound-modal .ant-select-focused .ant-select-selector,
 .elui-inbound-modal .ant-input-number-focused,
 .elui-inbound-modal .ant-picker-focused {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--elui-accent, var(--ant-color-primary)) 14%, transparent);
+  box-shadow: 0 0 0 3px
+    color-mix(in srgb, var(--elui-accent, var(--ant-color-primary)) 14%, transparent);
 }
 
 .elui-inbound-modal .advanced-shell {
