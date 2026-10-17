@@ -5,6 +5,13 @@
   bottom: max(20px, env(safe-area-inset-bottom));
 }
 
+.elui-theme-picker-anchor.is-inline {
+  position: relative;
+  inset-inline-end: auto;
+  bottom: auto;
+  z-index: auto;
+}
+
 .elui-theme-trigger.ant-btn {
   display: grid;
   width: 48px;
