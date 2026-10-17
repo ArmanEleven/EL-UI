@@ -25,7 +25,9 @@ jobs:
         working-directory: frontend
       - name: Format the two blocking files and commit exact formatter output
         run: |
+          cd frontend
           npx oxfmt src/layouts/PanelTopbar.css src/pages/master/AdminManagementPage.tsx
+          cd ..
           if git diff --quiet -- frontend/src/layouts/PanelTopbar.css frontend/src/pages/master/AdminManagementPage.tsx; then
             echo "Formatter made no changes."
           else
