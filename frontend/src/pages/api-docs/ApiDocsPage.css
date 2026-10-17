@@ -1,24 +1,28 @@
+.api-docs-page {
+  --sw-bg: var(--elui-surface, var(--ant-color-bg-container));
+  --sw-bg-soft: var(--surface-2, var(--elui-surface-elevated, var(--ant-color-bg-elevated)));
+  --sw-bg-input: var(--elui-bg, var(--ant-color-bg-layout));
+  --sw-bg-code: var(--bg-deep, var(--elui-bg, #080f1b));
+  --sw-border: var(--elui-border, var(--ant-color-border-secondary));
+  --sw-border-strong: var(--border-strong, var(--elui-border, var(--ant-color-border)));
+  --sw-text: var(--elui-text, var(--ant-color-text));
+  --sw-text-muted: var(--elui-muted-text, var(--ant-color-text-secondary));
+  --sw-text-dim: var(--text-3, var(--ant-color-text-tertiary));
+  --sw-accent: var(--elui-accent, var(--ant-color-primary));
+  color-scheme: light;
+}
+
 .api-docs-page.is-dark {
-  --sw-bg: #1f2026;
-  --sw-bg-soft: #25272e;
-  --sw-bg-input: #15161a;
-  --sw-bg-code: #0d0e12;
-  --sw-border: rgba(255, 255, 255, 0.08);
-  --sw-border-strong: rgba(255, 255, 255, 0.15);
-  --sw-text: rgba(255, 255, 255, 0.88);
-  --sw-text-muted: rgba(255, 255, 255, 0.6);
-  --sw-text-dim: rgba(255, 255, 255, 0.45);
-  --sw-accent: #58a6ff;
   color-scheme: dark;
 }
 
 .api-docs-page.is-dark.is-ultra {
-  --sw-bg: #0a0a0d;
-  --sw-bg-soft: #131316;
-  --sw-bg-input: #050507;
-  --sw-bg-code: #000;
-  --sw-border: rgba(255, 255, 255, 0.06);
-  --sw-border-strong: rgba(255, 255, 255, 0.12);
+  --sw-bg: var(--elui-surface, #0d0f12);
+  --sw-bg-soft: var(--surface-2, #14171c);
+  --sw-bg-input: var(--elui-bg, #050607);
+  --sw-bg-code: var(--bg-deep, #000);
+  --sw-border: var(--elui-border, rgb(212 221 231 / 12%));
+  --sw-border-strong: var(--border-strong, rgb(212 221 231 / 22%));
 }
 
 .api-docs-page .content-shell {
@@ -292,17 +296,17 @@
 }
 
 .api-docs-page.is-dark .swagger-ui .btn.execute:hover {
-  background: #79b9ff;
+  background: var(--sw-accent);
 }
 
 .api-docs-page.is-dark .swagger-ui .btn.authorize {
-  color: #52c41a;
-  border-color: rgba(82, 196, 26, 0.4);
-  background: rgba(82, 196, 26, 0.08);
+  color: var(--sw-accent);
+  border-color: color-mix(in srgb, var(--sw-accent) 42%, transparent);
+  background: color-mix(in srgb, var(--sw-accent) 8%, transparent);
 }
 
 .api-docs-page.is-dark .swagger-ui .btn.authorize svg {
-  fill: #52c41a;
+  fill: var(--sw-accent);
 }
 
 .api-docs-page.is-dark .swagger-ui .authorization__btn svg,
@@ -376,7 +380,7 @@
 }
 
 .api-docs-page.is-dark .swagger-ui a:hover {
-  color: #79b9ff;
+  color: var(--sw-accent);
 }
 
 .api-docs-page.is-dark .swagger-ui .info .title small {
@@ -389,7 +393,7 @@
 }
 
 .api-docs-page.is-dark .swagger-ui .response-control-media-type--accept-controller select {
-  border-color: rgba(82, 196, 26, 0.5);
+  border-color: color-mix(in srgb, var(--sw-accent) 52%, transparent);
 }
 
 .api-docs-page.is-dark .swagger-ui .loading-container .loading:before {
