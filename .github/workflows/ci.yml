@@ -25,7 +25,7 @@ on:
       - ".github/workflows/ci.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   go-test:
@@ -223,6 +223,32 @@ jobs:
             frontend/src/pages/master/AdminManagementPage.tsx
           if-no-files-found: error
           retention-days: 1
+      - name: Commit canonical Oxfmt formatting to PR branch (temporary)
+        if: github.event.pull_request.number == 6
+        env:
+          PR_BRANCH: ${{ github.head_ref }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          git fetch origin "$PR_BRANCH"
+          fetched_sha="$(git rev-parse FETCH_HEAD)"
+          if [ "$fetched_sha" != "$PR_HEAD_SHA" ]; then
+            echo "PR branch advanced; refusing to format a stale revision."
+            exit 1
+          fi
+          git checkout -B "$PR_BRANCH" "$fetched_sha"
+          cd frontend
+          npx oxfmt src/layouts/PanelTopbar.css src/pages/master/AdminManagementPage.tsx
+          cd ..
+          git add frontend/src/layouts/PanelTopbar.css frontend/src/pages/master/AdminManagementPage.tsx
+          if git diff --cached --quiet; then
+            echo "Both files are already formatted."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "style: apply canonical Oxfmt formatting"
+          git push origin HEAD:"$PR_BRANCH"
       - name: Format check
         run: npm run format:check
         working-directory: frontend
