@@ -400,7 +400,9 @@ export default function AdminManagementPage() {
                   showIcon
                   type="error"
                   message={
-                    queryError instanceof Error ? queryError.message : 'Could not load management data'
+                    queryError instanceof Error
+                      ? queryError.message
+                      : 'Could not load management data'
                   }
                   description="Confirm that you are signed in to the Master Panel, then refresh the page."
                   className="admin-management-error"
@@ -414,7 +416,9 @@ export default function AdminManagementPage() {
               />
               <Row gutter={[16, 16]} className="admin-management-grid">
                 <Col xs={24} xl={12}>
-                  <Card title={selectedRole ? 'Edit role: ' + selectedRole.role.name : 'Create role'}>
+                  <Card
+                    title={selectedRole ? 'Edit role: ' + selectedRole.role.name : 'Create role'}
+                  >
                     <Form<RoleForm>
                       form={roleForm}
                       layout="vertical"
@@ -515,7 +519,12 @@ export default function AdminManagementPage() {
                         name="username"
                         label="Username"
                         rules={[
-                          { required: true, min: 3, max: 64, pattern: /^[a-zA-Z0-9][a-zA-Z0-9._-]*$/ },
+                          {
+                            required: true,
+                            min: 3,
+                            max: 64,
+                            pattern: /^[a-zA-Z0-9][a-zA-Z0-9._-]*$/,
+                          },
                         ]}
                       >
                         <Input autoComplete="off" />
@@ -532,7 +541,10 @@ export default function AdminManagementPage() {
                           options={roles.map((role) => ({ value: role.id, label: role.role.name }))}
                         />
                       </Form.Item>
-                      <Form.Item name="permissionOverridesJSON" label="Per-admin limit overrides (JSON)">
+                      <Form.Item
+                        name="permissionOverridesJSON"
+                        label="Per-admin limit overrides (JSON)"
+                      >
                         <Input.TextArea rows={3} spellCheck={false} />
                       </Form.Item>
                       <Button type="primary" htmlType="submit" loading={savingAdmin} block>

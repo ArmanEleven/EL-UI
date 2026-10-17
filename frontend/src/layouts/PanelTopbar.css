@@ -9,13 +9,8 @@
   gap: 18px;
   min-height: var(--topbar-height, 76px);
   padding: 0 clamp(18px, 2.5vw, 36px);
-  border-bottom: 1px solid
-    var(--elui-border, var(--ant-color-border-secondary));
-  background: color-mix(
-    in srgb,
-    var(--elui-bg, var(--ant-color-bg-layout)) 82%,
-    transparent
-  );
+  border-bottom: 1px solid var(--elui-border, var(--ant-color-border-secondary));
+  background: color-mix(in srgb, var(--elui-bg, var(--ant-color-bg-layout)) 82%, transparent);
   backdrop-filter: blur(22px) saturate(135%);
   -webkit-backdrop-filter: blur(22px) saturate(135%);
 }
@@ -110,7 +105,11 @@
   border: 1px solid var(--elui-border, var(--ant-color-border-secondary));
   border-radius: 6px;
   color: var(--elui-muted-text, var(--ant-color-text-tertiary));
-  font: 9px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace;
+  font:
+    9px/1.5 ui-monospace,
+    SFMono-Regular,
+    Consolas,
+    monospace;
 }
 
 .elui-topbar .elui-theme-trigger.ant-btn {
