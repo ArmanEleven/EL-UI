@@ -9,7 +9,7 @@ import './ThemePicker.css';
 
 const { Text } = Typography;
 
-export default function ThemePicker() {
+export default function ThemePicker({ inline = false }: { inline?: boolean } = {}) {
   const [open, setOpen] = useState(false);
   const { t } = useTranslation();
   const { themeId, setTheme } = useTheme();
@@ -69,7 +69,7 @@ export default function ThemePicker() {
   );
 
   return (
-    <div className="elui-theme-picker-anchor">
+    <div className={`elui-theme-picker-anchor${inline ? ' is-inline' : ''}`}>
       <Popover
         content={content}
         trigger="click"
