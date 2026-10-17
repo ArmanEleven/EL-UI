@@ -35,7 +35,9 @@ test('all eight approved palettes apply their complete semantic token bridge', (
     expect(root.style.getPropertyValue('--elui-accent')).toBe(preset.accent);
     expect(root.style.getPropertyValue('--elui-accent-strong')).toBe(preset.accentStrong);
     expect(root.style.getPropertyValue('--bg')).toBe(preset.background);
-    expect(root.style.getPropertyValue('--bg-deep')).toBe(preset.backgroundDeep ?? preset.background);
+    expect(root.style.getPropertyValue('--bg-deep')).toBe(
+      preset.backgroundDeep ?? preset.background,
+    );
     expect(root.style.getPropertyValue('--surface')).toBe(preset.surface);
     expect(root.style.getPropertyValue('--surface-2')).toBe(
       preset.surfaceSecondary ?? preset.elevated,
