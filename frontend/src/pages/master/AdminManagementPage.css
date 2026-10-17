@@ -9,7 +9,9 @@
       transparent 36%
     ),
     var(--elui-bg, var(--ant-color-bg-layout));
-  transition: background-color 220ms ease, color 220ms ease;
+  transition:
+    background-color 220ms ease,
+    color 220ms ease;
 }
 
 .admin-management-header {
@@ -21,13 +23,20 @@
   padding: 20px 22px;
   border: 1px solid var(--elui-border, var(--ant-color-border-secondary));
   border-radius: 18px;
-  background: color-mix(in srgb, var(--elui-surface, var(--ant-color-bg-container)) 88%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--elui-surface, var(--ant-color-bg-container)) 88%,
+    transparent
+  );
   box-shadow:
     0 10px 30px rgba(0, 0, 0, 0.08),
     inset 0 1px 0 color-mix(in srgb, var(--elui-text, #fff) 4%, transparent);
   backdrop-filter: blur(16px) saturate(140%);
   -webkit-backdrop-filter: blur(16px) saturate(140%);
-  transition: background-color 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+  transition:
+    background-color 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease;
 }
 
 .admin-management-header h2 {
@@ -54,16 +63,27 @@
   min-width: 0;
   border: 1px solid var(--elui-border, var(--ant-color-border-secondary));
   border-radius: 17px;
-  background: color-mix(in srgb, var(--elui-surface, var(--ant-color-bg-container)) 92%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--elui-surface, var(--ant-color-bg-container)) 92%,
+    transparent
+  );
   box-shadow:
     0 12px 30px rgba(0, 0, 0, 0.075),
     inset 0 1px 0 color-mix(in srgb, var(--elui-text, #fff) 3%, transparent);
-  transition: background-color 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+  transition:
+    background-color 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease;
 }
 
 .admin-management-page .ant-card-head {
   border-bottom-color: var(--elui-border, var(--ant-color-border-secondary));
-  background: color-mix(in srgb, var(--elui-surface, var(--ant-color-bg-container)) 78%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--elui-surface, var(--ant-color-bg-container)) 78%,
+    transparent
+  );
 }
 
 .admin-management-page .ant-card-head-title {
@@ -82,7 +102,11 @@
 
 .admin-management-page .ant-table-thead > tr > th {
   border-bottom-color: var(--elui-border, var(--ant-color-border-secondary));
-  background: color-mix(in srgb, var(--elui-accent, var(--ant-color-primary)) 7%, var(--elui-surface, var(--ant-color-bg-container)));
+  background: color-mix(
+    in srgb,
+    var(--elui-accent, var(--ant-color-primary)) 7%,
+    var(--elui-surface, var(--ant-color-bg-container))
+  );
 }
 
 .admin-management-page .ant-table-tbody > tr > td {
@@ -90,7 +114,11 @@
 }
 
 .admin-management-page .ant-table-tbody > tr:hover > td {
-  background: color-mix(in srgb, var(--elui-accent, var(--ant-color-primary)) 7%, var(--elui-surface, var(--ant-color-bg-container)));
+  background: color-mix(
+    in srgb,
+    var(--elui-accent, var(--ant-color-primary)) 7%,
+    var(--elui-surface, var(--ant-color-bg-container))
+  );
 }
 
 .admin-management-page .ant-card,
@@ -113,11 +141,13 @@
 }
 
 .admin-management-page .ant-btn-primary {
-  box-shadow: 0 5px 16px color-mix(in srgb, var(--elui-accent-strong, var(--ant-color-primary)) 18%, transparent);
+  box-shadow: 0 5px 16px
+    color-mix(in srgb, var(--elui-accent-strong, var(--ant-color-primary)) 18%, transparent);
 }
 
 .admin-management-page .ant-btn-primary:hover {
-  box-shadow: 0 8px 22px color-mix(in srgb, var(--elui-accent-strong, var(--ant-color-primary)) 24%, transparent);
+  box-shadow: 0 8px 22px
+    color-mix(in srgb, var(--elui-accent-strong, var(--ant-color-primary)) 24%, transparent);
 }
 
 .admin-management-page .ant-tag {
