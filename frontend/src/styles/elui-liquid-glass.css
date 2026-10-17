@@ -571,6 +571,33 @@ html[data-palette='iridescent'] body.dark {
   -webkit-backdrop-filter: blur(var(--elui-glass-blur)) saturate(var(--elui-glass-saturation));
 }
 
+/* Legacy body.dark .ant-card rules outrank the page-level glass selectors.
+   Reassert translucent surfaces for both management areas at higher specificity. */
+body.dark .admin-management-page .ant-card,
+body.dark .management-portal .ant-card {
+  border-color: var(--elui-border, var(--ant-color-border-secondary));
+  background: color-mix(
+    in srgb,
+    var(--elui-surface, var(--ant-color-bg-container)) 86%,
+    transparent
+  );
+  box-shadow:
+    0 12px 30px rgb(0 0 0 / 16%),
+    inset 0 1px 0 color-mix(in srgb, var(--elui-text, #edf5ff) 4%, transparent);
+  backdrop-filter: blur(var(--elui-glass-blur, 18px)) saturate(var(--elui-glass-saturation, 145%));
+  -webkit-backdrop-filter: blur(var(--elui-glass-blur, 18px)) saturate(var(--elui-glass-saturation, 145%));
+}
+
+body.dark .admin-management-page .ant-card-head,
+body.dark .management-portal .ant-card-head {
+  border-bottom-color: var(--elui-border, var(--ant-color-border-secondary));
+  background: color-mix(
+    in srgb,
+    var(--elui-surface, var(--ant-color-bg-container)) 74%,
+    transparent
+  );
+}
+
 .admin-management-page .ant-card-head,
 .management-portal .ant-card-head {
   border-bottom-color: var(--elui-border, var(--ant-color-border-secondary));
