@@ -50,6 +50,7 @@ export default function ThemePicker() {
               />
               <span className="elui-theme-picker__labels">
                 <span className="elui-theme-picker__name">{preset.label}</span>
+                <span className="elui-theme-picker__description">{preset.description}</span>
               </span>
               <span className="elui-theme-picker__check" aria-hidden="true">
                 {selected ? <CheckOutlined /> : null}
