@@ -143,9 +143,9 @@
 .groups-page .ant-card,
 .hosts-page .ant-card,
 .api-docs-page .ant-card {
-  border: 1px solid rgba(47, 119, 82, 0.11);
+  border: 1px solid var(--elui-border, rgba(145, 225, 255, 0.18));
   border-radius: 16px;
-  box-shadow: 0 10px 26px rgba(23, 59, 34, 0.045);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.045);
 }
 body.dark .index-page .ant-card,
 body.dark .clients-page .ant-card,
@@ -156,11 +156,11 @@ body.dark .nodes-page .ant-card,
 body.dark .groups-page .ant-card,
 body.dark .hosts-page .ant-card,
 body.dark .api-docs-page .ant-card {
-  border-color: rgba(158, 232, 182, 0.09);
-  background: linear-gradient(145deg, rgba(22, 32, 24, 0.98), rgba(14, 21, 16, 0.98));
+  border-color: var(--elui-border, rgba(145, 225, 255, 0.18));
+  background: color-mix(in srgb, var(--elui-surface, #101e2c) 94%, transparent);
   box-shadow:
     0 14px 34px rgba(0, 0, 0, 0.17),
-    inset 0 1px 0 rgba(225, 255, 232, 0.025);
+    inset 0 1px 0 color-mix(in srgb, var(--elui-text, #edf7ff) 3%, transparent);
 }
 html[data-theme='ultra-dark'] body.dark .index-page .ant-card,
 html[data-theme='ultra-dark'] body.dark .clients-page .ant-card,
@@ -171,7 +171,7 @@ html[data-theme='ultra-dark'] body.dark .nodes-page .ant-card,
 html[data-theme='ultra-dark'] body.dark .groups-page .ant-card,
 html[data-theme='ultra-dark'] body.dark .hosts-page .ant-card,
 html[data-theme='ultra-dark'] body.dark .api-docs-page .ant-card {
-  background: linear-gradient(145deg, #0d130f, #070a08);
+  background: linear-gradient(145deg, var(--elui-surface, #0a0d11), var(--elui-bg, #030405));
 }
 .index-page .ant-card .ant-card-head,
 .clients-page .ant-card .ant-card-head,
@@ -182,7 +182,7 @@ html[data-theme='ultra-dark'] body.dark .api-docs-page .ant-card {
 .groups-page .ant-card .ant-card-head,
 .hosts-page .ant-card .ant-card-head,
 .api-docs-page .ant-card .ant-card-head {
-  border-bottom-color: rgba(47, 119, 82, 0.1);
+  border-bottom-color: var(--elui-border, rgba(145, 225, 255, 0.18));
 }
 body.dark .index-page .ant-card .ant-card-head,
 body.dark .clients-page .ant-card .ant-card-head,
@@ -193,5 +193,5 @@ body.dark .nodes-page .ant-card .ant-card-head,
 body.dark .groups-page .ant-card .ant-card-head,
 body.dark .hosts-page .ant-card .ant-card-head,
 body.dark .api-docs-page .ant-card .ant-card-head {
-  border-bottom-color: rgba(158, 232, 182, 0.09);
+  border-bottom-color: var(--elui-border, rgba(145, 225, 255, 0.18));
 }

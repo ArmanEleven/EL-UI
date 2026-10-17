@@ -41,6 +41,7 @@ import { useNodesQuery } from '@/api/queries/useNodesQuery';
 import { useHostsQuery } from '@/api/queries/useHostsQuery';
 import { withHostEndpoints } from '@/lib/hosts/host-link';
 import AppSidebar from '@/layouts/AppSidebar';
+import PanelTopbar from '@/layouts/PanelTopbar';
 const TextModal = lazy(() => import('@/components/feedback/TextModal'));
 import type { TextModalTab } from '@/components/feedback/TextModal';
 const PromptModal = lazy(() => import('@/components/feedback/PromptModal'));
@@ -728,6 +729,7 @@ export default function InboundsPage() {
         <AppSidebar />
 
         <Layout className="content-shell">
+          <PanelTopbar />
           <Layout.Content id="content-layout" className="content-area">
             <Spin
               spinning={!fetched || !hostsFetched}

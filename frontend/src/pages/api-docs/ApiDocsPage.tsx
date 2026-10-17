@@ -6,6 +6,7 @@ import 'swagger-ui-react/swagger-ui.css';
 
 import { useTheme } from '@/hooks/useTheme';
 import AppSidebar from '@/layouts/AppSidebar';
+import PanelTopbar from '@/layouts/PanelTopbar';
 import { EXAMPLES } from '@/generated/examples';
 import { buildWebSocketEvents } from './websocket-events';
 import './ApiDocsPage.css';
@@ -86,6 +87,7 @@ export default function ApiDocsPage() {
         <AppSidebar />
 
         <Layout className="content-shell">
+          <PanelTopbar />
           <Layout.Content className="content-area">
             <Tabs
               items={[

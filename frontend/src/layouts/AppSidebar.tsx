@@ -54,7 +54,7 @@ const DOCS_URL = 'https://github.com/ArmanEleven/EL-UI#readme';
 const REPO_URL = PROJECT_URL;
 const LOGOUT_KEY = '__logout__';
 const RAIL_WIDTH = 72;
-const SIDER_WIDTH = 220;
+const SIDER_WIDTH = 256;
 const SIDEBAR_PINNED_KEY = 'sidebar-pinned';
 
 let hoveredAcrossRemounts = false;
@@ -155,7 +155,8 @@ function ThemeCycleButton({
 
 function readSidebarPinned() {
   try {
-    return localStorage.getItem(SIDEBAR_PINNED_KEY) === 'true';
+    const stored = localStorage.getItem(SIDEBAR_PINNED_KEY);
+    return stored === null ? false : stored === 'true';
   } catch {
     return false;
   }

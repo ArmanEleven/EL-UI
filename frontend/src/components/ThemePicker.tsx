@@ -9,7 +9,7 @@ import './ThemePicker.css';
 
 const { Text } = Typography;
 
-export default function ThemePicker() {
+export default function ThemePicker({ inline = false }: { inline?: boolean } = {}) {
   const [open, setOpen] = useState(false);
   const { t } = useTranslation();
   const { themeId, setTheme } = useTheme();
@@ -50,6 +50,7 @@ export default function ThemePicker() {
               />
               <span className="elui-theme-picker__labels">
                 <span className="elui-theme-picker__name">{preset.label}</span>
+                <span className="elui-theme-picker__description">{preset.description}</span>
               </span>
               <span className="elui-theme-picker__check" aria-hidden="true">
                 {selected ? <CheckOutlined /> : null}
@@ -68,11 +69,11 @@ export default function ThemePicker() {
   );
 
   return (
-    <div className="elui-theme-picker-anchor">
+    <div className={`elui-theme-picker-anchor${inline ? ' is-inline' : ''}`}>
       <Popover
         content={content}
         trigger="click"
-        placement="topRight"
+        placement={inline ? 'bottomRight' : 'topRight'}
         open={open}
         onOpenChange={setOpen}
         arrow={false}

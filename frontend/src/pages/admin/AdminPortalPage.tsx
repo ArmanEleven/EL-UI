@@ -24,6 +24,7 @@ import {
 import type { ColumnsType } from 'antd/es/table';
 import { HttpUtil } from '@/utils';
 import { useTheme } from '@/hooks/useTheme';
+import ThemePicker from '@/components/ThemePicker';
 import './AdminPortalPage.css';
 
 type Permission = { allowed: boolean; scope: number };
@@ -264,6 +265,7 @@ export default function AdminPortalPage() {
             </div>
             <Space wrap>
               <Tag color={me.status === 'active' ? 'success' : 'warning'}>{me.status}</Tag>
+              <ThemePicker inline />
               <Button onClick={refresh}>{t('adminPortal.refresh')}</Button>
               <Button
                 onClick={async () => {

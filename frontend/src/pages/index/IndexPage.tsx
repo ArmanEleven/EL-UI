@@ -21,6 +21,7 @@ import { useTheme } from '@/hooks/useTheme';
 import { useStatusQuery } from '@/api/queries/useStatusQuery';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import AppSidebar from '@/layouts/AppSidebar';
+import PanelTopbar from '@/layouts/PanelTopbar';
 import { LazyMount } from '@/components/utility';
 import SponsorSlot from '@/components/sponsor/SponsorSlot';
 import { setMessageInstance } from '@/utils/messageBus';
@@ -172,6 +173,7 @@ export default function IndexPage() {
         <AppSidebar />
 
         <Layout className="content-shell">
+          <PanelTopbar />
           <Layout.Content className="content-area">
             <Spin
               spinning={loading || !fetched}

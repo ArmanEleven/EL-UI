@@ -143,8 +143,8 @@
 body.dark .log-container {
   --log-stamp: #6aa6ee;
   --log-debug: #6aa6ee;
-  --log-info: #4ed3a6;
-  --log-notice: #4ed3a6;
+  --log-info: var(--elui-accent, #65d8ff);
+  --log-notice: var(--elui-accent-strong, #2daddc);
   --log-warning: #ffb872;
   --log-error: #ff7575;
   --log-unknown: #b5b5b5;
@@ -154,8 +154,8 @@ body.dark .log-container {
 html[data-theme='ultra-dark'] .log-container {
   --log-stamp: #7fb6f1;
   --log-debug: #7fb6f1;
-  --log-info: #5fd9b0;
-  --log-notice: #5fd9b0;
+  --log-info: var(--elui-accent, #d4dde7);
+  --log-notice: var(--elui-accent-strong, #aebdcd);
   --log-warning: #ffcc88;
   --log-error: #ff8a8a;
   --log-unknown: #c4c4c4;

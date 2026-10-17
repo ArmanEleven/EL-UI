@@ -72,6 +72,7 @@ import ClientTrafficCell from '@/components/clients/ClientTrafficCell';
 import ClientSpeedTag, { isActiveSpeed } from '@/components/clients/ClientSpeedTag';
 import ClientCardComment from '@/components/clients/ClientCardComment';
 import AppSidebar from '@/layouts/AppSidebar';
+import PanelTopbar from '@/layouts/PanelTopbar';
 import { IntlUtil, SizeFormatter } from '@/utils';
 import { setMessageInstance } from '@/utils/messageBus';
 import { LazyMount } from '@/components/utility';
@@ -207,11 +208,11 @@ const INBOUND_PROTOCOL_COLORS: Record<string, string> = {
   trojan: 'volcano',
   shadowsocks: 'magenta',
   hysteria: 'cyan',
-  hysteria2: 'green',
+  hysteria2: 'cyan',
   wireguard: 'gold',
   amneziawg: 'yellow',
   http: 'purple',
-  mixed: 'lime',
+  mixed: 'geekblue',
   tunnel: 'orange',
   tuic: 'orange',
 };
@@ -1298,6 +1299,7 @@ export default function ClientsPage() {
         <AppSidebar />
 
         <Layout className="content-shell">
+          <PanelTopbar />
           <Layout.Content id="content-layout" className="content-area">
             <Spin
               spinning={!fetched || !hostsFetched}

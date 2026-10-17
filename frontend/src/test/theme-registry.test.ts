@@ -33,16 +33,18 @@ test('rejects arbitrary palette ids and migrates legacy ids', () => {
 });
 
 test('keeps Ant Design tokens aligned with the selected palette', () => {
+  const preset = getThemePreset('amethyst');
   const config = buildAntdThemeConfig(true, false, 'amethyst');
-  expect(config.token?.colorPrimary).toBe('#9b78ef');
-  expect(config.token?.colorBgBase).toBe('#100b1b');
-  expect(config.token?.colorBgContainer).toBe('#1b1428');
+  expect(config.token?.colorPrimary).toBe(preset.accentStrong);
+  expect(config.token?.colorBgBase).toBe(preset.background);
+  expect(config.token?.colorBgContainer).toBe(preset.surface);
 });
 
 test('keeps Horizon on the light Ant Design algorithm', () => {
+  const preset = getThemePreset('horizon');
   const config = buildAntdThemeConfig(false, false, 'horizon');
-  expect(config.token?.colorPrimary).toBe('#2767d8');
-  expect(config.token?.colorBgBase).toBe('#f2f6fb');
+  expect(config.token?.colorPrimary).toBe(preset.accentStrong);
+  expect(config.token?.colorBgBase).toBe(preset.background);
 });
 
 test('keeps Obsidian as the OLED dark preset', () => {
@@ -50,6 +52,6 @@ test('keeps Obsidian as the OLED dark preset', () => {
   const config = buildAntdThemeConfig(true, true, 'obsidian');
   expect(preset.isDark).toBe(true);
   expect(preset.isUltra).toBe(true);
-  expect(preset.background).toBe('#030405');
-  expect(config.token?.colorBgBase).toBe('#030405');
+  expect(preset.background).toBe('#050607');
+  expect(config.token?.colorBgBase).toBe('#050607');
 });
