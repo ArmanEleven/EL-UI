@@ -1,7 +1,13 @@
 /* Palette-aware surface overrides for legacy panel pages. */
 :root {
-  --bg-page: var(--elui-bg, #09121d);
-  --bg-card: var(--elui-surface, #101e2c);
+  --bg-page: var(--elui-bg, #080f1b);
+  --bg-card: var(--elui-surface, #101a29);
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+  --font-ui: Inter, Vazirmatn, 'Segoe UI', Tahoma, Arial, sans-serif;
 }
 
 .index-page,
@@ -205,8 +211,28 @@ body.light {
   color: var(--elui-text, #152439);
 }
 
-.ant-layout,
-.ant-layout-content {
+.index-page .ant-layout,
+.index-page .ant-layout-content,
+.clients-page .ant-layout,
+.clients-page .ant-layout-content,
+.inbounds-page .ant-layout,
+.inbounds-page .ant-layout-content,
+.xray-page .ant-layout,
+.xray-page .ant-layout-content,
+.settings-page .ant-layout,
+.settings-page .ant-layout-content,
+.nodes-page .ant-layout,
+.nodes-page .ant-layout-content,
+.groups-page .ant-layout,
+.groups-page .ant-layout-content,
+.hosts-page .ant-layout,
+.hosts-page .ant-layout-content,
+.api-docs-page .ant-layout,
+.api-docs-page .ant-layout-content,
+.sponsors-page .ant-layout,
+.sponsors-page .ant-layout-content,
+.management-portal .ant-layout,
+.management-portal .ant-layout-content {
   background-color: transparent;
 }
 
@@ -408,7 +434,6 @@ html[data-palette='iridescent'] body.dark {
 
 .ant-table-wrapper .ant-table,
 .ant-table-wrapper .ant-table-container {
-  overflow: hidden;
   border-radius: 13px;
   background: transparent;
 }
