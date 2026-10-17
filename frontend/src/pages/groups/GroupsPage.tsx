@@ -47,6 +47,7 @@ import { useClients } from '@/hooks/useClients';
 import { HttpUtil, SizeFormatter } from '@/utils';
 import { setMessageInstance } from '@/utils/messageBus';
 import AppSidebar from '@/layouts/AppSidebar';
+import PanelTopbar from '@/layouts/PanelTopbar';
 import { LazyMount } from '@/components/utility';
 import { keys } from '@/api/queryKeys';
 import {
@@ -494,6 +495,7 @@ export default function GroupsPage() {
       <Layout className={pageClass}>
         <AppSidebar />
         <Layout className="content-shell">
+          <PanelTopbar />
           <Layout.Content id="content-layout" className="content-area">
             <Spin spinning={!fetched} delay={200} description={t('loading')} size="large">
               {!fetched ? (

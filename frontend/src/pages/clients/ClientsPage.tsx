@@ -72,6 +72,7 @@ import ClientTrafficCell from '@/components/clients/ClientTrafficCell';
 import ClientSpeedTag, { isActiveSpeed } from '@/components/clients/ClientSpeedTag';
 import ClientCardComment from '@/components/clients/ClientCardComment';
 import AppSidebar from '@/layouts/AppSidebar';
+import PanelTopbar from '@/layouts/PanelTopbar';
 import { IntlUtil, SizeFormatter } from '@/utils';
 import { setMessageInstance } from '@/utils/messageBus';
 import { LazyMount } from '@/components/utility';
@@ -1298,6 +1299,7 @@ export default function ClientsPage() {
         <AppSidebar />
 
         <Layout className="content-shell">
+          <PanelTopbar />
           <Layout.Content id="content-layout" className="content-area">
             <Spin
               spinning={!fetched || !hostsFetched}

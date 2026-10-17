@@ -12,6 +12,7 @@ import {
 
 import { useTheme } from '@/hooks/useTheme';
 import AppSidebar from '@/layouts/AppSidebar';
+import PanelTopbar from '@/layouts/PanelTopbar';
 import { useSponsorsQuery } from '@/api/queries/useSponsorsQuery';
 import SponsorCard from '@/components/sponsor/SponsorCard';
 import { IntlUtil } from '@/utils';
@@ -96,6 +97,7 @@ export default function SponsorsPage() {
       <Layout className={pageClass}>
         <AppSidebar />
         <Layout className="content-shell">
+          <PanelTopbar />
           <Layout.Content className="content-area">
             <div className="sponsors-inner">
               <div className="sponsors-header">

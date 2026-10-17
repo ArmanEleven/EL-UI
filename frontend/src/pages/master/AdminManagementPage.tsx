@@ -10,6 +10,7 @@ import {
   Form,
   Input,
   InputNumber,
+  Layout,
   Row,
   Select,
   Space,
@@ -22,6 +23,8 @@ import {
 import type { ColumnsType } from 'antd/es/table';
 import { HttpUtil } from '@/utils';
 import { useTheme } from '@/hooks/useTheme';
+import AppSidebar from '@/layouts/AppSidebar';
+import PanelTopbar from '@/layouts/PanelTopbar';
 import './AdminManagementPage.css';
 
 type PermissionGrant = { allowed: boolean; scope: number };
@@ -358,15 +361,28 @@ export default function AdminManagementPage() {
   if (loading)
     return (
       <ConfigProvider theme={antdThemeConfig}>
-        <div className="admin-management-loading">
-          <Spin size="large" />
-        </div>
+        <Layout className="admin-management-shell">
+          <AppSidebar />
+          <Layout className="content-shell">
+            <PanelTopbar />
+            <Layout.Content className="content-area">
+              <div className="admin-management-loading">
+                <Spin size="large" />
+              </div>
+            </Layout.Content>
+          </Layout>
+        </Layout>
       </ConfigProvider>
     );
 
   return (
     <ConfigProvider theme={antdThemeConfig}>
-      <div className="admin-management-page">
+      <Layout className="admin-management-shell">
+        <AppSidebar />
+        <Layout className="content-shell">
+          <PanelTopbar />
+          <Layout.Content className="content-area">
+            <div className="admin-management-page">
         {contextHolder}
         <div className="admin-management-header">
           <div>
@@ -547,7 +563,10 @@ export default function AdminManagementPage() {
             </Card>
           </Col>
         </Row>
-      </div>
+            </div>
+          </Layout.Content>
+        </Layout>
+      </Layout>
     </ConfigProvider>
   );
 }
