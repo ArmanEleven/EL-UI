@@ -208,11 +208,11 @@ const INBOUND_PROTOCOL_COLORS: Record<string, string> = {
   trojan: 'volcano',
   shadowsocks: 'magenta',
   hysteria: 'cyan',
-  hysteria2: 'green',
+  hysteria2: 'cyan',
   wireguard: 'gold',
   amneziawg: 'yellow',
   http: 'purple',
-  mixed: 'lime',
+  mixed: 'geekblue',
   tunnel: 'orange',
   tuic: 'orange',
 };
