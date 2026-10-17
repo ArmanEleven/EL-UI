@@ -645,3 +645,24 @@
     border-radius: 15px;
   }
 }
+
+/* High-specificity legacy selectors must also consume the active palette. */
+.login-app.is-dark .brand-name {
+  background: linear-gradient(
+    110deg,
+    var(--elui-text, #edf5ff) 0%,
+    var(--elui-accent, #65d8ff) 52%,
+    var(--elui-accent-strong, #2daddc) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.login-app.is-dark .brand-accent {
+  background: linear-gradient(
+    90deg,
+    var(--elui-accent-strong, #2daddc),
+    var(--elui-accent, #65d8ff)
+  );
+}
