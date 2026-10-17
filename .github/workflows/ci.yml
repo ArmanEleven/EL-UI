@@ -209,6 +209,20 @@ jobs:
       - name: Lint
         run: npm run lint
         working-directory: frontend
+      - name: Temporary canonical format pass for PR #6
+        if: github.event.pull_request.number == 6
+        run: npx oxfmt src/layouts/PanelTopbar.css src/pages/master/AdminManagementPage.tsx
+        working-directory: frontend
+      - name: Upload exact formatter output for PR #6
+        if: github.event.pull_request.number == 6
+        uses: actions/upload-artifact@v4
+        with:
+          name: elui-oxfmt-canonical-output
+          path: |
+            frontend/src/layouts/PanelTopbar.css
+            frontend/src/pages/master/AdminManagementPage.tsx
+          if-no-files-found: error
+          retention-days: 1
       - name: Format check
         run: npm run format:check
         working-directory: frontend
