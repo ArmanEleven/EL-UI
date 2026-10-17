@@ -432,10 +432,22 @@
   --blob-4: color-mix(in srgb, var(--elui-accent-strong, #2daddc) 12%, transparent);
   --blob-5: color-mix(in srgb, var(--elui-accent, #65d8ff) 10%, transparent);
   --grid-color: color-mix(in srgb, var(--elui-text, #edf5ff) 4%, transparent);
-  --vignette: radial-gradient(ellipse at center, transparent 30%, color-mix(in srgb, var(--elui-bg, #080f1b) 24%, transparent) 100%);
+  --vignette: radial-gradient(
+    ellipse at center,
+    transparent 30%,
+    color-mix(in srgb, var(--elui-bg, #080f1b) 24%, transparent) 100%
+  );
   background:
-    radial-gradient(ellipse at 18% 8%, color-mix(in srgb, var(--elui-accent, #65d8ff) 10%, transparent), transparent 36%),
-    radial-gradient(ellipse at 92% 82%, color-mix(in srgb, var(--elui-accent-strong, #2daddc) 9%, transparent), transparent 38%),
+    radial-gradient(
+      ellipse at 18% 8%,
+      color-mix(in srgb, var(--elui-accent, #65d8ff) 10%, transparent),
+      transparent 36%
+    ),
+    radial-gradient(
+      ellipse at 92% 82%,
+      color-mix(in srgb, var(--elui-accent-strong, #2daddc) 9%, transparent),
+      transparent 38%
+    ),
     var(--elui-bg, #080f1b);
   color: var(--elui-text, #edf5ff);
 }
@@ -457,8 +469,16 @@
   --grid-color: color-mix(in srgb, var(--elui-text, #edf5ff) 3.5%, transparent);
   --vignette: radial-gradient(ellipse at center, transparent 25%, rgba(0, 0, 0, 0.5) 100%);
   background:
-    radial-gradient(ellipse at 18% 8%, color-mix(in srgb, var(--elui-accent, #65d8ff) 12%, transparent), transparent 36%),
-    radial-gradient(ellipse at 92% 82%, color-mix(in srgb, var(--elui-accent-strong, #2daddc) 10%, transparent), transparent 38%),
+    radial-gradient(
+      ellipse at 18% 8%,
+      color-mix(in srgb, var(--elui-accent, #65d8ff) 12%, transparent),
+      transparent 36%
+    ),
+    radial-gradient(
+      ellipse at 92% 82%,
+      color-mix(in srgb, var(--elui-accent-strong, #2daddc) 10%, transparent),
+      transparent 38%
+    ),
     var(--elui-bg, #080f1b);
 }
 
@@ -471,7 +491,11 @@
   --grid-color: color-mix(in srgb, var(--elui-text, #f3f5f8) 2.5%, transparent);
   --vignette: radial-gradient(ellipse at center, transparent 20%, rgba(0, 0, 0, 0.8) 100%);
   background:
-    radial-gradient(ellipse at 18% 8%, color-mix(in srgb, var(--elui-accent, #d4dde7) 7%, transparent), transparent 36%),
+    radial-gradient(
+      ellipse at 18% 8%,
+      color-mix(in srgb, var(--elui-accent, #d4dde7) 7%, transparent),
+      transparent 36%
+    ),
     var(--elui-bg, #050607);
 }
 
@@ -514,7 +538,8 @@
   width: 56px;
   height: 56px;
   margin-bottom: 5px;
-  border: 1px solid color-mix(in srgb, var(--elui-accent, #65d8ff) 48%, var(--elui-border, transparent));
+  border: 1px solid
+    color-mix(in srgb, var(--elui-accent, #65d8ff) 48%, var(--elui-border, transparent));
   border-radius: 17px;
   background: linear-gradient(
     145deg,
@@ -531,7 +556,11 @@
 }
 
 .login-app.is-dark .brand-symbol {
-  border-color: color-mix(in srgb, var(--elui-accent, #65d8ff) 55%, var(--elui-border, transparent));
+  border-color: color-mix(
+    in srgb,
+    var(--elui-accent, #65d8ff) 55%,
+    var(--elui-border, transparent)
+  );
   box-shadow:
     0 12px 32px color-mix(in srgb, var(--elui-accent, #65d8ff) 15%, transparent),
     inset 0 1px 0 rgba(255, 255, 255, 0.26);
@@ -565,7 +594,11 @@
   height: 3px;
   margin-top: 7px;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--elui-accent-strong, #2daddc), var(--elui-accent, #65d8ff));
+  background: linear-gradient(
+    90deg,
+    var(--elui-accent-strong, #2daddc),
+    var(--elui-accent, #65d8ff)
+  );
 }
 
 .login-form .ant-form-item-label > label {
@@ -574,7 +607,11 @@
 
 .login-app .ant-btn-primary {
   border: 1px solid color-mix(in srgb, var(--elui-accent, #65d8ff) 24%, transparent);
-  background: linear-gradient(110deg, var(--elui-accent-strong, #2daddc), var(--elui-accent, #65d8ff));
+  background: linear-gradient(
+    110deg,
+    var(--elui-accent-strong, #2daddc),
+    var(--elui-accent, #65d8ff)
+  );
   color: var(--elui-bg, #080f1b);
   box-shadow: 0 8px 20px color-mix(in srgb, var(--elui-accent-strong, #2daddc) 22%, transparent);
 }
