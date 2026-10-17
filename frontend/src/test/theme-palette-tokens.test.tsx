@@ -45,6 +45,7 @@ test('all eight approved palettes apply their complete semantic token bridge', (
     expect(root.style.getPropertyValue('--surface-3')).toBe(
       preset.surfaceTertiary ?? preset.elevated,
     );
+    expect(root.style.getPropertyValue('--surface-glass')).toBe(preset.surfaceGlass);
     expect(root.style.getPropertyValue('--text')).toBe(preset.text);
     expect(root.style.getPropertyValue('--text-2')).toBe(preset.mutedText);
     expect(root.style.getPropertyValue('--text-3')).toBe(preset.faintText ?? preset.mutedText);
@@ -55,5 +56,8 @@ test('all eight approved palettes apply their complete semantic token bridge', (
     expect(root.style.getPropertyValue('--border-strong')).toBe(
       preset.borderStrong ?? preset.border,
     );
+    expect(root.style.getPropertyValue('--glow')).toBe(preset.glow);
+    expect(root.style.getPropertyValue('--shadow')).toBe(preset.shadow);
+    expect(root.style.getPropertyValue('--shadow-soft')).toBe(preset.shadowSoft);
   }
 });
