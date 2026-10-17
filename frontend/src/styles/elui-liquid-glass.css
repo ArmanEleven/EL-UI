@@ -24,7 +24,9 @@
   --bg-card: var(--elui-surface, #101e2c);
   background-color: var(--elui-bg, #09121d) !important;
   color: var(--elui-text, #edf7ff);
-  transition: background-color 240ms ease, color 220ms ease;
+  transition:
+    background-color 240ms ease,
+    color 220ms ease;
 }
 
 .index-page .ant-layout,
@@ -147,8 +149,7 @@ html[data-palette='iridescent'] body {
   background:
     radial-gradient(ellipse at 10% 0%, rgba(99, 171, 255, 0.13), transparent 38%),
     radial-gradient(ellipse at 92% 8%, rgba(183, 115, 255, 0.13), transparent 36%),
-    radial-gradient(ellipse at 60% 100%, rgba(99, 232, 219, 0.07), transparent 40%),
-    var(--elui-bg);
+    radial-gradient(ellipse at 60% 100%, rgba(99, 232, 219, 0.07), transparent 40%), var(--elui-bg);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -165,7 +166,6 @@ html[data-palette='iridescent'] body {
     transition: none !important;
   }
 }
-
 
 /* --------------------------------------------------------------------------
    Approved EL-UI Liquid Glass beta — mapped to the real Ant Design panel.
@@ -238,12 +238,11 @@ body.light {
 
 .ant-sidebar > .ant-layout-sider {
   border-inline-end: 1px solid var(--elui-border, var(--ant-color-border-secondary));
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--elui-surface, #101a29) 96%, transparent),
-      var(--bg-deep, #050a12)
-    );
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--elui-surface, #101a29) 96%, transparent),
+    var(--bg-deep, #050a12)
+  );
   backdrop-filter: blur(var(--elui-glass-blur)) saturate(var(--elui-glass-saturation));
   -webkit-backdrop-filter: blur(var(--elui-glass-blur)) saturate(var(--elui-glass-saturation));
   transition:
@@ -257,13 +256,20 @@ body.light {
 }
 
 .brand-mark {
-  border-color: color-mix(in srgb, var(--elui-accent, var(--ant-color-primary)) 48%, var(--elui-border, transparent));
-  background:
-    linear-gradient(
-      145deg,
-      color-mix(in srgb, var(--elui-accent, var(--ant-color-primary)) 23%, var(--surface-2, var(--elui-surface))),
-      var(--elui-surface, var(--ant-color-bg-container))
-    );
+  border-color: color-mix(
+    in srgb,
+    var(--elui-accent, var(--ant-color-primary)) 48%,
+    var(--elui-border, transparent)
+  );
+  background: linear-gradient(
+    145deg,
+    color-mix(
+      in srgb,
+      var(--elui-accent, var(--ant-color-primary)) 23%,
+      var(--surface-2, var(--elui-surface))
+    ),
+    var(--elui-surface, var(--ant-color-bg-container))
+  );
   color: var(--elui-accent, var(--ant-color-primary));
   box-shadow:
     0 8px 24px color-mix(in srgb, var(--elui-accent, var(--ant-color-primary)) 14%, transparent),
@@ -291,7 +297,11 @@ body.light {
 
 .ant-sidebar .ant-menu-item:hover:not(.ant-menu-item-selected),
 .ant-sidebar .ant-menu-submenu-title:hover {
-  background: color-mix(in srgb, var(--elui-surface-elevated, var(--ant-color-fill-tertiary)) 58%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--elui-surface-elevated, var(--ant-color-fill-tertiary)) 58%,
+    transparent
+  );
   color: var(--elui-text, var(--ant-color-text));
 }
 
@@ -301,7 +311,11 @@ body.light {
   overflow: hidden;
   border: 1px solid var(--elui-border, var(--ant-color-border-secondary));
   border-radius: var(--elui-card-radius);
-  background: color-mix(in srgb, var(--elui-surface, var(--ant-color-bg-container)) 88%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--elui-surface, var(--ant-color-bg-container)) 88%,
+    transparent
+  );
   box-shadow:
     0 12px 30px rgba(0, 0, 0, 0.075),
     inset 0 1px 0 color-mix(in srgb, var(--elui-text, #edf5ff) 3%, transparent);
@@ -315,7 +329,11 @@ body.light {
 .ant-card-head {
   min-height: 52px;
   border-bottom-color: var(--elui-border, var(--ant-color-border-secondary));
-  background: color-mix(in srgb, var(--elui-surface, var(--ant-color-bg-container)) 76%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--elui-surface, var(--ant-color-bg-container)) 76%,
+    transparent
+  );
 }
 
 .ant-card-head-title {
@@ -328,7 +346,11 @@ body.light {
 }
 
 .ant-card-hoverable:hover {
-  border-color: color-mix(in srgb, var(--elui-accent, var(--ant-color-primary)) 50%, var(--elui-border, transparent));
+  border-color: color-mix(
+    in srgb,
+    var(--elui-accent, var(--ant-color-primary)) 50%,
+    var(--elui-border, transparent)
+  );
   box-shadow:
     0 16px 36px rgba(0, 0, 0, 0.13),
     inset 0 1px 0 color-mix(in srgb, var(--elui-text, #edf5ff) 5%, transparent);
@@ -370,11 +392,13 @@ html[data-palette='iridescent'] body.dark {
 }
 
 .ant-btn-primary {
-  box-shadow: 0 5px 16px color-mix(in srgb, var(--elui-accent-strong, var(--ant-color-primary)) 18%, transparent);
+  box-shadow: 0 5px 16px
+    color-mix(in srgb, var(--elui-accent-strong, var(--ant-color-primary)) 18%, transparent);
 }
 
 .ant-btn-primary:hover {
-  box-shadow: 0 8px 22px color-mix(in srgb, var(--elui-accent-strong, var(--ant-color-primary)) 25%, transparent);
+  box-shadow: 0 8px 22px
+    color-mix(in srgb, var(--elui-accent-strong, var(--ant-color-primary)) 25%, transparent);
   transform: translateY(-1px);
 }
 
@@ -403,7 +427,11 @@ html[data-palette='iridescent'] body.dark {
 .ant-select-selector,
 .ant-picker,
 .ant-input-textarea textarea {
-  background-color: color-mix(in srgb, var(--elui-surface, var(--ant-color-bg-container)) 92%, transparent);
+  background-color: color-mix(
+    in srgb,
+    var(--elui-surface, var(--ant-color-bg-container)) 92%,
+    transparent
+  );
   transition:
     border-color 160ms ease,
     background-color 160ms ease,
@@ -423,7 +451,8 @@ html[data-palette='iridescent'] body.dark {
 .ant-input-number-focused,
 .ant-select-focused .ant-select-selector,
 .ant-picker-focused {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--elui-accent, var(--ant-color-primary)) 13%, transparent);
+  box-shadow: 0 0 0 3px
+    color-mix(in srgb, var(--elui-accent, var(--ant-color-primary)) 13%, transparent);
 }
 
 /* Tables use the same accent as active navigation, never a hard-coded green. */
@@ -440,7 +469,11 @@ html[data-palette='iridescent'] body.dark {
 
 .ant-table-wrapper .ant-table-thead > tr > th {
   border-bottom-color: var(--elui-border, var(--ant-color-border-secondary));
-  background: color-mix(in srgb, var(--elui-accent, var(--ant-color-primary)) 6%, var(--elui-surface, var(--ant-color-bg-container)));
+  background: color-mix(
+    in srgb,
+    var(--elui-accent, var(--ant-color-primary)) 6%,
+    var(--elui-surface, var(--ant-color-bg-container))
+  );
   font-weight: 700;
 }
 
@@ -451,7 +484,11 @@ html[data-palette='iridescent'] body.dark {
 }
 
 .ant-table-wrapper .ant-table-tbody > tr:hover > td {
-  background: color-mix(in srgb, var(--elui-accent, var(--ant-color-primary)) 6%, var(--elui-surface, var(--ant-color-bg-container)));
+  background: color-mix(
+    in srgb,
+    var(--elui-accent, var(--ant-color-primary)) 6%,
+    var(--elui-surface, var(--ant-color-bg-container))
+  );
 }
 
 .ant-table-wrapper .ant-table-placeholder .ant-table-cell {
@@ -462,7 +499,9 @@ html[data-palette='iridescent'] body.dark {
 .ant-pagination .ant-pagination-prev,
 .ant-pagination .ant-pagination-next {
   border-radius: 9px;
-  transition: border-color 160ms ease, background-color 160ms ease;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease;
 }
 
 .ant-tag {
@@ -487,7 +526,11 @@ html[data-palette='iridescent'] body.dark {
 .ant-tooltip .ant-tooltip-inner {
   border: 1px solid var(--elui-border, var(--ant-color-border-secondary));
   border-radius: var(--elui-overlay-radius);
-  background: color-mix(in srgb, var(--elui-surface-elevated, var(--ant-color-bg-elevated)) 92%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--elui-surface-elevated, var(--ant-color-bg-elevated)) 92%,
+    transparent
+  );
   box-shadow: var(--shadow, 0 20px 56px rgba(0, 0, 0, 0.28));
   backdrop-filter: blur(22px) saturate(145%);
   -webkit-backdrop-filter: blur(22px) saturate(145%);
@@ -519,7 +562,11 @@ html[data-palette='iridescent'] body.dark {
 .management-portal .ant-card {
   border-color: var(--elui-border, var(--ant-color-border-secondary));
   border-radius: var(--elui-card-radius);
-  background: color-mix(in srgb, var(--elui-surface, var(--ant-color-bg-container)) 88%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--elui-surface, var(--ant-color-bg-container)) 88%,
+    transparent
+  );
   backdrop-filter: blur(var(--elui-glass-blur)) saturate(var(--elui-glass-saturation));
   -webkit-backdrop-filter: blur(var(--elui-glass-blur)) saturate(var(--elui-glass-saturation));
 }
@@ -527,13 +574,21 @@ html[data-palette='iridescent'] body.dark {
 .admin-management-page .ant-card-head,
 .management-portal .ant-card-head {
   border-bottom-color: var(--elui-border, var(--ant-color-border-secondary));
-  background: color-mix(in srgb, var(--elui-surface, var(--ant-color-bg-container)) 76%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--elui-surface, var(--ant-color-bg-container)) 76%,
+    transparent
+  );
 }
 
 .admin-management-header,
 .management-topbar {
   border-color: var(--elui-border, var(--ant-color-border-secondary));
-  background: color-mix(in srgb, var(--elui-surface, var(--ant-color-bg-container)) 80%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--elui-surface, var(--ant-color-bg-container)) 80%,
+    transparent
+  );
   box-shadow:
     0 12px 36px rgba(0, 0, 0, 0.08),
     inset 0 1px 0 color-mix(in srgb, var(--elui-text, #edf5ff) 4%, transparent);
@@ -543,33 +598,61 @@ html[data-palette='iridescent'] body.dark {
 
 .admin-management-page .ant-table-thead > tr > th,
 .management-portal .ant-table-thead > tr > th {
-  background: color-mix(in srgb, var(--elui-accent, var(--ant-color-primary)) 7%, var(--elui-surface, var(--ant-color-bg-container)));
+  background: color-mix(
+    in srgb,
+    var(--elui-accent, var(--ant-color-primary)) 7%,
+    var(--elui-surface, var(--ant-color-bg-container))
+  );
   border-bottom-color: var(--elui-border, var(--ant-color-border-secondary));
 }
 
 .admin-management-page .ant-table-tbody > tr:hover > td,
 .management-portal .ant-table-tbody > tr:hover > td {
-  background: color-mix(in srgb, var(--elui-accent, var(--ant-color-primary)) 7%, var(--elui-surface, var(--ant-color-bg-container)));
+  background: color-mix(
+    in srgb,
+    var(--elui-accent, var(--ant-color-primary)) 7%,
+    var(--elui-surface, var(--ant-color-bg-container))
+  );
 }
 
 /* The login entry is separate from the panel entry; keep its glow tied to tokens. */
 .login-app {
   background:
-    radial-gradient(ellipse at 18% 8%, color-mix(in srgb, var(--elui-accent, #65d8ff) 10%, transparent), transparent 36%),
-    radial-gradient(ellipse at 92% 82%, color-mix(in srgb, var(--elui-accent-strong, #2daddc) 9%, transparent), transparent 38%),
+    radial-gradient(
+      ellipse at 18% 8%,
+      color-mix(in srgb, var(--elui-accent, #65d8ff) 10%, transparent),
+      transparent 36%
+    ),
+    radial-gradient(
+      ellipse at 92% 82%,
+      color-mix(in srgb, var(--elui-accent-strong, #2daddc) 9%, transparent),
+      transparent 38%
+    ),
     var(--elui-bg, #080f1b);
 }
 
 .login-app.is-dark {
   background:
-    radial-gradient(ellipse at 18% 8%, color-mix(in srgb, var(--elui-accent, #65d8ff) 12%, transparent), transparent 36%),
-    radial-gradient(ellipse at 92% 82%, color-mix(in srgb, var(--elui-accent-strong, #2daddc) 10%, transparent), transparent 38%),
+    radial-gradient(
+      ellipse at 18% 8%,
+      color-mix(in srgb, var(--elui-accent, #65d8ff) 12%, transparent),
+      transparent 36%
+    ),
+    radial-gradient(
+      ellipse at 92% 82%,
+      color-mix(in srgb, var(--elui-accent-strong, #2daddc) 10%, transparent),
+      transparent 38%
+    ),
     var(--elui-bg, #080f1b);
 }
 
 .login-app.is-dark.is-ultra {
   background:
-    radial-gradient(ellipse at 18% 8%, color-mix(in srgb, var(--elui-accent, #d4dde7) 7%, transparent), transparent 36%),
+    radial-gradient(
+      ellipse at 18% 8%,
+      color-mix(in srgb, var(--elui-accent, #d4dde7) 7%, transparent),
+      transparent 36%
+    ),
     var(--elui-bg, #050607);
 }
 
