@@ -299,13 +299,13 @@
   background: var(--sw-accent);
 }
 
-.api-docs-page.is-dark .swagger-ui .btn.authorize {
+.api-docs-page .swagger-ui .btn.authorize {
   color: var(--sw-accent);
   border-color: color-mix(in srgb, var(--sw-accent) 42%, transparent);
   background: color-mix(in srgb, var(--sw-accent) 8%, transparent);
 }
 
-.api-docs-page.is-dark .swagger-ui .btn.authorize svg {
+.api-docs-page .swagger-ui .btn.authorize svg {
   fill: var(--sw-accent);
 }
 
@@ -392,7 +392,7 @@
   color: var(--sw-text);
 }
 
-.api-docs-page.is-dark .swagger-ui .response-control-media-type--accept-controller select {
+.api-docs-page .swagger-ui .response-control-media-type--accept-controller select {
   border-color: color-mix(in srgb, var(--sw-accent) 52%, transparent);
 }
 
