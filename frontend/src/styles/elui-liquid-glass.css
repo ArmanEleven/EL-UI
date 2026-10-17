@@ -585,7 +585,8 @@ body.dark .management-portal .ant-card {
     0 12px 30px rgb(0 0 0 / 16%),
     inset 0 1px 0 color-mix(in srgb, var(--elui-text, #edf5ff) 4%, transparent);
   backdrop-filter: blur(var(--elui-glass-blur, 18px)) saturate(var(--elui-glass-saturation, 145%));
-  -webkit-backdrop-filter: blur(var(--elui-glass-blur, 18px)) saturate(var(--elui-glass-saturation, 145%));
+  -webkit-backdrop-filter: blur(var(--elui-glass-blur, 18px))
+    saturate(var(--elui-glass-saturation, 145%));
 }
 
 body.dark .admin-management-page .ant-card-head,

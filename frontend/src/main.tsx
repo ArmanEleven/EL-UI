@@ -53,7 +53,7 @@ readyI18n().then(() => {
     createRoot(root).render(
       <ThemeProvider>
         <QueryProvider>
-<RouterProvider router={router} />
+          <RouterProvider router={router} />
         </QueryProvider>
       </ThemeProvider>,
     );

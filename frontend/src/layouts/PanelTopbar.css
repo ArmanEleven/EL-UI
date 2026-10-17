@@ -62,15 +62,27 @@
   padding: 0 11px;
   border-color: var(--elui-border, var(--ant-color-border-secondary));
   border-radius: 11px;
-  background: color-mix(in srgb, var(--elui-surface, var(--ant-color-bg-container)) 76%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--elui-surface, var(--ant-color-bg-container)) 76%,
+    transparent
+  );
   color: var(--elui-muted-text, var(--ant-color-text-secondary));
   text-align: start;
   box-shadow: none;
 }
 
 .elui-topbar__search.ant-btn:hover {
-  border-color: color-mix(in srgb, var(--elui-accent, var(--ant-color-primary)) 45%, var(--elui-border, transparent));
-  background: color-mix(in srgb, var(--elui-accent, var(--ant-color-primary)) 8%, var(--elui-surface, var(--ant-color-bg-container)));
+  border-color: color-mix(
+    in srgb,
+    var(--elui-accent, var(--ant-color-primary)) 45%,
+    var(--elui-border, transparent)
+  );
+  background: color-mix(
+    in srgb,
+    var(--elui-accent, var(--ant-color-primary)) 8%,
+    var(--elui-surface, var(--ant-color-bg-container))
+  );
   color: var(--elui-accent, var(--ant-color-primary));
 }
 

@@ -310,9 +310,14 @@
 
 body.dark .ant-drawer-content,
 body.dark .ant-drawer-body {
-  background-color: color-mix(in srgb, var(--elui-surface, var(--ant-color-bg-container)) 88%, transparent);
+  background-color: color-mix(
+    in srgb,
+    var(--elui-surface, var(--ant-color-bg-container)) 88%,
+    transparent
+  );
   backdrop-filter: blur(var(--elui-glass-blur, 18px)) saturate(var(--elui-glass-saturation, 145%));
-  -webkit-backdrop-filter: blur(var(--elui-glass-blur, 18px)) saturate(var(--elui-glass-saturation, 145%));
+  -webkit-backdrop-filter: blur(var(--elui-glass-blur, 18px))
+    saturate(var(--elui-glass-saturation, 145%));
 }
 
 html[data-theme='ultra-dark'] body.dark .ant-drawer-content,
@@ -412,7 +417,8 @@ body.dark .ant-sidebar > .ant-layout-sider {
     color-mix(in srgb, var(--bg-deep, var(--elui-bg, var(--ant-color-bg-layout))) 94%, transparent)
   );
   backdrop-filter: blur(var(--elui-glass-blur, 18px)) saturate(var(--elui-glass-saturation, 145%));
-  -webkit-backdrop-filter: blur(var(--elui-glass-blur, 18px)) saturate(var(--elui-glass-saturation, 145%));
+  -webkit-backdrop-filter: blur(var(--elui-glass-blur, 18px))
+    saturate(var(--elui-glass-saturation, 145%));
 }
 
 html[data-theme='ultra-dark'] body.dark .ant-sidebar > .ant-layout-sider {
