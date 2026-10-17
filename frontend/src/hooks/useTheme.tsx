@@ -80,7 +80,7 @@ function applyDom(themeId: ThemeId): void {
     '--surface': preset.surface,
     '--surface-2': preset.surfaceSecondary ?? preset.elevated,
     '--surface-3': preset.surfaceTertiary ?? preset.elevated,
-    '--surface-glass': `color-mix(in srgb, ${preset.surface} 80%, transparent)`,
+    '--surface-glass': preset.surfaceGlass,
     '--text': preset.text,
     '--text-2': preset.mutedText,
     '--text-3': preset.faintText ?? preset.mutedText,
@@ -93,11 +93,9 @@ function applyDom(themeId: ThemeId): void {
     '--warning': preset.isDark ? '#f2bd66' : '#9a6508',
     '--danger': preset.isDark ? '#ff6f87' : '#c62b45',
     '--info': preset.isDark ? '#75baff' : '#2868d5',
-    '--shadow': preset.isDark ? '0 24px 70px rgb(0 0 0 / 28%)' : '0 24px 70px rgb(31 57 90 / 12%)',
-    '--shadow-soft': preset.isDark
-      ? '0 12px 36px rgb(0 0 0 / 18%)'
-      : '0 12px 36px rgb(31 57 90 / 8%)',
-    '--glow': `0 0 38px color-mix(in srgb, ${preset.accent} 10%, transparent)`,
+    '--shadow': preset.shadow,
+    '--shadow-soft': preset.shadowSoft,
+    '--glow': preset.glow,
   };
 
   for (const [name, value] of Object.entries(variables)) {
