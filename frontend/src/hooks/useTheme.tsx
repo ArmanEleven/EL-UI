@@ -93,9 +93,7 @@ function applyDom(themeId: ThemeId): void {
     '--warning': preset.isDark ? '#f2bd66' : '#9a6508',
     '--danger': preset.isDark ? '#ff6f87' : '#c62b45',
     '--info': preset.isDark ? '#75baff' : '#2868d5',
-    '--shadow': preset.isDark
-      ? '0 24px 70px rgb(0 0 0 / 28%)'
-      : '0 24px 70px rgb(31 57 90 / 12%)',
+    '--shadow': preset.isDark ? '0 24px 70px rgb(0 0 0 / 28%)' : '0 24px 70px rgb(31 57 90 / 12%)',
     '--shadow-soft': preset.isDark
       ? '0 12px 36px rgb(0 0 0 / 18%)'
       : '0 12px 36px rgb(31 57 90 / 8%)',
