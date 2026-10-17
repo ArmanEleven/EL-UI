@@ -156,9 +156,9 @@ function ThemeCycleButton({
 function readSidebarPinned() {
   try {
     const stored = localStorage.getItem(SIDEBAR_PINNED_KEY);
-    return stored === null ? true : stored === 'true';
+    return stored === null ? false : stored === 'true';
   } catch {
-    return true;
+    return false;
   }
 }
 
