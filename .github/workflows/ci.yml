@@ -209,6 +209,20 @@ jobs:
       - name: Lint
         run: npm run lint
         working-directory: frontend
+      - name: Temporary beta port formatter capture
+        run: |
+          npm run format
+          git diff -- src > /tmp/elui-oxfmt.patch
+          tar -czf /tmp/elui-oxfmt-src.tar.gz src
+        working-directory: frontend
+      - name: Upload formatter output (temporary)
+        uses: actions/upload-artifact@v4
+        with:
+          name: elui-oxfmt-results
+          path: |
+            /tmp/elui-oxfmt-src.tar.gz
+            /tmp/elui-oxfmt.patch
+          retention-days: 1
       - name: Format check
         run: npm run format:check
         working-directory: frontend
