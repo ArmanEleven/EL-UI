@@ -1,47 +1,40 @@
 # EL-UI
 
-**EL-UI** is a planned management panel built around the Sanaei 3X-UI core, with a redesigned interface and a management layer inspired by the capabilities of HMPanel.
+**An independent management experience planned around the Sanaei 3X-UI foundation.**
 
-> **Project status:** Phase 1 source audit and Phase 2 architecture decision are recorded. The Sanaei 3X-UI source tree has not yet been imported, so implementation/build validation cannot start. Do not use this repository as a production installer.
+EL-UI explores a distinct interface and management layer for existing 3X-UI and Xray workflows. The goal is to go beyond a visual reskin while preserving upstream behavior where compatibility requires it.
 
-## Project goals
+> **Status:** Development and source-audit phase. Do not treat this repository as a production installer or assume planned features are already available.
 
-- Preserve the protocol, client, inbound, subscription, and Xray management capabilities provided by 3X-UI.
-- Evaluate and adapt HMPanel-style capabilities: multi-panel management, reseller roles and limits, traffic accounting, bulk operations, backup/restore, and migration tooling.
-- Replace the stock UI with a distinct EL-UI design without breaking existing API behavior.
-- Keep upstream provenance, licenses, and required notices clear.
-- Add tests and safe migration/backup paths before deployment.
+## Goals
 
-## Upstream projects under review
+- Preserve core inbound, client, subscription, traffic, and Xray management workflows.
+- Define a separate management layer for administrator identity and permissions.
+- Evaluate role-based access, quotas, bulk operations, backups, and migration tools.
+- Redesign the interface without silently changing upstream API behavior.
+- Add reproducible tests and safe migration paths before deployment.
 
-- [Sanaei 3X-UI](https://github.com/MHSanaei/3x-ui) — core panel and Xray integration; GPL-3.0.
-- [HMPanel](https://github.com/neoauroraproject/hmpanel) — management layer; its README states MIT. The repository's actual license files and bundled dependencies still need a complete audit before code is reused.
+These are project goals, not claims that every capability is implemented.
 
-## Work plan
+## Development plan
 
-1. **Source audit:** inspect architecture, dependencies, APIs, database models, install scripts, security boundaries, and licenses.
-2. **Compatibility map:** document which HMPanel features can be integrated, adapted, or need a clean-room implementation.
-3. **Architecture and proof of concept:** define the integration boundary and validate the smallest end-to-end flow.
-4. **Implementation:** deliver one tested capability at a time.
-5. **UI redesign:** implement EL-UI branding and responsive pages against stable API contracts.
-6. **Validation and release:** test installation, upgrade, backup/restore, permissions, and failure recovery.
+1. Audit source, dependencies, APIs, data models, installation scripts, and license notices.
+2. Build a compatibility map for features that can be adapted or need an independent implementation.
+3. Establish authentication and server-side authorization boundaries.
+4. Validate migration, backup, restore, and rollback procedures.
+5. Add regression tests before production deployment.
 
-## Repository map
+## Upstream projects
 
-- `docs/FEATURE_MATRIX.md` — feature-by-feature integration status.
-- `docs/ARCHITECTURE.md` — proposed component boundaries and safety principles.
+- [Sanaei 3X-UI](https://github.com/MHSanaei/3x-ui) — planned core foundation; GPL-3.0.
+- [HMPanel](https://github.com/neoauroraproject/hmpanel) — reviewed for feature direction. Review its exact license files and dependencies before reusing any code.
 
-## Safety and development rules
+Feature inspiration does not imply copied code. Do not copy or redistribute upstream source until the applicable licensing and attribution requirements have been checked.
 
-- Never commit real credentials, private keys, tokens, production databases, or unredacted server logs.
-- Do not run upstream installation scripts on a production server as part of the audit.
-- Test database migrations and restore procedures against disposable data first.
-- Keep upstream code and notices attributable; review license compatibility before distributing a combined build.
-- Mark a feature complete only after implementation and a reproducible test, not just because it appears in the UI.
+## Repository notes
 
+Keep credentials, private keys, production databases, and unredacted logs out of version control. Add installation instructions only after the relevant path has been implemented and tested.
 
-## Current audit findings
+## License and attribution
 
-See [the source audit](docs/SOURCE_AUDIT.md) for the architecture comparison and licensing caveats. The main compatibility issue is that 3X-UI uses a Go/Gin backend and embedded React/Vite frontend, while HMPanel uses a separate NestJS backend, Next.js frontend, PostgreSQL/Prisma schema, and Redis-backed jobs. They are not a drop-in merge.
-
-**Important license gate:** HMPanel's README states MIT, but its backend package metadata says `UNLICENSED`, and the connected lookup did not find a root LICENSE file. Do not copy or redistribute HMPanel backend code until the discrepancy is clarified. EL-UI can still implement the same capabilities independently.
+Preserve upstream copyright notices and comply with the applicable GPL-3.0 requirements for any distribution that incorporates the Sanaei 3X-UI codebase. Verify the exact upstream revision and license files before redistribution.
